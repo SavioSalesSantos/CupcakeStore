@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho - CupcakeStore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🍰 CupcakeStore</h1>
+            <div class="carrinho-info">
+                <a href="{{ url_for('home') }}">← Voltar às Compras</a>
+            </div>
+        </div>
+        <p>Seu carrinho de compras</p>
+    </header>
+
+    <main>
+        <div class="carrinho-container">
+            {% if produtos %}
+            <div class="itens-carrinho">
+                <h2>Itens no Carrinho ({{ produtos|length }})</h2>
+                
+                {% for produto in produtos %}
+                <div class="item-carrinho">
+                    <div class="info-produto">
+                        <h3>{{ produto[1] }}</h3>
+                        <p class="descricao">{{ produto[3] }}</p>
+                    </div>
+                    <div class="controles">
+                        <p class="preco">R$ {{ "%.2f"|format(produto[2]) }}</p>
+                        <button class="btn-remover" onclick="removerItem({{ produto[0] }})">❌ Remover</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="resumo-carrinho">
+                <h3>Resumo do Pedido</h3>
+                <div class="total">
+                    <p>Total: <strong>R$ {{ "%.2f"|format(total) }}</strong></p>
+                </div>
+                <button class="btn-finalizar" onclick="finalizarCompra()">✅ Finalizar Compra</button>
+            </div>
+            {% else %}
+            <div class="carrinho-vazio">
+                <h2>🛒 Seu carrinho está vazio</h2>
+                <p>Que tal dar uma olhada em nossos deliciosos cupcakes?</p>
+                <a href="{{ url_for('home') }}" class="btn-comprar">Ir às Compras</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/carrinho.js') }}"></script>
+</body>
+</html>

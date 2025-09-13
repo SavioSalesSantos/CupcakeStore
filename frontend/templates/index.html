@@ -8,12 +8,36 @@
 </head>
 <body>
     <header>
-        <h1>🍰 CupcakeStore</h1>
+        <div class="header-content">
+            <h1>🍰 CupcakeStore</h1>
+            <div class="carrinho-info">
+                <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+            </div>
+        </div>
+        <p>A melhor loja de cupcakes da internet!</p>
     </header>
 
     <main>
-        <p>Bem-vindo à melhor loja de cupcakes do mundo!</p>
-        <button onclick="comprar()">Quero Comprar!</button>
+        <div class="produtos">
+            <h2>Nossos Cupcakes</h2>
+            
+            <!-- VERIFICA SE EXISTEM PRODUTOS -->
+            {% if produtos %}
+                <div class="grid-produtos">
+                    <!-- LOOP PARA CADA PRODUTO -->
+                    {% for produto in produtos %}
+                    <div class="produto">
+                        <h3>{{ produto[1] }}</h3>          <!-- NOME -->
+                        <p class="descricao">{{ produto[3] }}</p>  <!-- DESCRICAO -->
+                        <p class="preco">R$ {{ "%.2f"|format(produto[2]) }}</p>  <!-- PRECO -->
+                        <button onclick="comprar({{ produto[0] }})">Comprar</button>  <!-- ID -->
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Nenhum produto disponível no momento.</p>
+            {% endif %}
+        </div>
     </main>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
