@@ -1,4 +1,4 @@
-🍪 Cupcake Shop - Projeto Acadêmico (UNICID)
+🍪 Cupcake Store  
 
 Um protótipo de e-commerce para uma loja de cupcakes, desenvolvido como trabalho acadêmico para a disciplina de Projeto Integrador Transdisciplinar II do curso de Engenharia de Software da UNICID.
 
