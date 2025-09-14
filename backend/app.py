@@ -1,6 +1,8 @@
-from flask import Flask, render_template, session, redirect, url_for, request  # 👈 Adicione ', request'
+from flask import Flask, render_template, session, redirect, url_for, request
 import os
 import sqlite3
+import random
+from datetime import datetime
 from datetime import timedelta
 try:
     from database.database import get_db_connection
@@ -158,6 +160,41 @@ def get_nome_produto(id_produto):
     except Exception as e:
         return {'nome': 'Produto'}
 
+# === NOVAS ROTAS PARA FINALIZAÇÃO DE COMPRA ===
+@app.route('/finalizar-compra')
+def finalizar_compra():
+    """Página de confirmação de compra finalizada"""
+    # Simula um ID de pedido (em um sistema real, viria do banco de dados)
+    pedido_id = f"{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
+    
+    # Calcula o total do carrinho atual
+    carrinho_ids = session.get('carrinho', [])
+    total = 0
+    if carrinho_ids:
+        conn = get_db_connection()
+        placeholders = ','.join('?' * len(carrinho_ids))
+        query = f'SELECT * FROM produtos WHERE id IN ({placeholders})'
+        produtos_carrinho = conn.execute(query, carrinho_ids).fetchall()
+        conn.close()
+        
+        quantidades = {}
+        for id_produto in carrinho_ids:
+            quantidades[id_produto] = quantidades.get(id_produto, 0) + 1
+        
+        total = sum(produto['preco'] * quantidades[produto['id']] for produto in produtos_carrinho)
+    
+    # Limpa o carrinho após finalizar a compra
+    session.pop('carrinho', None)
+    
+    return render_template('compra_finalizada.html', 
+                         pedido_id=pedido_id,
+                         data_pedido=datetime.now().strftime('%d/%m/%Y %H:%M'),
+                         total=total)
+
+@app.route('/meus-pedidos')
+def meus_pedidos():
+    """Página de histórico de pedidos (será implementada depois)"""
+    return "Página de meus pedidos - Em construção 🚧"
 # === FIM DAS NOVAS ROTAS ===
 
 if __name__ == '__main__':
@@ -171,5 +208,3 @@ if __name__ == '__main__':
     
     print("🚀 Server running at http://localhost:5000")
     app.run(debug=True)
-
-    

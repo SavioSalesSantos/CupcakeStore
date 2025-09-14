@@ -7,7 +7,6 @@ function removerItem(idProduto) {
 }
 
 function finalizarCompra() {
-    alert('🎉 Compra finalizada com sucesso! Obrigado pela preferência!');
-    // Redireciona para a página inicial
-    window.location.href = "/";
+    // Redireciona para a página de confirmação de compra
+    window.location.href = "/finalizar-compra";
 }

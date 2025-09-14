@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Finalizada - CupcakeStore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🍰 CupcakeStore</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="carrinho-container">
+            <div class="compra-finalizada">
+                <div class="icone-sucesso">🎉</div>
+                <h2>Compra Finalizada com Sucesso!</h2>
+                <p>Obrigado pela sua preferência! Seu pedido foi processado e em breve estará a caminho.</p>
+                <p>Um email de confirmação foi enviado para você (simulação).</p>
+                
+                <div class="detalhes-pedido">
+                    <h3>Resumo do Pedido</h3>
+                    <p><strong>Número do Pedido:</strong> #{{ pedido_id }}</p>
+                    <p><strong>Data:</strong> {{ data_pedido }}</p>
+                    <p><strong>Total:</strong> R$ {{ "%.2f"|format(total) }}</p>
+                </div>
+                
+                <div class="acoes-finalizadas">
+                    <a href="{{ url_for('home') }}" class="btn-comprar">🏠 Continuar Comprando</a>
+                    <a href="{{ url_for('meus_pedidos') }}" class="btn-finalizar">📦 Ver Meus Pedidos</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
