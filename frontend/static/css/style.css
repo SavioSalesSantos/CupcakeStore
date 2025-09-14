@@ -24,11 +24,17 @@ button:hover {
     background-color: #ff4d73;
 }
 
-/* Estilos para o header e carrinho */
+/* Estilos para o header e carrinho - VERSÃO CENTRALIZADA */
 .header-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Centraliza no lugar de space-between */
     align-items: center;
+    position: relative; /* Para posicionar o carrinho absolutamente */
+}
+
+.carrinho-info {
+    position: absolute; /* Tira do fluxo normal */
+    right: 0; /* Prende no canto direito */
 }
 
 .carrinho-info button {
@@ -341,4 +347,73 @@ button:hover {
         left: 10px;
         max-width: none;
     }
+}
+
+/* Animações para os botões de comprar */
+.produto button {
+    background-color: #ff6b8b;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.produto button:hover {
+    background-color: #ff4d73;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+}
+
+/* Efeito de clique - animação de "afundar" */
+.produto button:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 3px 10px rgba(255, 107, 139, 0.3);
+}
+
+/* Efeito de onda ao clicar (ripple effect) */
+.produto button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.produto button:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Loading animation para quando estiver processando */
+.produto button.carregando {
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.produto button.carregando::before {
+    content: '⏳';
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Confirmação de adicionado */
+.produto button.adicionado {
+    background-color: #27ae60 !important;
+    transform: scale(1.05);
 }

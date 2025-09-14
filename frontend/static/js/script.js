@@ -32,41 +32,47 @@ function mostrarNotificacao(mensagem, tipo = 'sucesso', titulo = 'Sucesso!') {
     }, 4000);
 }
 
-function comprar(idProduto, nomeProduto) {
+function comprar(idProduto, nomeProduto, element) {
+    // Animação de clique no botão
+    const botao = element;
+    botao.classList.add('carregando');
+    botao.textContent = 'Adicionando...';
+    
     fetch(`/adicionar/${idProduto}`)
         .then(response => {
             if (response.ok) {
+                // Animação de sucesso
+                botao.classList.remove('carregando');
+                botao.classList.add('adicionado');
+                botao.textContent = 'Adicionado!';
+                
                 atualizarContadorCarrinho();
                 mostrarNotificacao(
                     `${nomeProduto} adicionado ao carrinho! 🧁`,
                     'sucesso',
                     'Produto Adicionado!'
                 );
+                
+                // Volta ao normal após 2 segundos
+                setTimeout(() => {
+                    botao.classList.remove('adicionado');
+                    botao.textContent = 'Comprar';
+                }, 2000);
             }
         })
         .catch(error => {
             console.error('Erro:', error);
+            botao.classList.remove('carregando');
+            botao.textContent = 'Tentar Novamente';
+            setTimeout(() => {
+                botao.textContent = 'Comprar';
+            }, 2000);
+            
             mostrarNotificacao(
                 'Erro ao adicionar ao carrinho. Tente novamente.',
                 'erro',
                 'Oops!'
             );
-        });
-}
-
-function comprar(idProduto, nomeProduto) {
-    // Usando fetch para adicionar sem recarregar a página
-    fetch(`/adicionar/${idProduto}`)
-        .then(response => {
-            if (response.ok) {
-                // Atualiza o contador do carrinho
-                atualizarContadorCarrinho();
-                mostrarNotificacao(`${nomeProduto} adicionado ao carrinho! 🧁`);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            mostrarNotificatorio('Erro ao adicionar ao carrinho', 'erro');
         });
 }
 
