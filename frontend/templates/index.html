@@ -25,12 +25,12 @@
             {% if produtos %}
                 <div class="grid-produtos">
                     <!-- LOOP PARA CADA PRODUTO -->
-                    {% for produto in produtos %}
+            {% for produto in produtos %}
                     <div class="produto">
                         <h3>{{ produto[1] }}</h3>          <!-- NOME -->
                         <p class="descricao">{{ produto[3] }}</p>  <!-- DESCRICAO -->
                         <p class="preco">R$ {{ "%.2f"|format(produto[2]) }}</p>  <!-- PRECO -->
-                        <button onclick="comprar({{ produto[0] }})">Comprar</button>  <!-- ID -->
+                        <button onclick="comprar({{ produto[0] }}, '{{ produto[1] }}')">Comprar</button>  <!-- ID -->
                     </div>
                     {% endfor %}
                 </div>

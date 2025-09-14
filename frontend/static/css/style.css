@@ -149,3 +149,196 @@ button:hover {
 .btn-comprar:hover {
     background-color: #ff4d73;
 }
+
+/* Novos estilos para o carrinho real */
+.botoes-controle {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-adicionar, .btn-remover {
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.btn-adicionar {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btn-remover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.quantidade {
+    font-weight: bold;
+    color: #ff6b8b;
+}
+
+.preco-unitario {
+    font-size: 0.9em;
+    color: #666;
+    margin: 5px 0;
+}
+
+.acoes-carrinho {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-limpar {
+    background-color: #95a5a6;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-limpar:hover {
+    background-color: #7f8c8d;
+}
+
+/* Notificações elegantes e modernas - VERSÃO CORRIGIDA */
+.notificacao {
+    position: fixed !important;
+    bottom: 20px !important;  /* Muda para baixo para não cobrir o header */
+    right: 20px !important;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;  /* Roxo para diferenciar */
+    color: white !important;
+    padding: 15px 25px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4) !important;
+    z-index: 9999 !important;  /* Z-index altíssimo */
+    opacity: 0;
+    transform: translateY(50px) scale(0.9) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    max-width: 350px;
+    border-left: 5px solid #ffffff !important;
+    top: auto !important;  /* Remove qualquer posição top */
+}
+
+.notificacao.mostrar {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+.notificacao.erro {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4) !important;
+}
+
+.notificacao.sucesso {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;  /* Roxo mantido */
+    box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4) !important;
+}
+
+.notificacao-info {
+    background: linear-gradient(135deg, #3498db, #2980b9) !important;
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4) !important;
+}
+
+.notificacao-icon {
+    font-size: 1.4em;
+    animation: pulse 2s infinite;
+}
+
+.notificacao-conteudo {
+    flex: 1;
+}
+
+.notificacao-titulo {
+    font-weight: bold;
+    margin-bottom: 3px;
+    font-size: 1.1em;
+}
+
+.notificacao-mensagem {
+    font-size: 0.95em;
+    opacity: 0.95;
+}
+
+.btn-fechar {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: none !important;
+    color: white !important;
+    padding: 5px 10px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    font-size: 1.1em !important;
+    transition: background 0.3s ease !important;
+}
+
+.btn-fechar:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Animações */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .notificacao {
+        bottom: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+        max-width: none !important;
+    }
+}
+.notificacao-mensagem {
+    font-size: 0.95em;
+    opacity: 0.95;
+}
+
+.btn-fechar {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background 0.3s ease;
+}
+
+.btn-fechar:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animações */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .notificacao {
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
