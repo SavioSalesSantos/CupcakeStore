@@ -889,3 +889,117 @@ button:hover {
     transform: translateY(-2px);
 }
 /* 🔼 FIM DOS ESTILOS DO BOTÃO VOLTAR 🔼 */
+
+/* 🔽 ESTILOS PARA PÁGINA DE MEUS PEDIDOS 🔽 */
+.pedidos-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.pedido-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+.pedido-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ff6b8b;
+}
+
+.pedido-header h3 {
+    color: #ff6b8b;
+    margin: 0;
+}
+
+.pedido-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.pedido-status.pendente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.pedido-status.processando {
+    background: #cce7ff;
+    color: #004085;
+}
+
+.pedido-status.enviado {
+    background: #d4edda;
+    color: #155724;
+}
+
+.pedido-status.entregue {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.pedido-detalhes {
+    padding: 20px;
+}
+
+.pedido-detalhes p {
+    margin: 8px 0;
+}
+
+.pedido-itens {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed #ddd;
+}
+
+.pedido-itens h4 {
+    color: #ff6b8b;
+    margin-bottom: 15px;
+}
+
+.item-pedido {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.item-pedido:last-child {
+    border-bottom: none;
+}
+
+.sem-pedidos {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.sem-pedidos h2 {
+    color: #ff6b8b;
+    margin-bottom: 15px;
+}
+/* 🔼 FIM DOS ESTILOS DE MEUS PEDIDOS 🔼 */
+
+/* 🔽 ESTILO PARA O BOTÃO "MEUS PEDIDOS" 🔽 */
+.btn-pedidos {
+    padding: 8px 15px;
+    background: #9b59b6;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-pedidos:hover {
+    background: #8e44ad;
+    transform: translateY(-2px);
+}
+/* 🔼 FIM DO ESTILO PARA O BOTÃO "MEUS PEDIDOS"  🔼 */

@@ -12,9 +12,10 @@
         <h1>🍰 CupcakeStore</h1>
         <div class="carrinho-info">
             {% if session.get('user_id') %}
-                <!-- 👇 USUÁRIO LOGADO -->
+                <!-- 👇 USUÁRIO LOGADO - VERSÃO MELHORADA -->
                 <div class="user-info">
                     <span>Olá, {{ session['username'] }}!</span>
+                    <a href="{{ url_for('meus_pedidos') }}" class="btn-pedidos">📦 Meus Pedidos</a>
                     <a href="{{ url_for('logout') }}" class="btn-logout">🚪 Sair</a>
                     <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
                 </div>
@@ -37,7 +38,7 @@
             <button type="submit">Buscar</button>
         </form>
     </div>
-</header>
+    </header>
 
     <main>
         <div class="produtos">
