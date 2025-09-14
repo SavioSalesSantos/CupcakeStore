@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for
+from flask import Flask, render_template, session, redirect, url_for, request  # 👈 Adicione ', request'
 import os
 import sqlite3
 from datetime import timedelta
@@ -39,11 +39,29 @@ def get_produtos():
 
 @app.route('/')
 def home():
+    # 👇 OBTÉM O TERMO DE PESQUISA DA URL (se existir)
+    termo_pesquisa = request.args.get('q', '').lower()
+    
+    # 👇 OBTÉM TODOS OS PRODUTOS
     produtos = get_produtos()
-    # *** PEQUENA MELHORIA ***: Convertendo para lista para facilitar no template
-    # Isso nos permite usar produto['nome'] em vez de produto[1] no HTML
-    produtos_list = [dict(produto) for produto in produtos]
-    return render_template('index.html', produtos=produtos_list)
+    
+    # 👇 FILTRA OS PRODUTOS SE HOUVER UM TERMO DE PESQUISA
+    if termo_pesquisa:
+        produtos_filtrados = []
+        for produto in produtos:
+            # Converte para dicionário para facilitar o acesso
+            produto_dict = dict(produto)
+            # Verifica se o termo de pesquisa está no nome ou descrição
+            if (termo_pesquisa in produto_dict['nome'].lower() or 
+                termo_pesquisa in produto_dict['descricao'].lower()):
+                produtos_filtrados.append(produto_dict)
+        produtos_list = produtos_filtrados
+    else:
+        # Se não há pesquisa, mostra todos os produtos
+        produtos_list = [dict(produto) for produto in produtos]
+    
+    # 👇 PASSA O TERMO DE PESQUISA PARA O TEMPLATE PARA MOSTRAR NO CAMPO
+    return render_template('index.html', produtos=produtos_list, termo_pesquisa=termo_pesquisa)
 
 # === NOVAS ROTAS DO CARRINHO COM SESSÕES ===
 @app.route('/adicionar/<int:id_produto>')
@@ -55,7 +73,14 @@ def adicionar_carrinho(id_produto):
     session['carrinho'].append(id_produto)
     session.modified = True
     
-    return redirect(url_for('home'))
+    # 👇 VERIFICAMOS DE ONDE A REQUISIÇÃO VEIO PARA REDIRECIONAR CORRETAMENTE
+    # Se veio da página do carrinho, voltamos para o carrinho
+    # Se veio de qualquer outra página, voltamos para a home
+    referer = request.headers.get('Referer')
+    if referer and '/carrinho' in referer:
+        return redirect(url_for('carrinho'))
+    else:
+        return redirect(url_for('home'))
 
 @app.route('/remover/<int:id_produto>')
 def remover_carrinho(id_produto):
@@ -65,7 +90,12 @@ def remover_carrinho(id_produto):
             session['carrinho'].remove(id_produto)
             session.modified = True
     
-    return redirect(url_for('carrinho'))
+    # 👇 MESMA LÓGICA: Se veio do carrinho, volta para o carrinho
+    referer = request.headers.get('Referer')
+    if referer and '/carrinho' in referer:
+        return redirect(url_for('carrinho'))
+    else:
+        return redirect(url_for('home'))
 
 @app.route('/carrinho')
 def carrinho():

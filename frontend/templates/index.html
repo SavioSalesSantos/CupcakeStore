@@ -15,6 +15,12 @@
             </div>
         </div>
         <p>A melhor loja de cupcakes da internet!</p>
+           <div class="barra-pesquisa">
+        <form action="{{ url_for('home') }}" method="GET">
+            <input type="text" name="q" placeholder="🔍 Pesquisar cupcakes..." value="{{ request.args.get('q', '') }}">
+            <button type="submit">Buscar</button>
+        </form>
+    </div>
     </header>
 
     <main>
@@ -35,7 +41,13 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p>Nenhum produto disponível no momento.</p>
+                <!-- 🔽 MENSAGEM PARA NENHUM RESULTADO ENCONTRADO 🔽 -->
+                {% if termo_pesquisa %}
+                    <p class="nenhum-resultado">Nenhum cupcake encontrado para "{{ termo_pesquisa }}". 😢</p>
+                    <a href="{{ url_for('home') }}" class="btn-comprar">Ver Todos os Cupcakes</a>
+                {% else %}
+                    <p>Nenhum produto disponível no momento.</p>
+                {% endif %}
             {% endif %}
         </div>
     </main>
