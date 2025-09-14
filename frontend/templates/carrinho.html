@@ -26,16 +26,24 @@
                 {% for produto in produtos %}
                 <div class="item-carrinho">
                     <div class="info-produto">
-                        <h3>{{ produto[1] }}</h3>
-                        <p class="descricao">{{ produto[3] }}</p>
-                        <p class="quantidade">Quantidade: {{ quantidades[produto[0]] }}</p>
+                        <!-- 🔽 ALTERAÇÕES AQUI (3 linhas) 🔽 -->
+                        <h3>{{ produto['nome'] }}</h3>
+                        <p class="descricao">{{ produto['descricao'] }}</p>
+                        <p class="quantidade">Quantidade: {{ quantidades[produto['id']] }}</p>
+                        <!-- 🔼 FIM DAS ALTERAÇÕES 🔼 -->
                     </div>
                     <div class="controles">
-                        <p class="preco">R$ {{ "%.2f"|format(produto[2] * quantidades[produto[0]]) }}</p>
-                        <p class="preco-unitario">(R$ {{ "%.2f"|format(produto[2]) }} cada)</p>
+                        <!-- 🔽 ALTERAÇÕES AQUI (2 linhas) 🔽 -->
+                        <p class="preco">R$ {{ "%.2f"|format(produto['preco'] * quantidades[produto['id']]) }}</p>
+                        <p class="preco-unitario">(R$ {{ "%.2f"|format(produto['preco']) }} cada)</p>
+                        <!-- 🔼 FIM DAS ALTERAÇÕES 🔼 -->
                         <div class="botoes-controle">
-                            <a href="{{ url_for('adicionar_carrinho', id_produto=produto[0]) }}" class="btn-adicionar">➕</a>
-                            <a href="{{ url_for('remover_carrinho', id_produto=produto[0]) }}" class="btn-remover">➖</a>
+                            <!-- 🔽 ALTERAÇÃO AQUI (1 linha) 🔽 -->
+                            <a href="{{ url_for('adicionar_carrinho', id_produto=produto['id']) }}" class="btn-adicionar">➕</a>
+                            <!-- 🔼 FIM DA ALTERAÇÃO 🔼 -->
+                            <!-- 🔽 ALTERAÇÃO AQUI (1 linha) 🔽 -->
+                            <a href="{{ url_for('remover_carrinho', id_produto=produto['id']) }}" class="btn-remover">➖</a>
+                            <!-- 🔼 FIM DA ALTERAÇÃO 🔼 -->
                         </div>
                     </div>
                 </div>

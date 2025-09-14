@@ -1,13 +1,27 @@
+# database/database.py
 import sqlite3
 import os
+
+# *** NOVO ***: Adicionamos esta função para centralizar a conexão
+def get_db_connection():
+    """Retorna uma conexão com o banco de dados."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base_dir, 'cupcakes.db')
+    
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row  # 🔥 Isso é mágico: faz as consultas virem como dicionários!
+    return conn
+# *** FIM DO NOVO ***
 
 def init_db():
     # O banco será criado na PRÓPRIA pasta database/
     base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_dir, 'cupcakes.db')  # Agora está na mesma pasta
     
-    conn = sqlite3.connect(db_path)
+    # *** ALTERAÇÃO ***: Agora usamos a nova função get_db_connection() aqui dentro também!
+    conn = get_db_connection() # 👈 Mudamos essa linha
     cursor = conn.cursor()
+    # *** FIM DA ALTERAÇÃO ***
     
     # Cria tabela de produtos
     cursor.execute('''
