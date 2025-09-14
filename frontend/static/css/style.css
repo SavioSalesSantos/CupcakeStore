@@ -1,3 +1,4 @@
+/* 🔽 ESTILOS GERAIS 🔽 */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -10,44 +11,20 @@ h1 {
     color: #ff6b8b;
 }
 
-button {
-    background-color: #ff6b8b;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #ff4d73;
-}
-
-/* Estilos para o header e carrinho - VERSÃO CENTRALIZADA */
+/* 🔽 HEADER E LAYOUT 🔽 */
 .header-content {
     display: flex;
-    justify-content: center; /* Centraliza no lugar de space-between */
+    justify-content: center;
     align-items: center;
-    position: relative; /* Para posicionar o carrinho absolutamente */
+    position: relative;
 }
 
 .carrinho-info {
-    position: absolute; /* Tira do fluxo normal */
-    right: 0; /* Prende no canto direito */
+    position: absolute;
+    right: 0;
 }
 
-.carrinho-info button {
-    background-color: #27ae60;
-    padding: 8px 15px;
-    font-size: 14px;
-}
-
-.carrinho-info button:hover {
-    background-color: #219653;
-}
-
-/* Melhorias nos produtos */
+/* 🔽 PRODUTOS 🔽 */
 .grid-produtos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -69,7 +46,32 @@ button:hover {
     transform: translateY(-5px);
 }
 
-/* Estilos para o carrinho */
+.produto button {
+    background-color: #ff6b8b;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.produto button:hover {
+    background-color: #ff4d73;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+}
+
+.produto button:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 3px 10px rgba(255, 107, 139, 0.3);
+}
+
+/* 🔽 CARRINHO 🔽 */
 .carrinho-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -80,7 +82,6 @@ button:hover {
     margin-bottom: 30px;
 }
 
-/* Itens do carrinho - VERSÃO MELHORADA */
 .item-carrinho {
     display: flex;
     justify-content: space-between;
@@ -114,18 +115,6 @@ button:hover {
     line-height: 1.4;
 }
 
-.btn-remover {
-    background-color: #e74c3c;
-    padding: 8px 15px;
-    font-size: 14px;
-    margin-top: 10px;
-}
-
-.btn-remover:hover {
-    background-color: #c0392b;
-}
-
-/* Resumo do carrinho - VERSÃO MELHORADA */
 .resumo-carrinho {
     background: white;
     padding: 25px;
@@ -163,10 +152,37 @@ button:hover {
     flex-wrap: wrap;
 }
 
+.carrinho-vazio {
+    text-align: center;
+    padding: 50px;
+}
+
+/* 🔽 BOTÕES E CONTROLES 🔽 */
+.carrinho-info button {
+    background-color: #27ae60;
+    padding: 8px 15px;
+    font-size: 14px;
+}
+
+.carrinho-info button:hover {
+    background-color: #219653;
+}
+
+.btn-remover {
+    background-color: #e74c3c;
+    padding: 8px 15px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.btn-remover:hover {
+    background-color: #c0392b;
+}
+
 .btn-limpar {
-    background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
-    color: white !important;
-    padding: 12px 20px !important;
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: white;
+    padding: 12px 20px;
     text-decoration: none;
     border-radius: 8px;
     font-weight: bold;
@@ -174,14 +190,14 @@ button:hover {
 }
 
 .btn-limpar:hover {
-    background: linear-gradient(135deg, #7f8c8d, #6c7b7d) !important;
+    background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
     transform: translateY(-1px);
 }
 
 .btn-finalizar {
-    background: linear-gradient(135deg, #27ae60, #219653) !important;
-    color: white !important;
-    padding: 15px 30px !important;
+    background: linear-gradient(135deg, #27ae60, #219653);
+    color: white;
+    padding: 15px 30px;
     font-size: 1.1em;
     font-weight: bold;
     border: none;
@@ -191,14 +207,9 @@ button:hover {
 }
 
 .btn-finalizar:hover {
-    background: linear-gradient(135deg, #219653, #1e8449) !important;
+    background: linear-gradient(135deg, #219653, #1e8449);
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
-}
-
-.carrinho-vazio {
-    text-align: center;
-    padding: 50px;
 }
 
 .btn-comprar {
@@ -215,275 +226,6 @@ button:hover {
     background-color: #ff4d73;
 }
 
-/* Melhorar visualização dos preços */
-.controles {
-    flex: 1;
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 5px;
-}
-
-.preco {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #27ae60;
-}
-
-.preco-unitario {
-    font-size: 0.9em;
-    color: #666;
-}
-
-.quantidade {
-    font-weight: bold;
-    color: #ff6b8b;
-    background: #fff5f5;
-    padding: 4px 10px;
-    border-radius: 15px;
-    display: inline-block;
-}
-
-/* Notificações elegantes e modernas - VERSÃO CORRIGIDA */
-.notificacao {
-    position: fixed !important;
-    bottom: 20px !important;  /* Muda para baixo para não cobrir o header */
-    right: 20px !important;
-    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;  /* Roxo para diferenciar */
-    color: white !important;
-    padding: 15px 25px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4) !important;
-    z-index: 9999 !important;  /* Z-index altíssimo */
-    opacity: 0;
-    transform: translateY(50px) scale(0.9) !important;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-    display: flex !important;
-    align-items: center;
-    gap: 12px;
-    max-width: 350px;
-    border-left: 5px solid #ffffff !important;
-    top: auto !important;  /* Remove qualquer posição top */
-}
-
-.notificacao.mostrar {
-    opacity: 1 !important;
-    transform: translateY(0) scale(1) !important;
-}
-
-.notificacao.erro {
-    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
-    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4) !important;
-}
-
-.notificacao.sucesso {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;  /* Roxo mantido */
-    box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4) !important;
-}
-
-.notificacao-info {
-    background: linear-gradient(135deg, #3498db, #2980b9) !important;
-    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4) !important;
-}
-
-.notificacao-icon {
-    font-size: 1.4em;
-    animation: pulse 2s infinite;
-}
-
-.notificacao-conteudo {
-    flex: 1;
-}
-
-.notificacao-titulo {
-    font-weight: bold;
-    margin-bottom: 3px;
-    font-size: 1.1em;
-}
-
-.notificacao-mensagem {
-    font-size: 0.95em;
-    opacity: 0.95;
-}
-
-.btn-fechar {
-    background: rgba(255, 255, 255, 0.2) !important;
-    border: none !important;
-    color: white !important;
-    padding: 5px 10px !important;
-    border-radius: 50% !important;
-    cursor: pointer !important;
-    font-size: 1.1em !important;
-    transition: background 0.3s ease !important;
-}
-
-.btn-fechar:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Animações */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .notificacao {
-        bottom: 10px !important;
-        right: 10px !important;
-        left: 10px !important;
-        max-width: none !important;
-    }
-}
-.notificacao-mensagem {
-    font-size: 0.95em;
-    opacity: 0.95;
-}
-
-.btn-fechar {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.1em;
-    transition: background 0.3s ease;
-}
-
-.btn-fechar:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-/* Animações */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .notificacao {
-        top: 70px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-}
-
-/* Animações para os botões de comprar */
-.produto button {
-    background-color: #ff6b8b;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.produto button:hover {
-    background-color: #ff4d73;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-}
-
-/* Efeito de clique - animação de "afundar" */
-.produto button:active {
-    transform: translateY(1px) scale(0.98);
-    box-shadow: 0 3px 10px rgba(255, 107, 139, 0.3);
-}
-
-/* Efeito de onda ao clicar (ripple effect) */
-.produto button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
-}
-
-.produto button:active::after {
-    width: 300px;
-    height: 300px;
-}
-
-/* Loading animation para quando estiver processando */
-.produto button.carregando {
-    opacity: 0.8;
-    pointer-events: none;
-}
-
-.produto button.carregando::before {
-    content: '⏳';
-    margin-right: 8px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Confirmação de adicionado */
-.produto button.adicionado {
-    background-color: #27ae60 !important;
-    transform: scale(1.05);
-}
-
-/* Contador flutuante simplificado - só sobe */
-.contador-flutuante {
-    position: fixed;
-    background: #ff6b8b;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 50%;
-    font-weight: bold;
-    z-index: 9998;
-    pointer-events: none;
-    animation: subirESumir 1s ease-in-out forwards;
-}
-
-@keyframes subirESumir {
-    0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-    70% {
-        transform: translateY(-40px) scale(1.2);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(-60px) scale(0);
-        opacity: 0;
-    }
-}
-
-/* ===== BOTÕES DO CARRINHO - VERSÃO DEFINITIVA ===== */
 .controles {
     flex: 1;
     text-align: right;
@@ -493,50 +235,6 @@ button:hover {
     gap: 10px;
 }
 
-.botoes-controle {
-    display: flex !important;
-    gap: 10px !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.btn-adicionar, .btn-remover {
-    width: 40px !important;
-    height: 40px !important;
-    padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 8px !important;
-    font-weight: bold !important;
-    font-size: 18px !important;
-    text-decoration: none !important;
-    border: none !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-}
-
-.btn-adicionar {
-    background: linear-gradient(135deg, #27ae60, #219653) !important;
-    color: white !important;
-}
-
-.btn-adicionar:hover {
-    background: linear-gradient(135deg, #219653, #1e8449) !important;
-    transform: scale(1.1) !important;
-}
-
-.btn-remover {
-    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
-    color: white !important;
-}
-
-.btn-remover:hover {
-    background: linear-gradient(135deg, #c0392b, #a93226) !important;
-    transform: scale(1.1) !important;
-}
-
-/* Estilos para preços e quantidade */
 .preco {
     font-size: 1.3em;
     font-weight: bold;
@@ -560,54 +258,161 @@ button:hover {
     margin: 5px 0;
 }
 
-/* ===== CORREÇÃO ESPECÍFICA PARA OS BOTÕES + e - DA PÁGINA DO CARRINHO ===== */
 .botoes-controle {
-    display: flex !important;
-    gap: 10px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-top: 15px !important;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
 }
 
 .botoes-controle a {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 8px !important;
-    font-size: 18px !important;
-    font-weight: bold !important;
-    text-decoration: none !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* Botão + (Verde) */
 .botoes-controle a[href*="adicionar"] {
-    background: linear-gradient(135deg, #27ae60, #219653) !important;
-    color: white !important;
-    border: 2px solid #219653 !important;
+    background: linear-gradient(135deg, #27ae60, #219653);
+    color: white;
+    border: 2px solid #219653;
 }
 
 .botoes-controle a[href*="adicionar"]:hover {
-    background: linear-gradient(135deg, #219653, #1e8449) !important;
-    transform: scale(1.1) !important;
+    background: linear-gradient(135deg, #219653, #1e8449);
+    transform: scale(1.1);
 }
 
-/* Botão - (Vermelho) */
 .botoes-controle a[href*="remover"] {
-    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
-    color: white !important;
-    border: 2px solid #c0392b !important;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: 2px solid #c0392b;
 }
 
 .botoes-controle a[href*="remover"]:hover {
-    background: linear-gradient(135deg, #c0392b, #a93226) !important;
-    transform: scale(1.1) !important;
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: scale(1.1);
 }
 
-/* 🔽 ESTILOS PARA BARRA DE PESQUISA 🔽 */
+/* 🔽 NOTIFICAÇÕES 🔽 */
+.notificacao {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 350px;
+    border-left: 5px solid #ffffff;
+}
+
+.notificacao.mostrar {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.notificacao.erro {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+}
+
+.notificacao.sucesso {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+}
+
+.notificacao-info {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+}
+
+.notificacao-icon {
+    font-size: 1.4em;
+    animation: pulse 2s infinite;
+}
+
+.notificacao-conteudo {
+    flex: 1;
+}
+
+.notificacao-titulo {
+    font-weight: bold;
+    margin-bottom: 3px;
+    font-size: 1.1em;
+}
+
+.notificacao-mensagem {
+    font-size: 0.95em;
+    opacity: 0.95;
+}
+
+.btn-fechar {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background 0.3s ease;
+}
+
+.btn-fechar:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 🔽 ANIMAÇÕES 🔽 */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes subirESumir {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    70% {
+        transform: translateY(-40px) scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-60px) scale(0);
+        opacity: 0;
+    }
+}
+
+.contador-flutuante {
+    position: fixed;
+    background: #ff6b8b;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 50%;
+    font-weight: bold;
+    z-index: 9998;
+    pointer-events: none;
+    animation: subirESumir 1s ease-in-out forwards;
+}
+
+/* 🔽 BARRA DE PESQUISA 🔽 */
 .barra-pesquisa {
     margin: 20px 0;
     text-align: center;
@@ -643,7 +448,6 @@ button:hover {
     background: #ff4d73;
     border-color: #ff4d73;
 }
-/* 🔼 FIM DOS ESTILOS DE PESQUISA 🔼 */
 
 .nenhum-resultado {
     font-size: 1.2em;
@@ -651,7 +455,7 @@ button:hover {
     margin: 30px 0;
 }
 
-/* 🔽 ESTILOS PARA PÁGINA DE COMPRA FINALIZADA 🔽 */
+/* 🔽 COMPRA FINALIZADA 🔽 */
 .compra-finalizada {
     text-align: center;
     padding: 40px 20px;
@@ -717,9 +521,8 @@ button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
-/* 🔼 FIM DOS ESTILOS DE COMPRA FINALIZADA 🔼 */
 
-/* 🔽 ESTILOS PARA FORMULÁRIOS DE AUTENTICAÇÃO 🔽 */
+/* 🔽 FORMULÁRIOS DE AUTENTICAÇÃO 🔽 */
 .form-container {
     display: flex;
     justify-content: center;
@@ -828,50 +631,8 @@ button:hover {
     margin: 5px 0;
     font-size: 14px;
 }
-/* 🔼 FIM DOS ESTILOS DE AUTENTICAÇÃO 🔼 */
 
-/* 🔽 ESTILOS PARA INFO DO USUÁRIO 🔽 */
-.user-info, .auth-buttons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.btn-login, .btn-register, .btn-logout {
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.btn-login {
-    background: #3498db;
-    color: white;
-}
-
-.btn-register {
-    background: #27ae60;
-    color: white;
-}
-
-.btn-logout {
-    background: #e74c3c;
-    color: white;
-}
-
-.btn-login:hover, .btn-register:hover, .btn-logout:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.user-info span {
-    font-weight: bold;
-    color: #ff6b8b;
-}
-/* 🔼 FIM DOS ESTILOS DE USUÁRIO 🔼 */
-
-/* 🔽 ESTILOS PARA BOTÃO VOLTAR 🔽 */
+/* 🔽 BOTÃO VOLTAR 🔽 */
 .btn-voltar {
     display: inline-block;
     margin-bottom: 20px;
@@ -888,9 +649,8 @@ button:hover {
     background: #7f8c8d;
     transform: translateY(-2px);
 }
-/* 🔼 FIM DOS ESTILOS DO BOTÃO VOLTAR 🔼 */
 
-/* 🔽 ESTILOS PARA PÁGINA DE MEUS PEDIDOS 🔽 */
+/* 🔽 MEUS PEDIDOS 🔽 */
 .pedidos-container {
     max-width: 800px;
     margin: 0 auto;
@@ -985,21 +745,273 @@ button:hover {
     color: #ff6b8b;
     margin-bottom: 15px;
 }
-/* 🔼 FIM DOS ESTILOS DE MEUS PEDIDOS 🔼 */
 
-/* 🔽 ESTILO PARA O BOTÃO "MEUS PEDIDOS" 🔽 */
-.btn-pedidos {
-    padding: 8px 15px;
-    background: #9b59b6;
+/* 🔽 MENU DROPDOWN MODERNO (VERSÃO DEFINITIVA) 🔽 */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff6b8b, #ff4d73);
     color: white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    position: relative;
+    z-index: 1001; /* 👈 Garante que fique acima do dropdown */
+}
+
+.user-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+}
+
+.user-avatar {
+    font-size: 1.1em;
+}
+
+.user-name {
+    font-size: 0.95em;
+}
+
+.dropdown-arrow {
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+    transform: rotate(0deg); /* 👈 Posição inicial (seta para baixo) */
+}
+
+/* 👇 CORREÇÃO: Remove o espaço entre o botão e o menu */
+.user-menu:hover .user-trigger {
+    border-radius: 15px 15px 0 0;
+    margin-bottom: -1px; /* 👈 Conecta visualmente com o menu */
+}
+
+.user-menu:hover .dropdown-arrow {
+    transform: rotate(0deg); /* 👈 Mantém para baixo quando aberto */
+}
+
+/* 👇 Quando NÃO está hover, seta fica para cima */
+.user-menu:not(:hover) .dropdown-arrow {
+    transform: rotate(180deg); /* 👈 Seta para cima quando fechado */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 15px 15px; /* 👈 Borda arredondada só embaixo */
+    z-index: 1000;
+    overflow: hidden;
+    margin-top: -1px; /* 👈 Elimina o espaço */
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* 👇 CORREÇÃO DEFINITIVA: Mantém aberto quando mouse está em qualquer parte */
+.user-menu:hover .dropdown-content {
+    display: block;
+}
+
+/* 👇 GARANTE que o menu não fecha quando mouse está sobre ele */
+.dropdown-content:hover {
+    display: block !important;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
     text-decoration: none;
-    border-radius: 5px;
+    color: #333;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #ff6b8b;
+}
+
+.dropdown-item:hover .item-icon {
+    transform: scale(1.2);
+}
+
+.item-icon {
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+/* 👇 DEIXA O MENU MAIS FÁCIL DE USAR EM DISPOSITIVOS MÓVEIS */
+@media (max-width: 768px) {
+    .user-menu:hover .user-trigger {
+        margin-bottom: 0;
+        border-radius: 25px;
+    }
+    
+    .dropdown-content {
+        border-radius: 15px;
+        margin-top: 10px;
+    }
+}
+
+/* 🔽 CORREÇÃO DOS BOTÕES LOGIN/CADASTRO 🔽 */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-buttons a {
+    padding: 12px 20px;
+    border-radius: 25px;
+    text-decoration: none;
     font-weight: bold;
     transition: all 0.3s ease;
+    display: inline-block;
+    text-align: center;
 }
 
-.btn-pedidos:hover {
-    background: #8e44ad;
-    transform: translateY(-2px);
+.auth-buttons a.btn-login {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
 }
-/* 🔼 FIM DO ESTILO PARA O BOTÃO "MEUS PEDIDOS"  🔼 */
+
+.auth-buttons a.btn-register {
+    background: linear-gradient(135deg, #27ae60, #219653);
+    color: white;
+}
+
+.auth-buttons a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔽 CORREÇÃO DO BOTÃO DO CARRINHO 🔽 */
+.carrinho-info button {
+    background: linear-gradient(135deg, #27ae60, #219653);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.carrinho-info button:hover {
+    background: linear-gradient(135deg, #219653, #1e8449);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+/* 🔽 GARANTIR QUE OS BOTÕES DO CARRINHO NA PÁGINA DO CARRINHO FUNCIONEM 🔽 */
+.botoes-controle a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+}
+
+/* 🔽 BOTÕES +/- SIMPLIFICADOS E FUNCIONAIS 🔽 */
+.botoes-controle {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 15px !important;
+}
+
+.botoes-controle a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 2px solid transparent !important;
+}
+
+/* REMOVE os pseudo-elementos anteriores */
+.botoes-controle a::before,
+.botoes-controle a::after {
+    display: none !important;
+}
+
+/* Botão + (Cinza escuro) */
+.botoes-controle a[href*="adicionar"] {
+    background: linear-gradient(135deg, #adb5bd, #969ea6) !important;
+    color: white !important;
+    border-color: #969ea6 !important;
+}
+
+.botoes-controle a[href*="adicionar"]:hover {
+    background: linear-gradient(135deg, #5a6268, #495057) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 6px 18px rgba(108, 117, 125, 0.3) !important;
+}
+
+/* Botão - (Cinza médio) */
+.botoes-controle a[href*="remover"] {
+    background: linear-gradient(135deg, #adb5bd, #969ea6) !important;
+    color: white !important;
+    border-color: #969ea6 !important;
+}
+
+.botoes-controle a[href*="remover"]:hover {
+    background: linear-gradient(135deg, #969ea6, #848c94) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 6px 18px rgba(173, 181, 189, 0.3) !important;
+}
+
+/* 🔽 DEIXA OS BOTÕES RESPONSIVOS 🔽 */
+@media (max-width: 480px) {
+    .botoes-controle a {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+    }
+}

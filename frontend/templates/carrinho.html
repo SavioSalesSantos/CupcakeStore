@@ -26,24 +26,16 @@
                 {% for produto in produtos %}
                 <div class="item-carrinho">
                     <div class="info-produto">
-                        <!-- 🔽 ALTERAÇÕES AQUI (3 linhas) 🔽 -->
                         <h3>{{ produto['nome'] }}</h3>
                         <p class="descricao">{{ produto['descricao'] }}</p>
                         <p class="quantidade">Quantidade: {{ quantidades[produto['id']] }}</p>
-                        <!-- 🔼 FIM DAS ALTERAÇÕES 🔼 -->
                     </div>
                     <div class="controles">
-                        <!-- 🔽 ALTERAÇÕES AQUI (2 linhas) 🔽 -->
                         <p class="preco">R$ {{ "%.2f"|format(produto['preco'] * quantidades[produto['id']]) }}</p>
                         <p class="preco-unitario">(R$ {{ "%.2f"|format(produto['preco']) }} cada)</p>
-                        <!-- 🔼 FIM DAS ALTERAÇÕES 🔼 -->
                         <div class="botoes-controle">
-                            <!-- 🔽 ALTERAÇÃO AQUI (1 linha) 🔽 -->
-                            <a href="{{ url_for('adicionar_carrinho', id_produto=produto['id']) }}" class="btn-adicionar">➕</a>
-                            <!-- 🔼 FIM DA ALTERAÇÃO 🔼 -->
-                            <!-- 🔽 ALTERAÇÃO AQUI (1 linha) 🔽 -->
-                            <a href="{{ url_for('remover_carrinho', id_produto=produto['id']) }}" class="btn-remover">➖</a>
-                            <!-- 🔼 FIM DA ALTERAÇÃO 🔼 -->
+                           <a href="{{ url_for('adicionar_carrinho', id_produto=produto['id']) }}">➕</a>
+                           <a href="{{ url_for('remover_carrinho', id_produto=produto['id']) }}">➖</a>
                         </div>
                     </div>
                 </div>
