@@ -2,6 +2,8 @@ from flask import Flask, render_template, session, redirect, url_for, request
 import os
 import sqlite3
 import random
+from werkzeug.security import generate_password_hash, check_password_hash  # 👈 Para criptografar senhas
+from flask import flash  # 👈 Para mostrar mensagens flash
 from datetime import datetime
 from datetime import timedelta
 try:
@@ -196,16 +198,94 @@ def meus_pedidos():
     """Página de histórico de pedidos (será implementada depois)"""
     return "Página de meus pedidos - Em construção 🚧"
 
-# 👇 ROTAS TEMPORÁRIAS - só para testar as páginas
-@app.route('/register')
+# 👇 ROTA DE REGISTRO (COMPLETA)
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Página de cadastro (versão inicial)"""
+    """Página de cadastro"""
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        
+        try:
+            conn = get_db_connection()
+            
+            # Verifica se username ou email já existem
+            user_exists = conn.execute(
+                'SELECT id FROM users WHERE username = ? OR email = ?', 
+                (username, email)
+            ).fetchone()
+            
+            if user_exists:
+                flash('Username ou email já cadastrados!', 'error')
+                return render_template('register.html')
+            
+            # Cria hash da senha (criptografa)
+            password_hash = generate_password_hash(password)
+            
+            # Insere novo usuário no banco
+            conn.execute(
+                'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+                (username, email, password_hash)
+            )
+            conn.commit()
+            conn.close()
+            
+            flash('Conta criada com sucesso! Faça login.', 'success')
+            return redirect(url_for('login'))
+            
+        except Exception as e:
+            print(f"❌ Erro no registro: {e}")
+            flash('Erro ao criar conta. Tente novamente.', 'error')
+            return render_template('register.html')
+    
     return render_template('register.html')
 
-@app.route('/login')
+# 👇 ROTA DE LOGIN (COMPLETA)
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Página de login (versão inicial)"""
+    """Página de login"""
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        try:
+            conn = get_db_connection()
+            
+            # Busca usuário pelo email
+            user = conn.execute(
+                'SELECT * FROM users WHERE email = ?', 
+                (email,)
+            ).fetchone()
+            
+            conn.close()
+            
+            if user and check_password_hash(user['password'], password):
+                # Login bem-sucedido!
+                session['user_id'] = user['id']
+                session['username'] = user['username']
+                session.permanent = True  # 👈 Mantém login ativo
+                
+                flash(f'Bem-vindo de volta, {user["username"]}!', 'success')
+                return redirect(url_for('home'))
+            else:
+                flash('Email ou senha incorretos!', 'error')
+                return render_template('login.html')
+            
+        except Exception as e:
+            print(f"❌ Erro no login: {e}")
+            flash('Erro ao fazer login. Tente novamente.', 'error')
+            return render_template('login.html')
+    
     return render_template('login.html')
+
+# 👇 ROTA DE LOGOUT
+@app.route('/logout')
+def logout():
+    """Faz logout do usuário"""
+    session.clear()  # 👈 Limpa todos os dados da sessão
+    flash('Você fez logout com sucesso!', 'success')
+    return redirect(url_for('home'))
 
 # === FIM DAS NOVAS ROTAS ===
 

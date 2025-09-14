@@ -829,3 +829,63 @@ button:hover {
     font-size: 14px;
 }
 /* 🔼 FIM DOS ESTILOS DE AUTENTICAÇÃO 🔼 */
+
+/* 🔽 ESTILOS PARA INFO DO USUÁRIO 🔽 */
+.user-info, .auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-login, .btn-register, .btn-logout {
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-login {
+    background: #3498db;
+    color: white;
+}
+
+.btn-register {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-logout {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-login:hover, .btn-register:hover, .btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.user-info span {
+    font-weight: bold;
+    color: #ff6b8b;
+}
+/* 🔼 FIM DOS ESTILOS DE USUÁRIO 🔼 */
+
+/* 🔽 ESTILOS PARA BOTÃO VOLTAR 🔽 */
+.btn-voltar {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background: #95a5a6;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-voltar:hover {
+    background: #7f8c8d;
+    transform: translateY(-2px);
+}
+/* 🔼 FIM DOS ESTILOS DO BOTÃO VOLTAR 🔼 */

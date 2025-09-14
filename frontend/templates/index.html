@@ -8,20 +8,36 @@
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <h1>🍰 CupcakeStore</h1>
-            <div class="carrinho-info">
-                <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
-            </div>
+    <div class="header-content">
+        <h1>🍰 CupcakeStore</h1>
+        <div class="carrinho-info">
+            {% if session.get('user_id') %}
+                <!-- 👇 USUÁRIO LOGADO -->
+                <div class="user-info">
+                    <span>Olá, {{ session['username'] }}!</span>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">🚪 Sair</a>
+                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                </div>
+            {% else %}
+                <!-- 👇 USUÁRIO NÃO LOGADO -->
+                <div class="auth-buttons">
+                    <a href="{{ url_for('login') }}" class="btn-login">🔑 Login</a>
+                    <a href="{{ url_for('register') }}" class="btn-register">📝 Cadastrar</a>
+                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                </div>
+            {% endif %}
         </div>
-        <p>A melhor loja de cupcakes da internet!</p>
-           <div class="barra-pesquisa">
+    </div>
+    <p>A melhor loja de cupcakes da internet!</p>
+    
+    <!-- Barra de pesquisa -->
+    <div class="barra-pesquisa">
         <form action="{{ url_for('home') }}" method="GET">
             <input type="text" name="q" placeholder="🔍 Pesquisar cupcakes..." value="{{ request.args.get('q', '') }}">
             <button type="submit">Buscar</button>
         </form>
     </div>
-    </header>
+</header>
 
     <main>
         <div class="produtos">
