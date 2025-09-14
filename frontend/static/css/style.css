@@ -718,3 +718,114 @@ button:hover {
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 /* 🔼 FIM DOS ESTILOS DE COMPRA FINALIZADA 🔼 */
+
+/* 🔽 ESTILOS PARA FORMULÁRIOS DE AUTENTICAÇÃO 🔽 */
+.form-container {
+    display: flex;
+    justify-content: center;
+    padding: 30px 20px;
+}
+
+.form-auth {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-auth h2 {
+    color: #ff6b8b;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #ff6b8b;
+    outline: none;
+}
+
+.form-auth button {
+    width: 100%;
+    padding: 15px;
+    background: #ff6b8b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.form-auth button:hover {
+    background: #ff4d73;
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.auth-link a {
+    color: #ff6b8b;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-error {
+    background: #ffe6e6;
+    color: #d63031;
+    border: 1px solid #ff7675;
+}
+
+.alert-success {
+    background: #e6f7e6;
+    color: #27ae60;
+    border: 1px solid #2ecc71;
+}
+
+.test-user {
+    margin-top: 25px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.test-user p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+/* 🔼 FIM DOS ESTILOS DE AUTENTICAÇÃO 🔼 */

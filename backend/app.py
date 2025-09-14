@@ -195,6 +195,18 @@ def finalizar_compra():
 def meus_pedidos():
     """Página de histórico de pedidos (será implementada depois)"""
     return "Página de meus pedidos - Em construção 🚧"
+
+# 👇 ROTAS TEMPORÁRIAS - só para testar as páginas
+@app.route('/register')
+def register():
+    """Página de cadastro (versão inicial)"""
+    return render_template('register.html')
+
+@app.route('/login')
+def login():
+    """Página de login (versão inicial)"""
+    return render_template('login.html')
+
 # === FIM DAS NOVAS ROTAS ===
 
 if __name__ == '__main__':

@@ -1,29 +1,24 @@
-# database/database.py
 import sqlite3
 import os
+from werkzeug.security import generate_password_hash  # 👈 Import para criptografia
 
-# *** NOVO ***: Adicionamos esta função para centralizar a conexão
+# 👇 DEFINIMOS base_dir FORA das funções para poder usar em qualquer lugar
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
 def get_db_connection():
     """Retorna uma conexão com o banco de dados."""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_dir, 'cupcakes.db')
     
     conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row  # 🔥 Isso é mágico: faz as consultas virem como dicionários!
+    conn.row_factory = sqlite3.Row
     return conn
-# *** FIM DO NOVO ***
 
 def init_db():
-    # O banco será criado na PRÓPRIA pasta database/
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(base_dir, 'cupcakes.db')  # Agora está na mesma pasta
-    
-    # *** ALTERAÇÃO ***: Agora usamos a nova função get_db_connection() aqui dentro também!
-    conn = get_db_connection() # 👈 Mudamos essa linha
+    """Inicializa o banco de dados com todas as tabelas necessárias."""
+    conn = get_db_connection()
     cursor = conn.cursor()
-    # *** FIM DA ALTERAÇÃO ***
     
-    # Cria tabela de produtos
+    # Tabela de produtos (JÁ EXISTIA)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS produtos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,7 +28,33 @@ def init_db():
         )
     ''')
     
-    # Insere alguns dados de exemplo
+    # --- NOVAS TABELAS --- 
+    # Tabela de usuários
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Tabela de pedidos
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            order_data TEXT NOT NULL,
+            total_amount REAL NOT NULL,
+            status TEXT DEFAULT 'pendente',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+    # --- FIM NOVAS TABELAS ---
+    
+    # Insere dados de exemplo
     cursor.execute("SELECT COUNT(*) FROM produtos")
     if cursor.fetchone()[0] == 0:
         produtos = [
@@ -42,10 +63,17 @@ def init_db():
             ('Cupcake de Morango', 9.00, 'Recheado com geléia de morango natural')
         ]
         cursor.executemany('INSERT INTO produtos (nome, preco, descricao) VALUES (?, ?, ?)', produtos)
+        
+        # 👇 USUÁRIO DE TESTE (OPCIONAL)
+        senha_hash = generate_password_hash('teste123')
+        cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', 
+                      ('cliente_teste', 'teste@email.com', senha_hash))
     
     conn.commit()
     conn.close()
-    print(f"✅ Banco de dados criado em: {db_path}")
+    
+    # 👇 AGORA base_dir está disponível aqui!
+    print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 
 if __name__ == '__main__':
     init_db()
