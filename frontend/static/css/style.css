@@ -80,6 +80,7 @@ button:hover {
     margin-bottom: 30px;
 }
 
+/* Itens do carrinho - VERSÃO MELHORADA */
 .item-carrinho {
     display: flex;
     justify-content: space-between;
@@ -87,17 +88,30 @@ button:hover {
     padding: 20px;
     margin: 15px 0;
     background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.item-carrinho:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
 .info-produto {
     flex: 2;
 }
 
-.controles {
-    flex: 1;
-    text-align: right;
+.info-produto h3 {
+    color: #ff6b8b;
+    margin-bottom: 8px;
+    font-size: 1.3em;
+}
+
+.descricao {
+    color: #666;
+    margin-bottom: 10px;
+    line-height: 1.4;
 }
 
 .btn-remover {
@@ -111,30 +125,75 @@ button:hover {
     background-color: #c0392b;
 }
 
+/* Resumo do carrinho - VERSÃO MELHORADA */
 .resumo-carrinho {
     background: white;
     padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-top: 30px;
+}
+
+.resumo-carrinho h3 {
+    color: #ff6b8b;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5em;
 }
 
 .total {
-    font-size: 1.2em;
+    font-size: 1.3em;
     margin: 20px 0;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 5px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+    text-align: center;
+    border: 2px dashed #ff6b8b;
+}
+
+.total strong {
+    color: #ff6b8b;
+    font-size: 1.4em;
+}
+
+.acoes-carrinho {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-limpar {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.btn-limpar:hover {
+    background: linear-gradient(135deg, #7f8c8d, #6c7b7d) !important;
+    transform: translateY(-1px);
 }
 
 .btn-finalizar {
-    background-color: #27ae60;
-    padding: 15px 30px;
-    font-size: 18px;
-    width: 100%;
+    background: linear-gradient(135deg, #27ae60, #219653) !important;
+    color: white !important;
+    padding: 15px 30px !important;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btn-finalizar:hover {
-    background-color: #219653;
+    background: linear-gradient(135deg, #219653, #1e8449) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
 }
 
 .carrinho-vazio {
@@ -156,56 +215,34 @@ button:hover {
     background-color: #ff4d73;
 }
 
-/* Novos estilos para o carrinho real */
-.botoes-controle {
+/* Melhorar visualização dos preços */
+.controles {
+    flex: 1;
+    text-align: right;
     display: flex;
-    gap: 10px;
-    margin-top: 10px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
 }
 
-.btn-adicionar, .btn-remover {
-    padding: 5px 10px;
-    text-decoration: none;
-    border-radius: 5px;
+.preco {
+    font-size: 1.2em;
     font-weight: bold;
-}
-
-.btn-adicionar {
-    background-color: #27ae60;
-    color: white;
-}
-
-.btn-remover {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.quantidade {
-    font-weight: bold;
-    color: #ff6b8b;
+    color: #27ae60;
 }
 
 .preco-unitario {
     font-size: 0.9em;
     color: #666;
-    margin: 5px 0;
 }
 
-.acoes-carrinho {
-    display: flex;
-    gap: 15px;
-}
-
-.btn-limpar {
-    background-color: #95a5a6;
-    color: white;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.btn-limpar:hover {
-    background-color: #7f8c8d;
+.quantidade {
+    font-weight: bold;
+    color: #ff6b8b;
+    background: #fff5f5;
+    padding: 4px 10px;
+    border-radius: 15px;
+    display: inline-block;
 }
 
 /* Notificações elegantes e modernas - VERSÃO CORRIGIDA */
@@ -416,4 +453,156 @@ button:hover {
 .produto button.adicionado {
     background-color: #27ae60 !important;
     transform: scale(1.05);
+}
+
+/* Contador flutuante simplificado - só sobe */
+.contador-flutuante {
+    position: fixed;
+    background: #ff6b8b;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 50%;
+    font-weight: bold;
+    z-index: 9998;
+    pointer-events: none;
+    animation: subirESumir 1s ease-in-out forwards;
+}
+
+@keyframes subirESumir {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    70% {
+        transform: translateY(-40px) scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-60px) scale(0);
+        opacity: 0;
+    }
+}
+
+/* ===== BOTÕES DO CARRINHO - VERSÃO DEFINITIVA ===== */
+.controles {
+    flex: 1;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.botoes-controle {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.btn-adicionar, .btn-remover {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    font-size: 18px !important;
+    text-decoration: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-adicionar {
+    background: linear-gradient(135deg, #27ae60, #219653) !important;
+    color: white !important;
+}
+
+.btn-adicionar:hover {
+    background: linear-gradient(135deg, #219653, #1e8449) !important;
+    transform: scale(1.1) !important;
+}
+
+.btn-remover {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    color: white !important;
+}
+
+.btn-remover:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226) !important;
+    transform: scale(1.1) !important;
+}
+
+/* Estilos para preços e quantidade */
+.preco {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 5px 0;
+}
+
+.preco-unitario {
+    font-size: 0.9em;
+    color: #666;
+    margin: 0;
+}
+
+.quantidade {
+    font-weight: bold;
+    color: #ff6b8b;
+    background: #fff5f5;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 5px 0;
+}
+
+/* ===== CORREÇÃO ESPECÍFICA PARA OS BOTÕES + e - DA PÁGINA DO CARRINHO ===== */
+.botoes-controle {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 15px !important;
+}
+
+.botoes-controle a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+}
+
+/* Botão + (Verde) */
+.botoes-controle a[href*="adicionar"] {
+    background: linear-gradient(135deg, #27ae60, #219653) !important;
+    color: white !important;
+    border: 2px solid #219653 !important;
+}
+
+.botoes-controle a[href*="adicionar"]:hover {
+    background: linear-gradient(135deg, #219653, #1e8449) !important;
+    transform: scale(1.1) !important;
+}
+
+/* Botão - (Vermelho) */
+.botoes-controle a[href*="remover"] {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    color: white !important;
+    border: 2px solid #c0392b !important;
+}
+
+.botoes-controle a[href*="remover"]:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226) !important;
+    transform: scale(1.1) !important;
 }

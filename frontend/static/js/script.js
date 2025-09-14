@@ -33,15 +33,19 @@ function mostrarNotificacao(mensagem, tipo = 'sucesso', titulo = 'Sucesso!') {
 }
 
 function comprar(idProduto, nomeProduto, element) {
-    // Animação de clique no botão
     const botao = element;
+    
+    // Animação no botão
     botao.classList.add('carregando');
     botao.textContent = 'Adicionando...';
+    
+    // Criar contador flutuante
+    criarContadorFlutuante(botao);
     
     fetch(`/adicionar/${idProduto}`)
         .then(response => {
             if (response.ok) {
-                // Animação de sucesso
+                // Animações de sucesso
                 botao.classList.remove('carregando');
                 botao.classList.add('adicionado');
                 botao.textContent = 'Adicionado!';
@@ -56,16 +60,16 @@ function comprar(idProduto, nomeProduto, element) {
                 // Volta ao normal após 2 segundos
                 setTimeout(() => {
                     botao.classList.remove('adicionado');
-                    botao.textContent = 'Comprar';
+                    botao.textContent = '🛒 Comprar';
                 }, 2000);
             }
         })
         .catch(error => {
             console.error('Erro:', error);
             botao.classList.remove('carregando');
-            botao.textContent = 'Tentar Novamente';
+            botao.textContent = '🛒 Tentar Novamente';
             setTimeout(() => {
-                botao.textContent = 'Comprar';
+                botao.textContent = '🛒 Comprar';
             }, 2000);
             
             mostrarNotificacao(
@@ -75,6 +79,29 @@ function comprar(idProduto, nomeProduto, element) {
             );
         });
 }
+
+function criarContadorFlutuante(botao) {
+    const contador = document.createElement('div');
+    contador.className = 'contador-flutuante';
+    contador.textContent = '+1';
+    
+    // Posiciona onde estava o botão
+    const rect = botao.getBoundingClientRect();
+    contador.style.top = `${rect.top + window.scrollY}px`;
+    contador.style.left = `${rect.left + (rect.width / 2) - 15}px`; // Centraliza
+    
+    document.body.appendChild(contador);
+    
+    // Remove após animação
+    setTimeout(() => {
+        contador.remove();
+    }, 1000);
+}
+
+// Atualize também o carregamento inicial
+document.addEventListener('DOMContentLoaded', function() {
+    atualizarContadorCarrinho();
+});
 
 function atualizarContadorCarrinho() {
     fetch('/get-contador-carrinho')

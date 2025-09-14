@@ -30,7 +30,7 @@
                         <h3>{{ produto[1] }}</h3>
                         <p class="descricao">{{ produto[3] }}</p>
                         <p class="preco">R$ {{ "%.2f"|format(produto[2]) }}</p>
-                        <button onclick="comprar({{ produto[0] }}, '{{ produto[1] }}', this)">Comprar</button>
+                        <button onclick="comprar({{ produto[0] }}, '{{ produto[1] }}', this)">🛒 Comprar</button>
                     </div>
                     {% endfor %}
                 </div>
