@@ -97,6 +97,12 @@
             color: white;
         }
         
+        .badge-master {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+            color: white;
+            border: 2px solid gold;
+        }
+        
         .btn-acao {
             padding: 6px 12px;
             border: none;
@@ -127,9 +133,21 @@
             color: white;
         }
         
-        .btn-acao:hover {
+        .btn-master {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+            color: white;
+            cursor: default;
+            opacity: 0.8;
+        }
+        
+        .btn-acao:hover:not(.btn-master) {
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .btn-acao:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         .search-bar {
@@ -185,7 +203,7 @@
             border: 1px solid #bee5eb;
         }
 
-        /* 👇 ESTILOS DA MODAL (Reutilizando do produtos.html) */
+        /* 👇 ESTILOS DA MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -286,7 +304,7 @@
             transform: translateY(-2px);
         }
 
-        /* 👇 ANIMAÇÕES */
+        /* 👇 ANIMAÇões */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -383,7 +401,9 @@
                         <td>{{ usuario['username'] }}</td>
                         <td>{{ usuario['email'] }}</td>
                         <td>
-                            {% if usuario['is_admin'] == 1 %}
+                            {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
+                                <span class="admin-badge badge-master">👑 Master</span>
+                            {% elif usuario['is_admin'] == 1 %}
                                 <span class="admin-badge badge-admin">Administrador</span>
                             {% else %}
                                 <span class="admin-badge badge-user">Usuário</span>
@@ -392,32 +412,41 @@
                         <td>{{ usuario['created_at'] }}</td>
                         <td>
                             <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-                                {% if usuario['is_admin'] == 1 %}
-                                    <button class="btn-acao btn-remove-admin" 
-                                            onclick="toggleAdmin({{ usuario['id'] }}, 0)">
-                                        Remover Admin
+                                {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
+                                    <!-- CONTA MASTER - AÇÕES BLOQUEADAS -->
+                                    <button class="btn-acao btn-master" disabled title="Conta master protegida">
+                                        👑 Protegido
                                     </button>
+                                    
                                 {% else %}
-                                    <button class="btn-acao btn-toggle-admin" 
-                                            onclick="toggleAdmin({{ usuario['id'] }}, 1)">
-                                        Tornar Admin
+                                    <!-- USUÁRIOS NORMAIS -->
+                                    {% if usuario['is_admin'] == 1 %}
+                                        <button class="btn-acao btn-remove-admin" 
+                                                onclick="toggleAdmin({{ usuario['id'] }}, 0)">
+                                            Remover Admin
+                                        </button>
+                                    {% else %}
+                                        <button class="btn-acao btn-toggle-admin" 
+                                                onclick="toggleAdmin({{ usuario['id'] }}, 1)">
+                                            Tornar Admin
+                                        </button>
+                                    {% endif %}
+                                    
+                                    <button class="btn-acao btn-editar" 
+                                            onclick="editarUsuario({{ usuario['id'] }})">
+                                        ✏️ Editar
                                     </button>
-                                {% endif %}
-                                
-                                <button class="btn-acao btn-editar" 
-                                        onclick="editarUsuario({{ usuario['id'] }})">
-                                    ✏️ Editar
-                                </button>
-                                
-                                {% if usuario['id'] != session['user_id'] %}
-                                    <button class="btn-acao btn-excluir" 
-                                            onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
-                                        🗑️ Excluir
-                                    </button>
-                                {% else %}
-                                    <button class="btn-acao" disabled title="Não pode excluir a si mesmo">
-                                        🚫 Excluir
-                                    </button>
+                                    
+                                    {% if usuario['id'] != session['user_id'] %}
+                                        <button class="btn-acao btn-excluir" 
+                                                onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
+                                            🗑️ Excluir
+                                        </button>
+                                    {% else %}
+                                        <button class="btn-acao" disabled title="Não pode excluir a si mesmo">
+                                            🚫 Excluir
+                                        </button>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </td>

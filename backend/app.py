@@ -79,6 +79,25 @@ def utility_processor():
     return dict(is_admin=check_is_admin)
 
 # =============================================
+# 👇 FUNÇÕES DE MASTER
+# =============================================
+
+def is_master_account(user_id):
+    """Verifica se o usuário é a conta master"""
+    try:
+        conn = get_db_connection()
+        user = conn.execute(
+            'SELECT email FROM users WHERE id = ?', 
+            (user_id,)
+        ).fetchone()
+        conn.close()
+        
+        return user and user['email'] == 'saviosales@cupcakestore.com'
+    except Exception as e:
+        print(f"❌ Erro ao verificar conta master: {e}")
+        return False
+
+# =============================================
 # 👇 ROTAS PRINCIPAIS
 # =============================================
 
@@ -463,6 +482,10 @@ def atualizar_status_pedido(pedido_id):
 def toggle_admin_usuario(user_id):
     """Torna um usuário admin ou remove permissões"""
     try:
+        # Impede alteração da conta master
+        if is_master_account(user_id):
+            return jsonify({'success': False, 'message': 'Não pode alterar permissões da conta master!'})
+        
         data = request.get_json()
         is_admin = data.get('is_admin')
         
@@ -577,6 +600,10 @@ def admin_excluir_usuario(user_id):
         if user_id == session['user_id']:
             return jsonify({'success': False, 'message': 'Não pode excluir a si mesmo!'})
         
+        # Impede exclusão da conta master
+        if is_master_account(user_id):
+            return jsonify({'success': False, 'message': 'Não pode excluir a conta master!'})
+        
         conn = get_db_connection()
         
         # Primeiro exclui os pedidos do usuário
@@ -597,10 +624,15 @@ def admin_excluir_usuario(user_id):
 @app.route('/admin/usuario/<int:user_id>/editar')
 @admin_required
 def admin_editar_usuario(user_id):
-    """Página de edição de usuário (para implementar depois)"""
+    """Página de edição de usuário"""
+    # Impede edição da conta master
+    if is_master_account(user_id):
+        flash('Não pode editar a conta master!', 'error')
+        return redirect(url_for('admin_usuarios'))
+    
+    # Resto do código de edição...
     flash('Funcionalidade de edição de usuários em desenvolvimento!', 'info')
-    return redirect(url_for('admin_usuarios'))    
-
+    return redirect(url_for('admin_usuarios'))
 # =============================================
 # 👇 EXECUÇÃO DO APP
 # =============================================
