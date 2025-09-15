@@ -1,11 +1,11 @@
-from flask import Flask, render_template, session, redirect, url_for, request, flash
+from flask import Flask, render_template, session, redirect, url_for, request, flash, jsonify
 import os
 import sqlite3
 import random
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-from functools import wraps  
+from functools import wraps
 
 try:
     from database.database import get_db_connection
@@ -30,28 +30,7 @@ app.secret_key = 'sua_chave_secreta_super_segura_aqui_2024'
 app.permanent_session_lifetime = timedelta(days=7)
 
 # =============================================
-# FUNÇÃO PARA VERIFICAR ADMIN NO TEMPLATE 
-# =============================================
-@app.context_processor
-def utility_processor():
-    def check_is_admin():
-        """Verifica se o usuário logado é admin"""
-        if 'user_id' not in session:
-            return False
-        try:
-            conn = get_db_connection()
-            user = conn.execute(
-                'SELECT is_admin FROM users WHERE id = ?', 
-                (session['user_id'],)
-            ).fetchone()
-            conn.close()
-            return user and user['is_admin'] == 1
-        except:
-            return False
-    return dict(is_admin=check_is_admin)
-
-# =============================================
-# 👇 FUNÇÕES DE ADMIN - CORRIGIDAS
+# 👇 FUNÇÕES DE ADMIN
 # =============================================
 
 def is_admin():
@@ -81,8 +60,26 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.context_processor
+def utility_processor():
+    def check_is_admin():
+        """Verifica se o usuário logado é admin"""
+        if 'user_id' not in session:
+            return False
+        try:
+            conn = get_db_connection()
+            user = conn.execute(
+                'SELECT is_admin FROM users WHERE id = ?', 
+                (session['user_id'],)
+            ).fetchone()
+            conn.close()
+            return user and user['is_admin'] == 1
+        except:
+            return False
+    return dict(is_admin=check_is_admin)
+
 # =============================================
-# 👇 ROTAS EXISTENTES 
+# 👇 ROTAS PRINCIPAIS
 # =============================================
 
 def get_produtos():
@@ -245,7 +242,7 @@ def login():
             if user and check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
                 session['username'] = user['username']
-                session['is_admin'] = bool(user['is_admin'])  # 👈 ADICIONE ESTA LINHA
+                session['is_admin'] = bool(user['is_admin'])
                 session.permanent = True
                 
                 flash(f'Bem-vindo de volta, {user["username"]}!', 'success')
@@ -392,10 +389,6 @@ def admin_dashboard():
         print(f"❌ Erro no dashboard admin: {e}")
         flash('Erro ao carregar dashboard.', 'error')
         return redirect(url_for('home'))
-    
-# =============================================
-# 👇 ROTAS COMPLETAS DO PAINEL ADMIN
-# =============================================
 
 @app.route('/admin/produtos')
 @admin_required
@@ -486,7 +479,64 @@ def toggle_admin_usuario(user_id):
         print(f"❌ Erro ao atualizar permissões: {e}")
         return jsonify({'success': False, 'message': 'Erro ao atualizar permissões'})
 
-# === EXECUÇÃO DO APP ===
+# =============================================
+# 👇 NOVAS ROTAS PARA GERENCIAMENTO DE PRODUTOS
+# =============================================
+
+@app.route('/admin/produto/adicionar', methods=['POST'])
+@admin_required
+def admin_adicionar_produto():
+    """Adiciona um novo produto ao banco de dados"""
+    try:
+        nome = request.form['nome']
+        preco = float(request.form['preco'])
+        descricao = request.form['descricao']
+        
+        conn = get_db_connection()
+        conn.execute(
+            'INSERT INTO produtos (nome, preco, descricao) VALUES (?, ?, ?)',
+            (nome, preco, descricao)
+        )
+        conn.commit()
+        conn.close()
+        
+        flash('Produto adicionado com sucesso!', 'success')
+        return redirect(url_for('admin_produtos'))
+        
+    except Exception as e:
+        print(f"❌ Erro ao adicionar produto: {e}")
+        flash('Erro ao adicionar produto. Verifique os dados.', 'error')
+        return redirect(url_for('admin_produtos'))
+
+@app.route('/admin/produto/<int:id>/remover', methods=['POST'])
+@admin_required
+def admin_remover_produto(id):
+    """Remove um produto do banco de dados"""
+    try:
+        conn = get_db_connection()
+        conn.execute('DELETE FROM produtos WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        
+        flash('Produto removido com sucesso!', 'success')
+        return redirect(url_for('admin_produtos'))
+        
+    except Exception as e:
+        print(f"❌ Erro ao remover produto: {e}")
+        flash('Erro ao remover produto.', 'error')
+        return redirect(url_for('admin_produtos'))
+
+@app.route('/admin/produto/<int:id>/editar')
+@admin_required
+def admin_editar_produto(id):
+    """Página de edição de produto (será implementada)"""
+    flash('Funcionalidade de edição em desenvolvimento!', 'info')
+    return redirect(url_for('admin_produtos'))
+
+# =============================================
+# 👇 EXECUÇÃO DO APP
+# =============================================
+
 if __name__ == '__main__':
     print(f"📁 Templates path: {template_dir}")
     print(f"📁 Static path: {static_dir}")
