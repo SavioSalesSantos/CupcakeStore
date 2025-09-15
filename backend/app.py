@@ -526,6 +526,43 @@ def atualizar_status_pedido(pedido_id):
     except Exception as e:
         print(f"❌ Erro ao atualizar status: {e}")
         return jsonify({'success': False, 'message': 'Erro ao atualizar status'})
+    
+@app.route('/admin/pedido/<int:pedido_id>/excluir', methods=['POST'])
+@admin_required
+def admin_excluir_pedido(pedido_id):
+    """Exclui um pedido completamente do sistema"""
+    try:
+        conn = get_db_connection()
+        
+        # Primeiro busca o pedido para obter o valor total
+        pedido = conn.execute(
+            'SELECT total_amount FROM orders WHERE id = ?', 
+            (pedido_id,)
+        ).fetchone()
+        
+        if not pedido:
+            flash('Pedido não encontrado!', 'error')
+            return jsonify({'success': False, 'message': 'Pedido não encontrado!'})
+        
+        # Exclui o pedido
+        conn.execute('DELETE FROM orders WHERE id = ?', (pedido_id,))
+        conn.commit()
+        conn.close()
+        
+        # 🔥 AGORA USA FLASH E JSON JUNTOS
+        flash(f'Pedido #{pedido_id} excluído com sucesso! Valor removido: R$ {pedido["total_amount"]:.2f}', 'success')
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Pedido excluído com sucesso!',
+            'valor_removido': pedido['total_amount'],
+            'pedido_id': pedido_id
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao excluir pedido: {e}")
+        flash('Erro ao excluir pedido', 'error')
+        return jsonify({'success': False, 'message': 'Erro ao excluir pedido'})
 
 @app.route('/admin/usuario/<int:user_id>/admin', methods=['POST'])
 @admin_required
