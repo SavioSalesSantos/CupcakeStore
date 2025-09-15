@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Pedidos - CupcakeStore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ff6b8b;
+        }
+        
+        .admin-nav {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .nav-links a.active {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        }
+        
+        .pedidos-list {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .pedido-item {
+            padding: 20px;
+            margin: 15px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b8b;
+        }
+        
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .pedido-info {
+            flex: 2;
+        }
+        
+        .pedido-actions {
+            flex: 1;
+            text-align: right;
+        }
+        
+        .status-select {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .itens-pedido {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .item-pedido {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        
+        .status-pendente { background: #fff3cd; color: #856404; }
+        .status-processando { background: #cce7ff; color: #004085; }
+        .status-enviado { background: #d4edda; color: #155724; }
+        .status-entregue { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>📋 Gerenciar Pedidos</h1>
+            <div>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-voltar">← Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
+            </div>
+        </div>
+        
+        <div class="admin-nav">
+            <div class="nav-links">
+                <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
+                <a href="/admin/produtos">📦 Produtos</a>
+                <a href="/admin/pedidos" class="active">📋 Pedidos</a>
+                <a href="/admin/usuarios">👥 Usuários</a>
+            </div>
+        </div>
+        
+        <div class="pedidos-list">
+            <h2>📦 Todos os Pedidos</h2>
+            
+            {% if pedidos %}
+                {% for pedido in pedidos %}
+                <div class="pedido-item">
+                    <div class="pedido-header">
+                        <div class="pedido-info">
+                            <strong>Pedido #{{ pedido['id'] }}</strong>
+                            <br>
+                            <small>Cliente: {{ pedido['username'] }}</small>
+                            <br>
+                            <small>Total: R$ {{ "%.2f"|format(pedido['total_amount']) }}</small>
+                            <br>
+                            <small>Data: {{ pedido['created_at'] }}</small>
+                        </div>
+                        
+                        <div class="pedido-actions">
+                            <span class="status-badge status-{{ pedido['status'] }}">
+                                {{ pedido['status']|title }}
+                            </span>
+                            <br><br>
+                            <select class="status-select" id="status-{{ pedido['id'] }}">
+                                <option value="pendente" {% if pedido['status'] == 'pendente' %}selected{% endif %}>Pendente</option>
+                                <option value="processando" {% if pedido['status'] == 'processando' %}selected{% endif %}>Processando</option>
+                                <option value="enviado" {% if pedido['status'] == 'enviado' %}selected{% endif %}>Enviado</option>
+                                <option value="entregue" {% if pedido['status'] == 'entregue' %}selected{% endif %}>Entregue</option>
+                            </select>
+                            <button class="btn-save" onclick="atualizarStatus({{ pedido['id'] }})">💾 Salvar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="itens-pedido">
+                        <strong>Itens do Pedido:</strong>
+                        {% set itens = pedido['order_data']|string %}
+                        {% if itens %}
+                            {% for item in pedido['order_data'] %}
+                            <div class="item-pedido">
+                                <span>{{ item['quantidade'] }}x {{ item['nome'] }}</span>
+                                <span>R$ {{ "%.2f"|format(item['preco'] * item['quantidade']) }}</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Itens não disponíveis</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum pedido encontrado.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+    function atualizarStatus(pedidoId) {
+        const select = document.getElementById('status-' + pedidoId);
+        const novoStatus = select.value;
+        
+        fetch('/admin/pedido/' + pedidoId + '/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: novoStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Status atualizado com sucesso!');
+                location.reload();
+            } else {
+                alert('Erro ao atualizar status: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Erro ao atualizar status');
+            console.error('Error:', error);
+        });
+    }
+    </script>
+</body>
+</html>

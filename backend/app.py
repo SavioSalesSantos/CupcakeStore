@@ -5,6 +5,8 @@ import random
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+from functools import wraps  
+
 try:
     from database.database import get_db_connection
 except ModuleNotFoundError:
@@ -26,6 +28,41 @@ app = Flask(__name__,
 # 🔐 Chave secreta para sessions
 app.secret_key = 'sua_chave_secreta_super_segura_aqui_2024'
 app.permanent_session_lifetime = timedelta(days=7)
+
+# =============================================
+# 👇 FUNÇÕES DE ADMIN - CORRIGIDAS
+# =============================================
+
+def is_admin():
+    """Verifica se o usuário logado é administrador"""
+    if 'user_id' not in session:
+        return False
+    
+    try:
+        conn = get_db_connection()
+        user = conn.execute(
+            'SELECT is_admin FROM users WHERE id = ?', 
+            (session['user_id'],)
+        ).fetchone()
+        conn.close()
+        
+        return user and user['is_admin'] == 1
+    except Exception as e:
+        print(f"❌ Erro ao verificar admin: {e}")
+        return False
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not is_admin():
+            flash('Acesso restrito a administradores!', 'error')
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# =============================================
+# 👇 ROTAS EXISTENTES 
+# =============================================
 
 def get_produtos():
     """Função para buscar produtos do banco de dados"""
@@ -293,6 +330,139 @@ def meus_pedidos():
         print(f"❌ Erro ao carregar pedidos: {e}")
         flash('Erro ao carregar seus pedidos.', 'error')
         return redirect(url_for('home'))
+
+# =============================================
+# 👇 ROTAS DO PAINEL ADMIN
+# =============================================
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    """Dashboard do painel administrativo"""
+    try:
+        conn = get_db_connection()
+        
+        # Estatísticas
+        total_usuarios = conn.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        total_pedidos = conn.execute('SELECT COUNT(*) FROM orders').fetchone()[0]
+        total_vendas = conn.execute('SELECT SUM(total_amount) FROM orders').fetchone()[0] or 0
+        total_produtos = conn.execute('SELECT COUNT(*) FROM produtos').fetchone()[0]
+        
+        # Pedidos recentes
+        pedidos_recentes = conn.execute('''
+            SELECT o.*, u.username 
+            FROM orders o 
+            JOIN users u ON o.user_id = u.id 
+            ORDER BY o.created_at DESC 
+            LIMIT 5
+        ''').fetchall()
+        
+        conn.close()
+        
+        return render_template('admin/dashboard.html',
+                             total_usuarios=total_usuarios,
+                             total_pedidos=total_pedidos,
+                             total_vendas=total_vendas,
+                             total_produtos=total_produtos,
+                             pedidos_recentes=pedidos_recentes)
+                             
+    except Exception as e:
+        print(f"❌ Erro no dashboard admin: {e}")
+        flash('Erro ao carregar dashboard.', 'error')
+        return redirect(url_for('home'))
+    
+# =============================================
+# 👇 ROTAS COMPLETAS DO PAINEL ADMIN
+# =============================================
+
+@app.route('/admin/produtos')
+@admin_required
+def admin_produtos():
+    """Gerenciamento de produtos"""
+    try:
+        conn = get_db_connection()
+        produtos = conn.execute('SELECT * FROM produtos ORDER BY id DESC').fetchall()
+        conn.close()
+        return render_template('admin/produtos.html', produtos=produtos)
+    except Exception as e:
+        print(f"❌ Erro ao carregar produtos: {e}")
+        flash('Erro ao carregar produtos.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/pedidos')
+@admin_required
+def admin_pedidos():
+    """Gerenciamento de pedidos"""
+    try:
+        conn = get_db_connection()
+        pedidos = conn.execute('''
+            SELECT o.*, u.username 
+            FROM orders o 
+            JOIN users u ON o.user_id = u.id 
+            ORDER BY o.created_at DESC
+        ''').fetchall()
+        conn.close()
+        return render_template('admin/pedidos.html', pedidos=pedidos)
+    except Exception as e:
+        print(f"❌ Erro ao carregar pedidos: {e}")
+        flash('Erro ao carregar pedidos.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/usuarios')
+@admin_required
+def admin_usuarios():
+    """Gerenciamento de usuários"""
+    try:
+        conn = get_db_connection()
+        usuarios = conn.execute('SELECT * FROM users ORDER BY created_at DESC').fetchall()
+        conn.close()
+        return render_template('admin/usuarios.html', usuarios=usuarios)
+    except Exception as e:
+        print(f"❌ Erro ao carregar usuários: {e}")
+        flash('Erro ao carregar usuários.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/pedido/<int:pedido_id>/status', methods=['POST'])
+@admin_required
+def atualizar_status_pedido(pedido_id):
+    """Atualiza o status de um pedido"""
+    try:
+        data = request.get_json()
+        novo_status = data.get('status')
+        
+        conn = get_db_connection()
+        conn.execute(
+            'UPDATE orders SET status = ? WHERE id = ?',
+            (novo_status, pedido_id)
+        )
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Status atualizado com sucesso!'})
+    except Exception as e:
+        print(f"❌ Erro ao atualizar status: {e}")
+        return jsonify({'success': False, 'message': 'Erro ao atualizar status'})
+
+@app.route('/admin/usuario/<int:user_id>/admin', methods=['POST'])
+@admin_required
+def toggle_admin_usuario(user_id):
+    """Torna um usuário admin ou remove permissões"""
+    try:
+        data = request.get_json()
+        is_admin = data.get('is_admin')
+        
+        conn = get_db_connection()
+        conn.execute(
+            'UPDATE users SET is_admin = ? WHERE id = ?',
+            (is_admin, user_id)
+        )
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Permissões atualizadas com sucesso!'})
+    except Exception as e:
+        print(f"❌ Erro ao atualizar permissões: {e}")
+        return jsonify({'success': False, 'message': 'Erro ao atualizar permissões'})
 
 # === EXECUÇÃO DO APP ===
 if __name__ == '__main__':

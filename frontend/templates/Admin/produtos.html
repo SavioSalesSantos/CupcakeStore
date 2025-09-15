@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Produtos - CupcakeStore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ff6b8b;
+        }
+        
+        .admin-nav {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .nav-links a.active {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        }
+        
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .produto-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .produto-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .add-produto {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>📦 Gerenciar Produtos</h1>
+            <div>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-voltar">← Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
+            </div>
+        </div>
+        
+        <div class="admin-nav">
+            <div class="nav-links">
+                <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
+                <a href="/admin/produtos" class="active">📦 Produtos</a>
+                <a href="/admin/pedidos">📋 Pedidos</a>
+                <a href="/admin/usuarios">👥 Usuários</a>
+            </div>
+        </div>
+        
+        <div class="add-produto">
+            <h2>➕ Adicionar Novo Produto</h2>
+            <form>
+                <div class="form-group">
+                    <label for="nome">Nome do Produto:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="preco">Preço:</label>
+                    <input type="number" id="preco" name="preco" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="descricao">Descrição:</label>
+                    <textarea id="descricao" name="descricao" rows="3" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-finalizar">Adicionar Produto</button>
+            </form>
+        </div>
+        
+        <h2>📋 Lista de Produtos</h2>
+        
+        <div class="produtos-grid">
+            {% for produto in produtos %}
+            <div class="produto-card">
+                <h3>{{ produto['nome'] }}</h3>
+                <p><strong>Preço:</strong> R$ {{ "%.2f"|format(produto['preco']) }}</p>
+                <p><strong>Descrição:</strong> {{ produto['descricao'] }}</p>
+                
+                <div class="produto-actions">
+                    <a href="#" class="btn-edit">✏️ Editar</a>
+                    <button class="btn-delete">🗑️ Excluir</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários - CupcakeStore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ff6b8b;
+        }
+        
+        .admin-nav {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .nav-links a.active {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        }
+        
+        .usuarios-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .usuarios-table th,
+        .usuarios-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .usuarios-table th {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .usuarios-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .admin-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .badge-admin {
+            background: #ff6b8b;
+            color: white;
+        }
+        
+        .badge-user {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-toggle-admin {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .btn-remove-admin {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>👥 Gerenciar Usuários</h1>
+            <div>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-voltar">← Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
+            </div>
+        </div>
+        
+        <div class="admin-nav">
+            <div class="nav-links">
+                <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
+                <a href="/admin/produtos">📦 Produtos</a>
+                <a href="/admin/pedidos">📋 Pedidos</a>
+                <a href="/admin/usuarios" class="active">👥 Usuários</a>
+            </div>
+        </div>
+        
+        <div class="usuarios-list">
+            <h2>📋 Todos os Usuários</h2>
+            
+            <table class="usuarios-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Data Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario['id'] }}</td>
+                        <td>{{ usuario['username'] }}</td>
+                        <td>{{ usuario['email'] }}</td>
+                        <td>
+                            {% if usuario['is_admin'] == 1 %}
+                                <span class="admin-badge badge-admin">Administrador</span>
+                            {% else %}
+                                <span class="admin-badge badge-user">Usuário</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ usuario['created_at'] }}</td>
+                        <td>
+                            {% if usuario['is_admin'] == 1 %}
+                                <button class="btn-remove-admin" onclick="toggleAdmin({{ usuario['id'] }}, 0)">
+                                    Remover Admin
+                                </button>
+                            {% else %}
+                                <button class="btn-toggle-admin" onclick="toggleAdmin({{ usuario['id'] }}, 1)">
+                                    Tornar Admin
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+   

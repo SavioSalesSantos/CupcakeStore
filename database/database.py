@@ -18,7 +18,7 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Tabela de produtos (JÁ EXISTIA)
+    # Tabela de produtos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS produtos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,14 +28,14 @@ def init_db():
         )
     ''')
     
-    # --- NOVAS TABELAS --- 
-    # Tabela de usuários
+    # Tabela de usuários (ATUALIZADA com campo is_admin)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
+            is_admin BOOLEAN DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -52,7 +52,6 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
-    # --- FIM NOVAS TABELAS ---
     
     # Insere dados de exemplo
     cursor.execute("SELECT COUNT(*) FROM produtos")
@@ -64,7 +63,12 @@ def init_db():
         ]
         cursor.executemany('INSERT INTO produtos (nome, preco, descricao) VALUES (?, ?, ?)', produtos)
         
-        # 👇 USUÁRIO DE TESTE (OPCIONAL)
+        # 👇 USUÁRIO ADMIN DE TESTE
+        senha_hash = generate_password_hash('admin123')
+        cursor.execute('INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, ?)', 
+                      ('admin', 'admin@cupcakestore.com', senha_hash, 1))
+        
+        # 👇 USUÁRIO NORMAL DE TESTE
         senha_hash = generate_password_hash('teste123')
         cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', 
                       ('cliente_teste', 'teste@email.com', senha_hash))
@@ -72,7 +76,6 @@ def init_db():
     conn.commit()
     conn.close()
     
-    # 👇 AGORA base_dir está disponível aqui!
     print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 
 if __name__ == '__main__':
