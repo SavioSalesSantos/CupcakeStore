@@ -563,6 +563,43 @@ def admin_editar_produto(id):
         print(f"❌ Erro ao editar produto: {e}")
         flash('Erro ao editar produto.', 'error')
         return redirect(url_for('admin_produtos'))
+    
+# =============================================
+# 👇 ROTAS NOVAS PÁGINA USUÁRIO
+# =============================================    
+
+@app.route('/admin/usuario/<int:user_id>/excluir', methods=['POST'])
+@admin_required
+def admin_excluir_usuario(user_id):
+    """Exclui um usuário do sistema"""
+    try:
+        # Impede que o usuário exclua a si mesmo
+        if user_id == session['user_id']:
+            return jsonify({'success': False, 'message': 'Não pode excluir a si mesmo!'})
+        
+        conn = get_db_connection()
+        
+        # Primeiro exclui os pedidos do usuário
+        conn.execute('DELETE FROM orders WHERE user_id = ?', (user_id,))
+        
+        # Depois exclui o usuário
+        conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Usuário excluído com sucesso!'})
+        
+    except Exception as e:
+        print(f"❌ Erro ao excluir usuário: {e}")
+        return jsonify({'success': False, 'message': 'Erro ao excluir usuário'})
+
+@app.route('/admin/usuario/<int:user_id>/editar')
+@admin_required
+def admin_editar_usuario(user_id):
+    """Página de edição de usuário (para implementar depois)"""
+    flash('Funcionalidade de edição de usuários em desenvolvimento!', 'info')
+    return redirect(url_for('admin_usuarios'))    
 
 # =============================================
 # 👇 EXECUÇÃO DO APP

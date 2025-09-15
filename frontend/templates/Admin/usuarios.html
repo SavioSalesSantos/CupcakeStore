@@ -81,9 +81,9 @@
         }
         
         .admin-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
             font-weight: bold;
         }
         
@@ -97,24 +97,231 @@
             color: white;
         }
         
-        .btn-toggle-admin {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            color: white;
+        .btn-acao {
             padding: 6px 12px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.9em;
+            margin: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-toggle-admin {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
         }
         
         .btn-remove-admin {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
-            padding: 6px 12px;
+        }
+        
+        .btn-editar {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-excluir {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+        
+        .btn-acao:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .search-bar button {
+            padding: 12px 20px;
+            background: #ff6b8b;
+            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9em;
+        }
+
+        /* Estilos para mensagens flash */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* 👇 ESTILOS DA MODAL (Reutilizando do produtos.html) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .modal-close {
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-body p {
+            margin: 10px 0;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-cancelar-modal {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-confirmar-modal {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancelar-modal:hover {
+            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+            transform: translateY(-2px);
+        }
+
+        .btn-confirmar-modal:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+        }
+
+        /* 👇 ANIMAÇÕES */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* 👇 RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .usuarios-table {
+                font-size: 14px;
+            }
+            
+            .btn-acao {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+            
+            .modal-content {
+                margin: 20% auto;
+                width: 95%;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -136,9 +343,27 @@
                 <a href="/admin/usuarios" class="active">👥 Usuários</a>
             </div>
         </div>
+
+        <!-- 👇 MENSAGENS FLASH -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="search-bar">
+            <input type="text" placeholder="🔍 Buscar usuários..." id="searchInput">
+            <button onclick="filtrarUsuarios()">Buscar</button>
+        </div>
         
         <div class="usuarios-list">
-            <h2>📋 Todos os Usuários</h2>
+            <h2>📋 Todos os Usuários ({{ usuarios|length }})</h2>
             
             <table class="usuarios-table">
                 <thead>
@@ -153,7 +378,7 @@
                 </thead>
                 <tbody>
                     {% for usuario in usuarios %}
-                    <tr>
+                    <tr class="usuario-row">
                         <td>{{ usuario['id'] }}</td>
                         <td>{{ usuario['username'] }}</td>
                         <td>{{ usuario['email'] }}</td>
@@ -166,19 +391,165 @@
                         </td>
                         <td>{{ usuario['created_at'] }}</td>
                         <td>
-                            {% if usuario['is_admin'] == 1 %}
-                                <button class="btn-remove-admin" onclick="toggleAdmin({{ usuario['id'] }}, 0)">
-                                    Remover Admin
+                            <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                                {% if usuario['is_admin'] == 1 %}
+                                    <button class="btn-acao btn-remove-admin" 
+                                            onclick="toggleAdmin({{ usuario['id'] }}, 0)">
+                                        Remover Admin
+                                    </button>
+                                {% else %}
+                                    <button class="btn-acao btn-toggle-admin" 
+                                            onclick="toggleAdmin({{ usuario['id'] }}, 1)">
+                                        Tornar Admin
+                                    </button>
+                                {% endif %}
+                                
+                                <button class="btn-acao btn-editar" 
+                                        onclick="editarUsuario({{ usuario['id'] }})">
+                                    ✏️ Editar
                                 </button>
-                            {% else %}
-                                <button class="btn-toggle-admin" onclick="toggleAdmin({{ usuario['id'] }}, 1)">
-                                    Tornar Admin
-                                </button>
-                            {% endif %}
+                                
+                                {% if usuario['id'] != session['user_id'] %}
+                                    <button class="btn-acao btn-excluir" 
+                                            onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
+                                        🗑️ Excluir
+                                    </button>
+                                {% else %}
+                                    <button class="btn-acao" disabled title="Não pode excluir a si mesmo">
+                                        🚫 Excluir
+                                    </button>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-   
+    </div>
+
+    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO -->
+    <div id="modalExclusaoUsuario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 Confirmar Exclusão</h3>
+                <span class="modal-close" onclick="fecharModalUsuario()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o usuário <strong id="nome-usuario-excluir">[Username]</strong>?</p>
+                <p>⚠️ Todos os pedidos deste usuário também serão removidos!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancelar-modal" onclick="fecharModalUsuario()">❌ Cancelar</button>
+                <button class="btn-confirmar-modal" onclick="confirmarExclusaoUsuario()">🗑️ Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 👇 VARIÁVEIS GLOBAIS
+    let usuarioIdParaExcluir = null;
+    let usuarioNomeParaExcluir = null;
+
+    // 👇 FUNÇÃO PARA FILTRAR USUÁRIOS
+    function filtrarUsuarios() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.usuario-row');
+        
+        rows.forEach(row => {
+            const username = row.cells[1].textContent.toLowerCase();
+            const email = row.cells[2].textContent.toLowerCase();
+            
+            if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // 👇 ABRIR MODAL DE EXCLUSÃO
+    function abrirModalExclusaoUsuario(id, username) {
+        usuarioIdParaExcluir = id;
+        usuarioNomeParaExcluir = username;
+        
+        document.getElementById('nome-usuario-excluir').textContent = username;
+        document.getElementById('modalExclusaoUsuario').style.display = 'block';
+    }
+
+    // 👇 FECHAR MODAL
+    function fecharModalUsuario() {
+        document.getElementById('modalExclusaoUsuario').style.display = 'none';
+        usuarioIdParaExcluir = null;
+        usuarioNomeParaExcluir = null;
+    }
+
+    // 👇 CONFIRMAR EXCLUSÃO
+    function confirmarExclusaoUsuario() {
+        if (usuarioIdParaExcluir) {
+            fetch(`/admin/usuario/${usuarioIdParaExcluir}/excluir`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erro ao excluir usuário: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Erro ao excluir usuário');
+                console.error('Error:', error);
+            });
+        }
+        fecharModalUsuario();
+    }
+
+    // 👇 EDITAR USUÁRIO (Para implementar depois)
+    function editarUsuario(id) {
+        alert('Funcionalidade de edição em desenvolvimento! 🚀');
+        // window.location.href = `/admin/usuario/${id}/editar`;
+    }
+
+    // 👇 TOGGLE ADMIN (Já existente - manter)
+    function toggleAdmin(userId, isAdmin) {
+        fetch('/admin/usuario/' + userId + '/admin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ is_admin: isAdmin })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao atualizar permissões: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Erro ao atualizar permissões');
+            console.error('Error:', error);
+        });
+    }
+
+    // 👇 EVENT LISTENERS PARA A MODAL
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fechar modal ao clicar fora do conteúdo
+        document.getElementById('modalExclusaoUsuario').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModalUsuario();
+            }
+        });
+
+        // Busca em tempo real
+        document.getElementById('searchInput').addEventListener('input', filtrarUsuarios);
+    });
+    </script>
+</body>
+</html>
