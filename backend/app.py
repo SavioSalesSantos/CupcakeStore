@@ -598,11 +598,13 @@ def admin_excluir_usuario(user_id):
     try:
         # Impede que o usuário exclua a si mesmo
         if user_id == session['user_id']:
-            return jsonify({'success': False, 'message': 'Não pode excluir a si mesmo!'})
+            flash('Não pode excluir a si mesmo!', 'error')
+            return redirect(url_for('admin_usuarios'))
         
         # Impede exclusão da conta master
         if is_master_account(user_id):
-            return jsonify({'success': False, 'message': 'Não pode excluir a conta master!'})
+            flash('Não pode excluir a conta master!', 'error')
+            return redirect(url_for('admin_usuarios'))
         
         conn = get_db_connection()
         
@@ -615,24 +617,82 @@ def admin_excluir_usuario(user_id):
         conn.commit()
         conn.close()
         
-        return jsonify({'success': True, 'message': 'Usuário excluído com sucesso!'})
+        flash('Usuário excluído com sucesso!', 'success')
+        return redirect(url_for('admin_usuarios'))
         
     except Exception as e:
         print(f"❌ Erro ao excluir usuário: {e}")
-        return jsonify({'success': False, 'message': 'Erro ao excluir usuário'})
+        flash('Erro ao excluir usuário.', 'error')
+        return redirect(url_for('admin_usuarios'))
 
-@app.route('/admin/usuario/<int:user_id>/editar')
+@app.route('/admin/usuario/<int:user_id>/editar', methods=['GET', 'POST'])
 @admin_required
 def admin_editar_usuario(user_id):
-    """Página de edição de usuário"""
-    # Impede edição da conta master
-    if is_master_account(user_id):
-        flash('Não pode editar a conta master!', 'error')
+    """Edita um usuário"""
+    try:
+        # Impede edição da conta master por outros usuários
+        if is_master_account(user_id) and not is_master_account(session['user_id']):
+            flash('Não pode editar a conta master!', 'error')
+            return redirect(url_for('admin_usuarios'))
+        
+        conn = get_db_connection()
+        
+        if request.method == 'POST':
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            is_admin = request.form.get('is_admin', 0)
+            
+            # Se for a conta master, força is_admin = 1
+            if is_master_account(user_id):
+                is_admin = 1
+            
+            # Atualiza os dados básicos
+            if is_master_account(user_id):
+                # Conta master - não atualiza email
+                conn.execute(
+                    'UPDATE users SET username = ? WHERE id = ?',
+                    (username, user_id)
+                )
+            else:
+                conn.execute(
+                    'UPDATE users SET username = ?, email = ?, is_admin = ? WHERE id = ?',
+                    (username, email, is_admin, user_id)
+                )
+            
+            # Atualiza a senha se fornecida
+            if password:
+                password_hash = generate_password_hash(password)
+                conn.execute(
+                    'UPDATE users SET password = ? WHERE id = ?',
+                    (password_hash, user_id)
+                )
+            
+            conn.commit()
+            conn.close()
+            
+            flash('Usuário atualizado com sucesso!', 'success')
+            return redirect(url_for('admin_usuarios'))
+        
+        else:
+            # Modo visualização - busca os dados do usuário
+            usuario = conn.execute(
+                'SELECT * FROM users WHERE id = ?', 
+                (user_id,)
+            ).fetchone()
+            conn.close()
+            
+            if usuario:
+                return render_template('admin/editar_usuario.html', usuario=usuario)
+            else:
+                flash('Usuário não encontrado!', 'error')
+                return redirect(url_for('admin_usuarios'))
+                
+    except Exception as e:
+        print(f"❌ Erro ao editar usuário: {e}")
+        flash('Erro ao editar usuário.', 'error')
         return redirect(url_for('admin_usuarios'))
     
-    # Resto do código de edição...
-    flash('Funcionalidade de edição de usuários em desenvolvimento!', 'info')
-    return redirect(url_for('admin_usuarios'))
 # =============================================
 # 👇 EXECUÇÃO DO APP
 # =============================================

@@ -217,7 +217,7 @@
         }
 
         .modal-content {
-            background-color: white;
+            background: white;
             margin: 10% auto;
             padding: 0;
             border-radius: 15px;
@@ -281,6 +281,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
+            border: none;
         }
 
         .btn-confirmar-modal {
@@ -292,6 +293,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
+            border: none;
         }
 
         .btn-cancelar-modal:hover {
@@ -304,7 +306,7 @@
             transform: translateY(-2px);
         }
 
-        /* 👇 ANIMAÇões */
+        /* 👇 ANIMAÇÕES */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -438,6 +440,9 @@
                                     </button>
                                     
                                     {% if usuario['id'] != session['user_id'] %}
+                                        <!-- FORMULÁRIO INVISÍVEL PARA EXCLUSÃO -->
+                                        <form action="{{ url_for('admin_excluir_usuario', user_id=usuario['id']) }}" method="POST" style="display: none;" id="form-excluir-{{ usuario['id'] }}">
+                                        </form>
                                         <button class="btn-acao btn-excluir" 
                                                 onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
                                             🗑️ Excluir
@@ -513,35 +518,24 @@
         usuarioNomeParaExcluir = null;
     }
 
-    // 👇 CONFIRMAR EXCLUSÃO
+    // 👇 CONFIRMAR EXCLUSÃO (VERSÃO CORRIGIDA)
     function confirmarExclusaoUsuario() {
         if (usuarioIdParaExcluir) {
-            fetch(`/admin/usuario/${usuarioIdParaExcluir}/excluir`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Erro ao excluir usuário: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Erro ao excluir usuário');
-                console.error('Error:', error);
-            });
+            // Cria um formulário temporário para enviar a requisição POST
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/usuario/${usuarioIdParaExcluir}/excluir`;
+            
+            // Adiciona o formulário à página e envia
+            document.body.appendChild(form);
+            form.submit();
         }
         fecharModalUsuario();
     }
 
-    // 👇 EDITAR USUÁRIO (Para implementar depois)
+    // 👇 EDITAR USUÁRIO
     function editarUsuario(id) {
-        alert('Funcionalidade de edição em desenvolvimento! 🚀');
-        // window.location.href = `/admin/usuario/${id}/editar`;
+        window.location.href = `/admin/usuario/${id}/editar`;
     }
 
     // 👇 TOGGLE ADMIN (Já existente - manter)
