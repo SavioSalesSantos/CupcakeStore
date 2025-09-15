@@ -526,12 +526,43 @@ def admin_remover_produto(id):
         flash('Erro ao remover produto.', 'error')
         return redirect(url_for('admin_produtos'))
 
-@app.route('/admin/produto/<int:id>/editar')
+@app.route('/admin/produto/<int:id>/editar', methods=['GET', 'POST'])
 @admin_required
 def admin_editar_produto(id):
-    """Página de edição de produto (será implementada)"""
-    flash('Funcionalidade de edição em desenvolvimento!', 'info')
-    return redirect(url_for('admin_produtos'))
+    """Edita um produto existente"""
+    try:
+        conn = get_db_connection()
+        
+        if request.method == 'POST':
+            # Processar edição
+            nome = request.form['nome']
+            preco = float(request.form['preco'])
+            descricao = request.form['descricao']
+            
+            conn.execute(
+                'UPDATE produtos SET nome = ?, preco = ?, descricao = ? WHERE id = ?',
+                (nome, preco, descricao, id)
+            )
+            conn.commit()
+            conn.close()
+            
+            flash('Produto atualizado com sucesso!', 'success')
+            return redirect(url_for('admin_produtos'))
+        else:
+            # Mostrar formulário de edição
+            produto = conn.execute('SELECT * FROM produtos WHERE id = ?', (id,)).fetchone()
+            conn.close()
+            
+            if produto:
+                return render_template('admin/editar_produto.html', produto=produto)
+            else:
+                flash('Produto não encontrado!', 'error')
+                return redirect(url_for('admin_produtos'))
+                
+    except Exception as e:
+        print(f"❌ Erro ao editar produto: {e}")
+        flash('Erro ao editar produto.', 'error')
+        return redirect(url_for('admin_produtos'))
 
 # =============================================
 # 👇 EXECUÇÃO DO APP
