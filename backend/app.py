@@ -30,6 +30,27 @@ app.secret_key = 'sua_chave_secreta_super_segura_aqui_2024'
 app.permanent_session_lifetime = timedelta(days=7)
 
 # =============================================
+# FUNÇÃO PARA VERIFICAR ADMIN NO TEMPLATE 
+# =============================================
+@app.context_processor
+def utility_processor():
+    def check_is_admin():
+        """Verifica se o usuário logado é admin"""
+        if 'user_id' not in session:
+            return False
+        try:
+            conn = get_db_connection()
+            user = conn.execute(
+                'SELECT is_admin FROM users WHERE id = ?', 
+                (session['user_id'],)
+            ).fetchone()
+            conn.close()
+            return user and user['is_admin'] == 1
+        except:
+            return False
+    return dict(is_admin=check_is_admin)
+
+# =============================================
 # 👇 FUNÇÕES DE ADMIN - CORRIGIDAS
 # =============================================
 
@@ -224,6 +245,7 @@ def login():
             if user and check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
                 session['username'] = user['username']
+                session['is_admin'] = bool(user['is_admin'])  # 👈 ADICIONE ESTA LINHA
                 session.permanent = True
                 
                 flash(f'Bem-vindo de volta, {user["username"]}!', 'success')
