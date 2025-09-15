@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .admin-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -54,55 +54,151 @@
             background: linear-gradient(135deg, #ff6b8b, #ff4d73);
         }
         
-        .pedidos-list {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        .filtros-pedidos {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
         }
         
-        .pedido-item {
-            padding: 20px;
-            margin: 15px 0;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #ff6b8b;
+        .filtro-status {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
+        
+        .btn-status {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-status.todos {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+        
+        .btn-status.pendente {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            color: #d63031;
+        }
+        
+        .btn-status.processando {
+            background: linear-gradient(135deg, #81ecec, #74b9ff);
+            color: #2d3436;
+        }
+        
+        .btn-status.enviado {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+        }
+        
+        .btn-status.entregue {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+        
+        .btn-status.cancelado {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            color: white;
+        }
+        
+        .btn-status:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-status.ativo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .estatisticas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .estatistica-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .estatistica-numero {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .pedidos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .pedido-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+            transition: transform 0.3s ease;
+        }
+        
+        .pedido-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .pedido-card.pendente { border-left-color: #fdcb6e; }
+        .pedido-card.processando { border-left-color: #74b9ff; }
+        .pedido-card.enviado { border-left-color: #6c5ce7; }
+        .pedido-card.entregue { border-left-color: #00b894; }
+        .pedido-card.cancelado { border-left-color: #636e72; }
         
         .pedido-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            margin-bottom: 20px;
         }
         
-        .pedido-info {
-            flex: 2;
+        .pedido-info h3 {
+            color: #ff6b8b;
+            margin: 0 0 5px 0;
         }
         
-        .pedido-actions {
-            flex: 1;
-            text-align: right;
+        .pedido-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
         }
         
-        .status-select {
-            padding: 8px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
+        .status-pendente { background: #fff3cd; color: #856404; }
+        .status-processando { background: #cce7ff; color: #004085; }
+        .status-enviado { background: #e0cffc; color: #4a3c7d; }
+        .status-entregue { background: #d4edda; color: #155724; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+        
+        .pedido-detalhes {
+            margin-bottom: 20px;
         }
         
-        .btn-save {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
+        .pedido-detalhes p {
+            margin: 5px 0;
+            color: #666;
         }
         
-        .itens-pedido {
+        .pedido-itens {
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px dashed #ddd;
@@ -112,19 +208,129 @@
             display: flex;
             justify-content: space-between;
             padding: 5px 0;
+            font-size: 0.9em;
         }
         
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
+        .pedido-acoes {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .select-status {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .btn-atualizar {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
             font-weight: bold;
-            font-size: 0.8em;
         }
         
-        .status-pendente { background: #fff3cd; color: #856404; }
-        .status-processando { background: #cce7ff; color: #004085; }
-        .status-enviado { background: #d4edda; color: #155724; }
-        .status-entregue { background: #d1ecf1; color: #0c5460; }
+        .btn-detalhes {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .nenhum-pedido {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .search-bar button {
+            padding: 12px 20px;
+            background: #ff6b8b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Estilos para mensagens flash */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 768px) {
+            .pedidos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filtro-status {
+                justify-content: center;
+            }
+            
+            .btn-status {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
+            .pedido-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .pedido-acoes {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -145,67 +351,147 @@
                 <a href="/admin/usuarios">👥 Usuários</a>
             </div>
         </div>
-        
-        <div class="pedidos-list">
-            <h2>📦 Todos os Pedidos</h2>
-            
+
+        <!-- 👇 MENSAGENS FLASH -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- 👇 ESTATÍSTICAS -->
+        <div class="estatisticas">
+            {% for stat in contagem_status %}
+            <div class="estatistica-card">
+                <h3>{{ stat['status']|title }}</h3>
+                <div class="estatistica-numero">{{ stat['count'] }}</div>
+                <small>Pedidos</small>
+            </div>
+            {% endfor %}
+            <div class="estatistica-card">
+                <h3>Total</h3>
+                <div class="estatistica-numero">{{ pedidos|length }}</div>
+                <small>Pedidos</small>
+            </div>
+        </div>
+
+        <!-- 👇 FILTROS -->
+        <div class="filtros-pedidos">
+            <div class="filtro-status">
+                <button class="btn-status todos {{ 'ativo' if status_filter == 'todos' }}" 
+                        onclick="filtrarPorStatus('todos')">
+                    📦 Todos
+                </button>
+                <button class="btn-status pendente {{ 'ativo' if status_filter == 'pendente' }}" 
+                        onclick="filtrarPorStatus('pendente')">
+                    ⏳ Pendentes
+                </button>
+                <button class="btn-status processando {{ 'ativo' if status_filter == 'processando' }}" 
+                        onclick="filtrarPorStatus('processando')">
+                    🧑‍🍳 Processando
+                </button>
+                <button class="btn-status enviado {{ 'ativo' if status_filter == 'enviado' }}" 
+                        onclick="filtrarPorStatus('enviado')">
+                    🚚 Enviados
+                </button>
+                <button class="btn-status entregue {{ 'ativo' if status_filter == 'entregue' }}" 
+                        onclick="filtrarPorStatus('entregue')">
+                    ✅ Entregues
+                </button>
+                <button class="btn-status cancelado {{ 'ativo' if status_filter == 'cancelado' }}" 
+                        onclick="filtrarPorStatus('cancelado')">
+                    ❌ Cancelados
+                </button>
+            </div>
+        </div>
+
+        <!-- 👇 LISTA DE PEDIDOS -->
+        <div class="pedidos-grid">
             {% if pedidos %}
                 {% for pedido in pedidos %}
-                <div class="pedido-item">
+                <div class="pedido-card {{ pedido['status'] }}">
                     <div class="pedido-header">
                         <div class="pedido-info">
-                            <strong>Pedido #{{ pedido['id'] }}</strong>
-                            <br>
-                            <small>Cliente: {{ pedido['username'] }}</small>
-                            <br>
-                            <small>Total: R$ {{ "%.2f"|format(pedido['total_amount']) }}</small>
-                            <br>
-                            <small>Data: {{ pedido['created_at'] }}</small>
+                            <h3>Pedido #{{ pedido['id'] }}</h3>
+                            <p><strong>Cliente:</strong> {{ pedido['username'] }}</p>
+                            <p><strong>Data:</strong> {{ pedido['created_at'] }}</p>
+                            <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido['total_amount']) }}</p>
                         </div>
-                        
-                        <div class="pedido-actions">
-                            <span class="status-badge status-{{ pedido['status'] }}">
-                                {{ pedido['status']|title }}
-                            </span>
-                            <br><br>
-                            <select class="status-select" id="status-{{ pedido['id'] }}">
-                                <option value="pendente" {% if pedido['status'] == 'pendente' %}selected{% endif %}>Pendente</option>
-                                <option value="processando" {% if pedido['status'] == 'processando' %}selected{% endif %}>Processando</option>
-                                <option value="enviado" {% if pedido['status'] == 'enviado' %}selected{% endif %}>Enviado</option>
-                                <option value="entregue" {% if pedido['status'] == 'entregue' %}selected{% endif %}>Entregue</option>
-                            </select>
-                            <button class="btn-save" onclick="atualizarStatus({{ pedido['id'] }})">💾 Salvar</button>
-                        </div>
+                        <span class="pedido-status status-{{ pedido['status'] }}">
+                            {{ pedido['status']|title }}
+                        </span>
                     </div>
                     
-                    <div class="itens-pedido">
+                    <div class="pedido-itens">
                         <strong>Itens do Pedido:</strong>
-                        {% set itens = pedido['order_data']|string %}
-                        {% if itens %}
-                            {% for item in pedido['order_data'] %}
+                        {% if pedido.itens is defined and pedido.itens %}
+                            {% for item in pedido.itens %}
                             <div class="item-pedido">
-                                <span>{{ item['quantidade'] }}x {{ item['nome'] }}</span>
-                                <span>R$ {{ "%.2f"|format(item['preco'] * item['quantidade']) }}</span>
+                                <span>
+                                    {% if item is mapping and item.nome is defined and item.quantidade is defined %}
+                                        {{ item.quantidade }}x {{ item.nome }}
+                                    {% else %}
+                                        1x Item inválido
+                                    {% endif %}
+                                </span>
+                                <span>
+                                    {% if item is mapping and item.preco is defined and item.quantidade is defined %}
+                                        R$ {{ "%.2f"|format(item.preco * item.quantidade) }}
+                                    {% else %}
+                                        R$ 0.00
+                                    {% endif %}
+                                </span>
                             </div>
                             {% endfor %}
                         {% else %}
-                            <p>Itens não disponíveis</p>
+                            <p>Nenhum item disponível</p>
                         {% endif %}
+                    </div>
+                    
+                    <div class="pedido-acoes">
+                        <select class="select-status" id="status-{{ pedido['id'] }}">
+                            <option value="pendente" {% if pedido['status'] == 'pendente' %}selected{% endif %}>⏳ Pendente</option>
+                            <option value="processando" {% if pedido['status'] == 'processando' %}selected{% endif %}>🧑‍🍳 Processando</option>
+                            <option value="enviado" {% if pedido['status'] == 'enviado' %}selected{% endif %}>🚚 Enviado</option>
+                            <option value="entregue" {% if pedido['status'] == 'entregue' %}selected{% endif %}>✅ Entregue</option>
+                            <option value="cancelado" {% if pedido['status'] == 'cancelado' %}selected{% endif %}>❌ Cancelado</option>
+                        </select>
+                        <button class="btn-atualizar" onclick="atualizarStatus({{ pedido['id'] }})">
+                            💾 Atualizar
+                        </button>
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <p>Nenhum pedido encontrado.</p>
+                <div class="nenhum-pedido">
+                    <h2>📦 Nenhum pedido encontrado</h2>
+                    <p>Não há pedidos com o status selecionado.</p>
+                    <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
+                        Ver Todos os Pedidos
+                    </button>
+                </div>
             {% endif %}
         </div>
     </div>
 
     <script>
+    // 👇 FILTRAR POR STATUS
+    function filtrarPorStatus(status) {
+        window.location.href = `/admin/pedidos?status=${status}`;
+    }
+
+    // 👇 ATUALIZAR STATUS
     function atualizarStatus(pedidoId) {
-        const select = document.getElementById('status-' + pedidoId);
+        const select = document.getElementById(`status-${pedidoId}`);
         const novoStatus = select.value;
         
-        fetch('/admin/pedido/' + pedidoId + '/status', {
+        fetch(`/admin/pedido/${pedidoId}/status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -225,6 +511,12 @@
             alert('Erro ao atualizar status');
             console.error('Error:', error);
         });
+    }
+
+    // 👇 BUSCA EM TEMPO REAL (PARA IMPLEMENTAR DEPOIS)
+    function buscarPedidos() {
+        const termo = document.getElementById('searchPedidos').value.toLowerCase();
+        // Implementar busca futuramente
     }
     </script>
 </body>

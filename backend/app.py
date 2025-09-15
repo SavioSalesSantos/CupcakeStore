@@ -426,19 +426,69 @@ def admin_produtos():
 @app.route('/admin/pedidos')
 @admin_required
 def admin_pedidos():
-    """Gerenciamento de pedidos"""
+    """Gerenciamento de pedidos com filtros"""
     try:
+        status_filter = request.args.get('status', 'todos')
+        
         conn = get_db_connection()
-        pedidos = conn.execute('''
-            SELECT o.*, u.username 
-            FROM orders o 
-            JOIN users u ON o.user_id = u.id 
-            ORDER BY o.created_at DESC
+        
+        if status_filter == 'todos':
+            pedidos = conn.execute('''
+                SELECT o.*, u.username 
+                FROM orders o 
+                JOIN users u ON o.user_id = u.id 
+                ORDER BY o.created_at DESC
+            ''').fetchall()
+        else:
+            pedidos = conn.execute('''
+                SELECT o.*, u.username 
+                FROM orders o 
+                JOIN users u ON o.user_id = u.id 
+                WHERE o.status = ?
+                ORDER BY o.created_at DESC
+            ''', (status_filter,)).fetchall()
+        
+        # Contagem por status para estatísticas
+        contagem_status = conn.execute('''
+            SELECT status, COUNT(*) as count 
+            FROM orders 
+            GROUP BY status
         ''').fetchall()
+        
         conn.close()
-        return render_template('admin/pedidos.html', pedidos=pedidos)
+        
+        print(f"📦 Pedidos encontrados: {len(pedidos)}")
+        
+        # Converte os pedidos para dicionários e processa o JSON
+        pedidos_processados = []
+        for pedido in pedidos:
+            try:
+                pedido_dict = dict(pedido)
+                print(f"🔍 Processando pedido {pedido_dict['id']}")
+                print(f"   Dados order_data: {pedido_dict['order_data']}")
+                
+                # Converte a string JSON para objeto Python
+                pedido_dict['itens'] = json.loads(pedido_dict['order_data'])
+                print(f"   Itens convertidos: {pedido_dict['itens']}")
+                
+                pedidos_processados.append(pedido_dict)
+            except Exception as e:
+                print(f"❌ ERRO no pedido {pedido_dict.get('id', 'unknown')}: {e}")
+                print(f"   Dados problemáticos: {pedido_dict}")
+                # Skip pedidos com erro
+                continue
+        
+        print(f"✅ Pedidos processados com sucesso: {len(pedidos_processados)}")
+        
+        return render_template('admin/pedidos.html', 
+                             pedidos=pedidos_processados,
+                             contagem_status=contagem_status,
+                             status_filter=status_filter)
+                             
     except Exception as e:
         print(f"❌ Erro ao carregar pedidos: {e}")
+        import traceback
+        traceback.print_exc()
         flash('Erro ao carregar pedidos.', 'error')
         return redirect(url_for('admin_dashboard'))
 
@@ -693,6 +743,7 @@ def admin_editar_usuario(user_id):
         flash('Erro ao editar usuário.', 'error')
         return redirect(url_for('admin_usuarios'))
     
+
 # =============================================
 # 👇 EXECUÇÃO DO APP
 # =============================================
