@@ -681,16 +681,17 @@ def admin_adicionar_produto():
                 # Gera nome único para a imagem
                 filename = secure_filename(file.filename)
                 unique_filename = f"{uuid.uuid4().hex}_{filename}"
-                imagem_path = os.path.join('uploads', unique_filename)
+                # 🔽 CORREÇÃO: Salvar o caminho COMPLETO para o static
+                imagem_path = os.path.join('static', 'uploads', unique_filename)
                 
-                # Salva a imagem
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                # Salva a imagem (caminho completo)
+                file.save(os.path.join(app.root_path, '..', imagem_path))
                 
                 # 🔥 OPcional: Redimensiona a imagem
                 try:
-                    img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                    img = Image.open(os.path.join(app.root_path, '..', imagem_path))
                     img.thumbnail((500, 500))
-                    img.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                    img.save(os.path.join(app.root_path, '..', imagem_path))
                 except Exception as e:
                     print(f"⚠️ Erro ao redimensionar imagem: {e}")
                     # Continua mesmo se não conseguir redimensionar
@@ -698,7 +699,7 @@ def admin_adicionar_produto():
         conn = get_db_connection()
         conn.execute(
             'INSERT INTO produtos (nome, preco, descricao, imagem) VALUES (?, ?, ?, ?)',
-            (nome, preco, descricao, imagem_path)
+            (nome, preco, descricao, imagem_path)  # Agora com caminho completo
         )
         conn.commit()
         conn.close()
@@ -748,14 +749,15 @@ def admin_editar_produto(id):
                 if file and file.filename != '' and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     unique_filename = f"{uuid.uuid4().hex}_{filename}"
-                    imagem_path = os.path.join('uploads', unique_filename)
+                    # 🔽 CORREÇÃO: Salvar o caminho COMPLETO
+                    imagem_path = os.path.join('static', 'uploads', unique_filename)
                     
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                    file.save(os.path.join(app.root_path, '..', imagem_path))
                     
                     # Remove imagem antiga se existir
                     produto_antigo = conn.execute('SELECT imagem FROM produtos WHERE id = ?', (id,)).fetchone()
                     if produto_antigo and produto_antigo['imagem']:
-                        old_image_path = os.path.join(static_dir, produto_antigo['imagem'])
+                        old_image_path = os.path.join(app.root_path, '..', produto_antigo['imagem'])
                         if os.path.exists(old_image_path):
                             os.remove(old_image_path)
             

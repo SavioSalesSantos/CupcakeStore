@@ -370,6 +370,18 @@
         <div class="produtos-grid">
             {% for produto in produtos %}
             <div class="produto-card">
+                <!-- 🔽 ADICIONAR IMAGEM AQUI -->
+                {% if produto['imagem'] is defined and produto['imagem'] %}
+                <img src="{{ url_for('static', filename=produto['imagem'].replace('static/', '')) }}"
+                    alt="{{ produto['nome'] }}"
+                    style="max-width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                {% else %}
+                <div
+                    style="height: 150px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    🧁 Sem imagem
+                </div>
+                {% endif %}
+
                 <h3>{{ produto['nome'] }}</h3>
                 <p><strong>Preço:</strong> R$ {{ "%.2f"|format(produto['preco']) }}</p>
                 <p><strong>Descrição:</strong> {{ produto['descricao'] }}</p>
@@ -387,77 +399,76 @@
             </div>
             {% endfor %}
         </div>
-    </div>
 
-    <!-- 👇 MODAL DE CONFIRMAÇÃO ELEGANTE -->
-    <div id="modalConfirmacao" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🧁 Confirmar Exclusão</h3>
-                <span class="modal-close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir o produto <strong id="nome-produto-excluir">[Nome do
-                        Produto]</strong>?</p>
-                <p>Esta ação não pode ser desfeita.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancelar-modal">❌ Cancelar</button>
-                <button class="btn-confirmar-modal">🗑️ Sim, Excluir</button>
+        <!-- 👇 MODAL DE CONFIRMAÇÃO ELEGANTE -->
+        <div id="modalConfirmacao" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🧁 Confirmar Exclusão</h3>
+                    <span class="modal-close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir o produto <strong id="nome-produto-excluir">[Nome do
+                            Produto]</strong>?</p>
+                    <p>Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancelar-modal">❌ Cancelar</button>
+                    <button class="btn-confirmar-modal">🗑️ Sim, Excluir</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        // 👇 VARIÁVEIS GLOBAIS
-        let produtoIdParaExcluir = null;
-        let produtoNomeParaExcluir = null;
+        <script>
+            // 👇 VARIÁVEIS GLOBAIS
+            let produtoIdParaExcluir = null;
+            let produtoNomeParaExcluir = null;
 
-        // 👇 ABRIR MODAL
-        function abrirModalExclusao(id, nome) {
-            produtoIdParaExcluir = id;
-            produtoNomeParaExcluir = nome;
+            // 👇 ABRIR MODAL
+            function abrirModalExclusao(id, nome) {
+                produtoIdParaExcluir = id;
+                produtoNomeParaExcluir = nome;
 
-            document.getElementById('nome-produto-excluir').textContent = nome;
-            document.getElementById('modalConfirmacao').style.display = 'block';
-        }
-
-        // 👇 FECHAR MODAL
-        function fecharModal() {
-            document.getElementById('modalConfirmacao').style.display = 'none';
-            produtoIdParaExcluir = null;
-            produtoNomeParaExcluir = null;
-        }
-
-        // 👇 CONFIRMAR EXCLUSÃO
-        function confirmarExclusao() {
-            if (produtoIdParaExcluir) {
-                // Envia o formulário de exclusão
-                const form = document.querySelector(`form[action="/admin/produto/${produtoIdParaExcluir}/remover"]`);
-                if (form) {
-                    form.submit();
-                }
+                document.getElementById('nome-produto-excluir').textContent = nome;
+                document.getElementById('modalConfirmacao').style.display = 'block';
             }
-            fecharModal();
-        }
 
-        // 👇 EVENT LISTENERS
-        document.addEventListener('DOMContentLoaded', function () {
-            // Fechar modal ao clicar no X ou no botão cancelar
-            document.querySelector('.modal-close').addEventListener('click', fecharModal);
-            document.querySelector('.btn-cancelar-modal').addEventListener('click', fecharModal);
+            // 👇 FECHAR MODAL
+            function fecharModal() {
+                document.getElementById('modalConfirmacao').style.display = 'none';
+                produtoIdParaExcluir = null;
+                produtoNomeParaExcluir = null;
+            }
 
-            // Confirmar exclusão
-            document.querySelector('.btn-confirmar-modal').addEventListener('click', confirmarExclusao);
-
-            // Fechar modal ao clicar fora do conteúdo
-            document.getElementById('modalConfirmacao').addEventListener('click', function (e) {
-                if (e.target === this) {
-                    fecharModal();
+            // 👇 CONFIRMAR EXCLUSÃO
+            function confirmarExclusao() {
+                if (produtoIdParaExcluir) {
+                    // Envia o formulário de exclusão
+                    const form = document.querySelector(`form[action="/admin/produto/${produtoIdParaExcluir}/remover"]`);
+                    if (form) {
+                        form.submit();
+                    }
                 }
+                fecharModal();
+            }
+
+            // 👇 EVENT LISTENERS
+            document.addEventListener('DOMContentLoaded', function () {
+                // Fechar modal ao clicar no X ou no botão cancelar
+                document.querySelector('.modal-close').addEventListener('click', fecharModal);
+                document.querySelector('.btn-cancelar-modal').addEventListener('click', fecharModal);
+
+                // Confirmar exclusão
+                document.querySelector('.btn-confirmar-modal').addEventListener('click', confirmarExclusao);
+
+                // Fechar modal ao clicar fora do conteúdo
+                document.getElementById('modalConfirmacao').addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        fecharModal();
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>
