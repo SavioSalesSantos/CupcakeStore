@@ -783,10 +783,16 @@
             }, 3000);
         }
 
-        // 👇 ATUALIZAR STATUS
+        // 👇 ATUALIZAR STATUS COM REDIRECT PARA MOSTRAR FLASH MESSAGES
         function atualizarStatus(pedidoId) {
             const select = document.getElementById(`status-${pedidoId}`);
             const novoStatus = select.value;
+            const statusAnterior = select.getAttribute('data-status-anterior');
+
+            // Se não mudou, não faz nada
+            if (novoStatus === statusAnterior) {
+                return;
+            }
 
             fetch(`/admin/pedido/${pedidoId}/status`, {
                 method: 'POST',
@@ -797,19 +803,25 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        // Mostra notificação elegante em vez de alerta
-                        mostrarNotificacaoFlash('Status atualizado com sucesso!', 'success');
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        mostrarNotificacaoFlash('Erro ao atualizar status: ' + data.message, 'error');
+                    if (data.success && data.redirect) {
+                        // Redireciona para a mesma página para mostrar a flash message
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const statusFilter = urlParams.get('status') || 'todos';
+                        window.location.href = `/admin/pedidos?status=${statusFilter}`;
+                    } else if (!data.success && data.redirect) {
+                        // Também redireciona para mostrar mensagem de erro
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const statusFilter = urlParams.get('status') || 'todos';
+                        window.location.href = `/admin/pedidos?status=${statusFilter}`;
+                    } else if (!data.success) {
+                        alert('Erro ao atualizar status: ' + (data.message || 'Erro desconhecido'));
+                        // Reverte o select para o status anterior
+                        select.value = statusAnterior;
                     }
                 })
                 .catch(error => {
-                    alert('Erro ao atualizar status');
-                    console.error('Error:', error);
+                    alert('Erro de conexão ao atualizar status');
+                    select.value = statusAnterior;
                 });
         }
 

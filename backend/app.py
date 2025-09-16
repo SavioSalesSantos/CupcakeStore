@@ -406,37 +406,70 @@ def meus_pedidos():
 @app.route('/admin/pedidos/resetar-numeracao', methods=['POST'])
 @admin_required
 def admin_resetar_numeracao_pedidos():
-    """Reinicia a numeração automática dos pedidos"""
+    """Reinicia a numeração automática dos pedidos - SOLUÇÃO RADICAL"""
     try:
         conn = get_db_connection()
         
-        # Busca o próximo ID que seria usado
-        next_id = conn.execute("SELECT seq FROM sqlite_sequence WHERE name='orders'").fetchone()
+        # 1. Primeiro verifica se há pedidos na tabela
+        pedidos_count = conn.execute("SELECT COUNT(*) as count FROM orders").fetchone()
+        has_orders = pedidos_count['count'] > 0
         
-        if next_id:
-            # Reseta a sequência para o próximo ID disponível
-            max_id = conn.execute("SELECT COALESCE(MAX(id), 0) FROM orders").fetchone()[0]
-            next_val = max_id + 1 if max_id > 0 else 1
+        if not has_orders:
+            # 🔽 CASO 1: NÃO HÁ PEDIDOS - ZERA COMPLETAMENTE
+            conn.execute("DELETE FROM sqlite_sequence WHERE name='orders'")
+            next_val = 1
+            message = 'Numeração resetada! Próximo pedido será #1'
             
-            conn.execute("UPDATE sqlite_sequence SET seq = ? WHERE name='orders'", (next_val,))
-            conn.commit()
-            
-            flash(f'Numeração resetada! Próximo pedido será #{(max_id + 1) if max_id > 0 else 1}', 'success')
         else:
-            # Se não existir sequência, cria uma
-            max_id = conn.execute("SELECT COALESCE(MAX(id), 0) FROM orders").fetchone()[0]
-            next_val = max_id + 1 if max_id > 0 else 1
+            # 🔽 CASO 2: HÁ PEDIDOS - SOLUÇÃO RADICAL
+            # Precisamos recriar a tabela para forçar o reset completo
             
-            conn.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('orders', ?)", (next_val,))
-            conn.commit()
+            # Primeiro backup dos dados
+            pedidos_backup = conn.execute("SELECT * FROM orders").fetchall()
             
-            flash(f'Sequência criada! Próximo pedido será #{(max_id + 1) if max_id > 0 else 1}', 'success')
+            # Drop da tabela existente
+            conn.execute("DROP TABLE orders")
+            
+            # Recria a tabela com AUTOINCREMENT
+            conn.execute('''
+                CREATE TABLE orders (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    order_data TEXT NOT NULL,
+                    total_amount REAL NOT NULL,
+                    status TEXT DEFAULT 'pendente',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users (id)
+                )
+            ''')
+            
+            # Restaura os dados (os IDs serão regenerados a partir de 1)
+            for pedido in pedidos_backup:
+                conn.execute(
+                    'INSERT INTO orders (user_id, order_data, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)',
+                    (pedido['user_id'], pedido['order_data'], pedido['total_amount'], 
+                     pedido['status'], pedido['created_at'])
+                )
+            
+            # Agora o próximo ID será automaticamente 1 + quantidade de pedidos
+            next_val = len(pedidos_backup) + 1
+            message = f'Numeração completamente resetada! Próximo pedido será #{next_val}'
         
+        conn.commit()
         conn.close()
-        return jsonify({'success': True, 'proximo_id': next_val})
+        
+        flash(message, 'success')
+        return jsonify({
+            'success': True, 
+            'proximo_id': next_val,
+            'message': message
+        })
         
     except Exception as e:
         print(f"❌ Erro ao resetar numeração: {e}")
+        import traceback
+        traceback.print_exc()
+        
         flash('Erro ao resetar numeração de pedidos', 'error')
         return jsonify({'success': False, 'message': str(e)})
 
@@ -580,7 +613,7 @@ def admin_usuarios():
 @app.route('/admin/pedido/<int:pedido_id>/status', methods=['POST'])
 @admin_required
 def atualizar_status_pedido(pedido_id):
-    """Atualiza o status de um pedido"""
+    """Atualiza o status de um pedido - AGORA COM FLASH MESSAGES"""
     try:
         data = request.get_json()
         novo_status = data.get('status')
@@ -593,10 +626,14 @@ def atualizar_status_pedido(pedido_id):
         conn.commit()
         conn.close()
         
-        return jsonify({'success': True, 'message': 'Status atualizado com sucesso!'})
+        # 🔽 AGORA RETORNA REDIRECT EM VEZ DE JSON
+        flash('Status atualizado com sucesso!', 'success')
+        return jsonify({'success': True, 'redirect': True})
+        
     except Exception as e:
         print(f"❌ Erro ao atualizar status: {e}")
-        return jsonify({'success': False, 'message': 'Erro ao atualizar status'})
+        flash('Erro ao atualizar status', 'error')
+        return jsonify({'success': False, 'redirect': True})
     
 @app.route('/admin/pedido/<int:pedido_id>/excluir', methods=['POST'])
 @admin_required
