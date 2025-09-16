@@ -100,7 +100,8 @@
         {% endwith %}
 
         <div class="form-editar">
-            <form action="{{ url_for('admin_editar_produto', id=produto['id']) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ url_for('admin_editar_produto', id=produto['id']) }}" method="POST"
+                enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="nome">Nome do Produto:</label>
                     <input type="text" id="nome" name="nome" value="{{ produto['nome'] }}" required>
@@ -121,10 +122,16 @@
                     <label for="imagem">Imagem do Produto:</label>
                     {% if produto['imagem'] is defined and produto['imagem'] %}
                     <div style="margin-bottom: 10px;">
-                        <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}"
-                            style="max-width: 200px; border-radius: 8px;">
+                        <img src="{{ url_for('static', filename=produto['imagem'].replace('static/', '')) }}"
+                            alt="{{ produto['nome'] }}" style="max-width: 200px; border-radius: 8px;">
                         <br>
                         <small>Imagem atual</small>
+                        <br>
+                        <!-- 🔽 NOVA OPÇÃO PARA REMOVER IMAGEM -->
+                        <label style="margin-top: 10px; display: inline-block;">
+                            <input type="checkbox" name="remover_imagem" value="1">
+                            ❌ Remover imagem atual
+                        </label>
                     </div>
                     {% else %}
                     <div style="margin-bottom: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px;">

@@ -741,15 +741,25 @@ def admin_editar_produto(id):
             nome = request.form['nome']
             preco = float(request.form['preco'])
             descricao = request.form['descricao']
+            remover_imagem = request.form.get('remover_imagem') == '1'
             
-            # Processar upload da nova imagem
-            imagem_path = None
-            if 'imagem' in request.files:
+            # 🔽 VERIFICAR SE DEVE REMOVER A IMAGEM ATUAL
+            if remover_imagem:
+                # Busca a imagem atual para remover o arquivo
+                produto_atual = conn.execute('SELECT imagem FROM produtos WHERE id = ?', (id,)).fetchone()
+                if produto_atual and produto_atual['imagem']:
+                    old_image_path = os.path.join(app.root_path, '..', produto_atual['imagem'])
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+                # Define como None no banco
+                imagem_path = None
+            
+            # Processar upload da nova imagem (se não estiver removendo)
+            elif 'imagem' in request.files:
                 file = request.files['imagem']
                 if file and file.filename != '' and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     unique_filename = f"{uuid.uuid4().hex}_{filename}"
-                    # 🔽 CORREÇÃO: Salvar o caminho COMPLETO
                     imagem_path = os.path.join('static', 'uploads', unique_filename)
                     
                     file.save(os.path.join(app.root_path, '..', imagem_path))
@@ -760,9 +770,17 @@ def admin_editar_produto(id):
                         old_image_path = os.path.join(app.root_path, '..', produto_antigo['imagem'])
                         if os.path.exists(old_image_path):
                             os.remove(old_image_path)
+                else:
+                    # Se não enviou nova imagem, mantém a atual
+                    produto_atual = conn.execute('SELECT imagem FROM produtos WHERE id = ?', (id,)).fetchone()
+                    imagem_path = produto_atual['imagem'] if produto_atual else None
+            else:
+                # Se não enviou nova imagem, mantém a atual
+                produto_atual = conn.execute('SELECT imagem FROM produtos WHERE id = ?', (id,)).fetchone()
+                imagem_path = produto_atual['imagem'] if produto_atual else None
             
             # Atualiza o produto
-            if imagem_path:
+            if remover_imagem or imagem_path:
                 conn.execute(
                     'UPDATE produtos SET nome = ?, preco = ?, descricao = ?, imagem = ? WHERE id = ?',
                     (nome, preco, descricao, imagem_path, id)
