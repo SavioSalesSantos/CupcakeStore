@@ -673,42 +673,65 @@ def admin_adicionar_produto():
         preco = float(request.form['preco'])
         descricao = request.form['descricao']
         
+        print(f"📝 Dados do formulário: {nome}, {preco}, {descricao}")
+        
         # Processar upload da imagem
         imagem_path = None
         if 'imagem' in request.files:
             file = request.files['imagem']
+            print(f"📁 Arquivo recebido: {file.filename}")
+            
             if file and file.filename != '' and allowed_file(file.filename):
+                print("✅ Arquivo válido")
+                
                 # Gera nome único para a imagem
                 filename = secure_filename(file.filename)
                 unique_filename = f"{uuid.uuid4().hex}_{filename}"
-                # 🔽 CORREÇÃO: Salvar o caminho COMPLETO para o static
-                imagem_path = os.path.join('static', 'uploads', unique_filename)
+                # 🔽 CORREÇÃO: Usar barras normais independente do sistema operacional
+                imagem_path = f"uploads/{unique_filename}"
                 
-                # Salva a imagem (caminho completo)
-                file.save(os.path.join(app.root_path, '..', imagem_path))
+                print(f"📂 Caminho da imagem: {imagem_path}")
                 
-                # 🔥 OPcional: Redimensiona a imagem
+                # Cria o caminho completo para salvar
+                full_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                print(f"📂 Caminho completo: {full_path}")
+                
+                # Garante que o diretório existe
+                os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                
+                # Salva a imagem
+                file.save(full_path)
+                print("✅ Imagem salva com sucesso")
+                
+                # Tenta redimensionar
                 try:
-                    img = Image.open(os.path.join(app.root_path, '..', imagem_path))
+                    img = Image.open(full_path)
                     img.thumbnail((500, 500))
-                    img.save(os.path.join(app.root_path, '..', imagem_path))
+                    img.save(full_path)
+                    print("✅ Imagem redimensionada")
                 except Exception as e:
-                    print(f"⚠️ Erro ao redimensionar imagem: {e}")
-                    # Continua mesmo se não conseguir redimensionar
+                    print(f"⚠️ Erro ao redimensionar: {e}")
+            else:
+                print("❌ Arquivo inválido ou não permitido")
 
         conn = get_db_connection()
         conn.execute(
             'INSERT INTO produtos (nome, preco, descricao, imagem) VALUES (?, ?, ?, ?)',
-            (nome, preco, descricao, imagem_path)  # Agora com caminho completo
+            (nome, preco, descricao, imagem_path)
         )
         conn.commit()
         conn.close()
         
+        print("✅ Produto adicionado ao banco")
         flash('Produto adicionado com sucesso!', 'success')
         return redirect(url_for('admin_produtos'))
         
     except Exception as e:
-        print(f"❌ Erro ao adicionar produto: {e}")
+        print(f"❌ ERRO DETALHADO ao adicionar produto: {str(e)}")
+        print(f"❌ Tipo do erro: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
+        
         flash('Erro ao adicionar produto. Verifique os dados.', 'error')
         return redirect(url_for('admin_produtos'))
 
@@ -748,7 +771,9 @@ def admin_editar_produto(id):
                 # Busca a imagem atual para remover o arquivo
                 produto_atual = conn.execute('SELECT imagem FROM produtos WHERE id = ?', (id,)).fetchone()
                 if produto_atual and produto_atual['imagem']:
-                    old_image_path = os.path.join(app.root_path, '..', produto_atual['imagem'])
+                    # Extrai apenas o nome do arquivo do caminho
+                    filename = os.path.basename(produto_atual['imagem'])
+                    old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     if os.path.exists(old_image_path):
                         os.remove(old_image_path)
                 # Define como None no banco
@@ -760,14 +785,18 @@ def admin_editar_produto(id):
                 if file and file.filename != '' and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     unique_filename = f"{uuid.uuid4().hex}_{filename}"
-                    imagem_path = os.path.join('static', 'uploads', unique_filename)
+                    # 🔽 CORREÇÃO: Usar barras normais
+                    imagem_path = f"uploads/{unique_filename}"
                     
-                    file.save(os.path.join(app.root_path, '..', imagem_path))
+                    full_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                    file.save(full_path)
                     
                     # Remove imagem antiga se existir
                     produto_antigo = conn.execute('SELECT imagem FROM produtos WHERE id = ?', (id,)).fetchone()
                     if produto_antigo and produto_antigo['imagem']:
-                        old_image_path = os.path.join(app.root_path, '..', produto_antigo['imagem'])
+                        # Extrai apenas o nome do arquivo do caminho antigo
+                        old_filename = os.path.basename(produto_antigo['imagem'])
+                        old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
                         if os.path.exists(old_image_path):
                             os.remove(old_image_path)
                 else:
@@ -780,17 +809,10 @@ def admin_editar_produto(id):
                 imagem_path = produto_atual['imagem'] if produto_atual else None
             
             # Atualiza o produto
-            if remover_imagem or imagem_path:
-                conn.execute(
-                    'UPDATE produtos SET nome = ?, preco = ?, descricao = ?, imagem = ? WHERE id = ?',
-                    (nome, preco, descricao, imagem_path, id)
-                )
-            else:
-                conn.execute(
-                    'UPDATE produtos SET nome = ?, preco = ?, descricao = ? WHERE id = ?',
-                    (nome, preco, descricao, id)
-                )
-            
+            conn.execute(
+                'UPDATE produtos SET nome = ?, preco = ?, descricao = ?, imagem = ? WHERE id = ?',
+                (nome, preco, descricao, imagem_path, id)
+            )
             conn.commit()
             conn.close()
             
