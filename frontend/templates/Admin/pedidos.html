@@ -279,6 +279,18 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-atualizar:hover {
+            background: linear-gradient(135deg, #219653, #1e8449);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-atualizar:active {
+            transform: translateY(1px) scale(0.98);
         }
 
         .btn-detalhes {
@@ -737,6 +749,40 @@
             window.location.href = `/admin/pedidos?status=${status}`;
         }
 
+        // 👇 FUNÇÃO PARA MOSTRAR NOTIFICAÇÕES FLASH (SUBSTITUI ALERTAS)
+        function mostrarNotificacaoFlash(mensagem, tipo = 'success') {
+            // Cria elemento de notificação
+            const notificacao = document.createElement('div');
+            notificacao.className = `notificacao ${tipo}`;
+            notificacao.style.position = 'fixed';
+            notificacao.style.top = '20px';
+            notificacao.style.right = '20px';
+            notificacao.style.zIndex = '10000';
+
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+
+            notificacao.innerHTML = `
+        <span class="notificacao-icon">${icons[tipo] || '✅'}</span>
+        <div class="notificacao-conteudo">
+            <div class="notificacao-mensagem">${mensagem}</div>
+        </div>
+        <button class="btn-fechar" onclick="this.parentElement.remove()">×</button>
+    `;
+
+            document.body.appendChild(notificacao);
+
+            // Remove automaticamente após 3 segundos
+            setTimeout(() => {
+                if (notificacao.parentElement) {
+                    notificacao.remove();
+                }
+            }, 3000);
+        }
+
         // 👇 ATUALIZAR STATUS
         function atualizarStatus(pedidoId) {
             const select = document.getElementById(`status-${pedidoId}`);
@@ -752,10 +798,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Status atualizado com sucesso!');
-                        location.reload();
+                        // Mostra notificação elegante em vez de alerta
+                        mostrarNotificacaoFlash('Status atualizado com sucesso!', 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     } else {
-                        alert('Erro ao atualizar status: ' + data.message);
+                        mostrarNotificacaoFlash('Erro ao atualizar status: ' + data.message, 'error');
                     }
                 })
                 .catch(error => {

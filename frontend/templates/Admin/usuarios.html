@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,7 @@
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         .admin-header {
             display: flex;
             justify-content: space-between;
@@ -20,21 +21,21 @@
             padding-bottom: 15px;
             border-bottom: 3px solid #ff6b8b;
         }
-        
+
         .admin-nav {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
-        
+
         .nav-links {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-        
+
         .nav-links a {
             padding: 12px 20px;
             background: linear-gradient(135deg, #3498db, #2980b9);
@@ -44,65 +45,65 @@
             font-weight: bold;
             transition: all 0.3s ease;
         }
-        
+
         .nav-links a:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
-        
+
         .nav-links a.active {
             background: linear-gradient(135deg, #ff6b8b, #ff4d73);
         }
-        
+
         .usuarios-table {
             width: 100%;
             border-collapse: collapse;
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .usuarios-table th,
         .usuarios-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-        
+
         .usuarios-table th {
             background: linear-gradient(135deg, #ff6b8b, #ff4d73);
             color: white;
             font-weight: bold;
         }
-        
+
         .usuarios-table tr:hover {
             background: #f8f9fa;
         }
-        
+
         .admin-badge {
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.9em;
             font-weight: bold;
         }
-        
+
         .badge-admin {
             background: #ff6b8b;
             color: white;
         }
-        
+
         .badge-user {
             background: #3498db;
             color: white;
         }
-        
+
         .badge-master {
             background: linear-gradient(135deg, #ff6b8b, #ff4d73);
             color: white;
             border: 2px solid gold;
         }
-        
+
         .btn-acao {
             padding: 6px 12px;
             border: none;
@@ -112,50 +113,50 @@
             margin: 2px;
             transition: all 0.3s ease;
         }
-        
+
         .btn-toggle-admin {
             background: linear-gradient(135deg, #27ae60, #219653);
             color: white;
         }
-        
+
         .btn-remove-admin {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
         }
-        
+
         .btn-editar {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
         }
-        
+
         .btn-excluir {
             background: linear-gradient(135deg, #95a5a6, #7f8c8d);
             color: white;
         }
-        
+
         .btn-master {
             background: linear-gradient(135deg, #ff6b8b, #ff4d73);
             color: white;
             cursor: default;
             opacity: 0.8;
         }
-        
+
         .btn-acao:hover:not(.btn-master) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
-        
+
         .btn-acao:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         .search-bar {
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
         }
-        
+
         .search-bar input {
             flex: 1;
             padding: 12px;
@@ -163,14 +164,27 @@
             border-radius: 8px;
             font-size: 16px;
         }
-        
+
         .search-bar button {
             padding: 12px 20px;
-            background: #ff6b8b;
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+        }
+
+        .search-bar button:hover {
+            background: linear-gradient(135deg, #ff4d73, #ff3366);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        .search-bar button:active {
+            transform: translateY(1px) scale(0.98);
         }
 
         /* Estilos para mensagens flash */
@@ -308,16 +322,22 @@
 
         /* 👇 ANIMAÇÕES */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(-50px) scale(0.9);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
@@ -328,23 +348,24 @@
             .usuarios-table {
                 font-size: 14px;
             }
-            
+
             .btn-acao {
                 padding: 4px 8px;
                 font-size: 12px;
             }
-            
+
             .modal-content {
                 margin: 20% auto;
                 width: 95%;
             }
-            
+
             .modal-footer {
                 flex-direction: column;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="admin-container">
         <div class="admin-header">
@@ -354,7 +375,7 @@
                 <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
             </div>
         </div>
-        
+
         <div class="admin-nav">
             <div class="nav-links">
                 <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
@@ -366,25 +387,25 @@
 
         <!-- 👇 MENSAGENS FLASH -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
 
         <div class="search-bar">
             <input type="text" placeholder="🔍 Buscar usuários..." id="searchInput">
             <button onclick="filtrarUsuarios()">Buscar</button>
         </div>
-        
+
         <div class="usuarios-list">
             <h2>📋 Todos os Usuários ({{ usuarios|length }})</h2>
-            
+
             <table class="usuarios-table">
                 <thead>
                     <tr>
@@ -404,54 +425,52 @@
                         <td>{{ usuario['email'] }}</td>
                         <td>
                             {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
-                                <span class="admin-badge badge-master">👑 Master</span>
+                            <span class="admin-badge badge-master">👑 Master</span>
                             {% elif usuario['is_admin'] == 1 %}
-                                <span class="admin-badge badge-admin">Administrador</span>
+                            <span class="admin-badge badge-admin">Administrador</span>
                             {% else %}
-                                <span class="admin-badge badge-user">Usuário</span>
+                            <span class="admin-badge badge-user">Usuário</span>
                             {% endif %}
                         </td>
                         <td>{{ usuario['created_at'] }}</td>
                         <td>
                             <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                                 {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
-                                    <!-- CONTA MASTER - AÇÕES BLOQUEADAS -->
-                                    <button class="btn-acao btn-master" disabled title="Conta master protegida">
-                                        👑 Protegido
-                                    </button>
-                                    
+                                <!-- CONTA MASTER - AÇÕES BLOQUEADAS -->
+                                <button class="btn-acao btn-master" disabled title="Conta master protegida">
+                                    👑 Protegido
+                                </button>
+
                                 {% else %}
-                                    <!-- USUÁRIOS NORMAIS -->
-                                    {% if usuario['is_admin'] == 1 %}
-                                        <button class="btn-acao btn-remove-admin" 
-                                                onclick="toggleAdmin({{ usuario['id'] }}, 0)">
-                                            Remover Admin
-                                        </button>
-                                    {% else %}
-                                        <button class="btn-acao btn-toggle-admin" 
-                                                onclick="toggleAdmin({{ usuario['id'] }}, 1)">
-                                            Tornar Admin
-                                        </button>
-                                    {% endif %}
-                                    
-                                    <button class="btn-acao btn-editar" 
-                                            onclick="editarUsuario({{ usuario['id'] }})">
-                                        ✏️ Editar
-                                    </button>
-                                    
-                                    {% if usuario['id'] != session['user_id'] %}
-                                        <!-- FORMULÁRIO INVISÍVEL PARA EXCLUSÃO -->
-                                        <form action="{{ url_for('admin_excluir_usuario', user_id=usuario['id']) }}" method="POST" style="display: none;" id="form-excluir-{{ usuario['id'] }}">
-                                        </form>
-                                        <button class="btn-acao btn-excluir" 
-                                                onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
-                                            🗑️ Excluir
-                                        </button>
-                                    {% else %}
-                                        <button class="btn-acao" disabled title="Não pode excluir a si mesmo">
-                                            🚫 Excluir
-                                        </button>
-                                    {% endif %}
+                                <!-- USUÁRIOS NORMAIS -->
+                                {% if usuario['is_admin'] == 1 %}
+                                <button class="btn-acao btn-remove-admin" onclick="toggleAdmin({{ usuario['id'] }}, 0)">
+                                    Remover Admin
+                                </button>
+                                {% else %}
+                                <button class="btn-acao btn-toggle-admin" onclick="toggleAdmin({{ usuario['id'] }}, 1)">
+                                    Tornar Admin
+                                </button>
+                                {% endif %}
+
+                                <button class="btn-acao btn-editar" onclick="editarUsuario({{ usuario['id'] }})">
+                                    ✏️ Editar
+                                </button>
+
+                                {% if usuario['id'] != session['user_id'] %}
+                                <!-- FORMULÁRIO INVISÍVEL PARA EXCLUSÃO -->
+                                <form action="{{ url_for('admin_excluir_usuario', user_id=usuario['id']) }}"
+                                    method="POST" style="display: none;" id="form-excluir-{{ usuario['id'] }}">
+                                </form>
+                                <button class="btn-acao btn-excluir"
+                                    onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
+                                    🗑️ Excluir
+                                </button>
+                                {% else %}
+                                <button class="btn-acao" disabled title="Não pode excluir a si mesmo">
+                                    🚫 Excluir
+                                </button>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </td>
@@ -481,98 +500,99 @@
     </div>
 
     <script>
-    // 👇 VARIÁVEIS GLOBAIS
-    let usuarioIdParaExcluir = null;
-    let usuarioNomeParaExcluir = null;
+        // 👇 VARIÁVEIS GLOBAIS
+        let usuarioIdParaExcluir = null;
+        let usuarioNomeParaExcluir = null;
 
-    // 👇 FUNÇÃO PARA FILTRAR USUÁRIOS
-    function filtrarUsuarios() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const rows = document.querySelectorAll('.usuario-row');
-        
-        rows.forEach(row => {
-            const username = row.cells[1].textContent.toLowerCase();
-            const email = row.cells[2].textContent.toLowerCase();
-            
-            if (username.includes(searchTerm) || email.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
+        // 👇 FUNÇÃO PARA FILTRAR USUÁRIOS
+        function filtrarUsuarios() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('.usuario-row');
 
-    // 👇 ABRIR MODAL DE EXCLUSÃO
-    function abrirModalExclusaoUsuario(id, username) {
-        usuarioIdParaExcluir = id;
-        usuarioNomeParaExcluir = username;
-        
-        document.getElementById('nome-usuario-excluir').textContent = username;
-        document.getElementById('modalExclusaoUsuario').style.display = 'block';
-    }
+            rows.forEach(row => {
+                const username = row.cells[1].textContent.toLowerCase();
+                const email = row.cells[2].textContent.toLowerCase();
 
-    // 👇 FECHAR MODAL
-    function fecharModalUsuario() {
-        document.getElementById('modalExclusaoUsuario').style.display = 'none';
-        usuarioIdParaExcluir = null;
-        usuarioNomeParaExcluir = null;
-    }
-
-    // 👇 CONFIRMAR EXCLUSÃO (VERSÃO CORRIGIDA)
-    function confirmarExclusaoUsuario() {
-        if (usuarioIdParaExcluir) {
-            // Cria um formulário temporário para enviar a requisição POST
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/admin/usuario/${usuarioIdParaExcluir}/excluir`;
-            
-            // Adiciona o formulário à página e envia
-            document.body.appendChild(form);
-            form.submit();
+                if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
-        fecharModalUsuario();
-    }
 
-    // 👇 EDITAR USUÁRIO
-    function editarUsuario(id) {
-        window.location.href = `/admin/usuario/${id}/editar`;
-    }
+        // 👇 ABRIR MODAL DE EXCLUSÃO
+        function abrirModalExclusaoUsuario(id, username) {
+            usuarioIdParaExcluir = id;
+            usuarioNomeParaExcluir = username;
 
-    // 👇 TOGGLE ADMIN (Já existente - manter)
-    function toggleAdmin(userId, isAdmin) {
-        fetch('/admin/usuario/' + userId + '/admin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ is_admin: isAdmin })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao atualizar permissões: ' + data.message);
+            document.getElementById('nome-usuario-excluir').textContent = username;
+            document.getElementById('modalExclusaoUsuario').style.display = 'block';
+        }
+
+        // 👇 FECHAR MODAL
+        function fecharModalUsuario() {
+            document.getElementById('modalExclusaoUsuario').style.display = 'none';
+            usuarioIdParaExcluir = null;
+            usuarioNomeParaExcluir = null;
+        }
+
+        // 👇 CONFIRMAR EXCLUSÃO (VERSÃO CORRIGIDA)
+        function confirmarExclusaoUsuario() {
+            if (usuarioIdParaExcluir) {
+                // Cria um formulário temporário para enviar a requisição POST
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/usuario/${usuarioIdParaExcluir}/excluir`;
+
+                // Adiciona o formulário à página e envia
+                document.body.appendChild(form);
+                form.submit();
             }
-        })
-        .catch(error => {
-            alert('Erro ao atualizar permissões');
-            console.error('Error:', error);
-        });
-    }
+            fecharModalUsuario();
+        }
 
-    // 👇 EVENT LISTENERS PARA A MODAL
-    document.addEventListener('DOMContentLoaded', function() {
-        // Fechar modal ao clicar fora do conteúdo
-        document.getElementById('modalExclusaoUsuario').addEventListener('click', function(e) {
-            if (e.target === this) {
-                fecharModalUsuario();
-            }
-        });
+        // 👇 EDITAR USUÁRIO
+        function editarUsuario(id) {
+            window.location.href = `/admin/usuario/${id}/editar`;
+        }
 
-        // Busca em tempo real
-        document.getElementById('searchInput').addEventListener('input', filtrarUsuarios);
-    });
+        // 👇 TOGGLE ADMIN (Já existente - manter)
+        function toggleAdmin(userId, isAdmin) {
+            fetch('/admin/usuario/' + userId + '/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ is_admin: isAdmin })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Erro ao atualizar permissões: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao atualizar permissões');
+                    console.error('Error:', error);
+                });
+        }
+
+        // 👇 EVENT LISTENERS PARA A MODAL
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fechar modal ao clicar fora do conteúdo
+            document.getElementById('modalExclusaoUsuario').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    fecharModalUsuario();
+                }
+            });
+
+            // Busca em tempo real
+            document.getElementById('searchInput').addEventListener('input', filtrarUsuarios);
+        });
     </script>
 </body>
+
 </html>

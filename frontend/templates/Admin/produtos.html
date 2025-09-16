@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,7 @@
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         .admin-header {
             display: flex;
             justify-content: space-between;
@@ -20,21 +21,21 @@
             padding-bottom: 15px;
             border-bottom: 3px solid #ff6b8b;
         }
-        
+
         .admin-nav {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
-        
+
         .nav-links {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-        
+
         .nav-links a {
             padding: 12px 20px;
             background: linear-gradient(135deg, #3498db, #2980b9);
@@ -44,74 +45,92 @@
             font-weight: bold;
             transition: all 0.3s ease;
         }
-        
+
         .nav-links a:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
-        
+
         .nav-links a.active {
             background: linear-gradient(135deg, #ff6b8b, #ff4d73);
         }
-        
+
         .produtos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
-        
+
         .produto-card {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .produto-actions {
             display: flex;
             gap: 10px;
             margin-top: 15px;
         }
-        
+
         .btn-edit {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
             padding: 8px 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
         }
-        
+
         .btn-delete {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
             padding: 8px 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
         }
-        
+
+        .btn-edit:hover,
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-edit:active,
+        .btn-delete:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
         .add-produto {
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
-        
+
         .form-group {
             margin-bottom: 15px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        
-        .form-group input, .form-group textarea {
+
+        .form-group input,
+        .form-group textarea {
             width: 100%;
             padding: 10px;
             border: 2px solid #ddd;
@@ -251,16 +270,22 @@
 
         /* 👇 ANIMAÇÕES */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(-50px) scale(0.9);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
@@ -272,13 +297,14 @@
                 margin: 20% auto;
                 width: 95%;
             }
-            
+
             .modal-footer {
                 flex-direction: column;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="admin-container">
         <div class="admin-header">
@@ -288,7 +314,7 @@
                 <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
             </div>
         </div>
-        
+
         <div class="admin-nav">
             <div class="nav-links">
                 <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
@@ -300,17 +326,17 @@
 
         <!-- 👇 MENSAGENS FLASH -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
-        
+
         <div class="add-produto">
             <h2>➕ Adicionar Novo Produto</h2>
             <form action="{{ url_for('admin_adicionar_produto') }}" method="POST" enctype="multipart/form-data">
@@ -318,41 +344,42 @@
                     <label for="nome">Nome do Produto:</label>
                     <input type="text" id="nome" name="nome" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="preco">Preço:</label>
                     <input type="number" id="preco" name="preco" step="0.01" min="0" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="descricao">Descrição:</label>
                     <textarea id="descricao" name="descricao" rows="3" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="imagem">Imagem do Produto:</label>
                     <input type="file" id="imagem" name="imagem" accept="image/*">
                     <small>Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP (até 16MB)</small>
                 </div>
-                
+
                 <button type="submit" class="btn-finalizar">Adicionar Produto</button>
             </form>
         </div>
-        
+
         <h2>📋 Lista de Produtos</h2>
-        
+
         <div class="produtos-grid">
             {% for produto in produtos %}
             <div class="produto-card">
                 <h3>{{ produto['nome'] }}</h3>
                 <p><strong>Preço:</strong> R$ {{ "%.2f"|format(produto['preco']) }}</p>
                 <p><strong>Descrição:</strong> {{ produto['descricao'] }}</p>
-                
+
                 <div class="produto-actions">
                     <a href="{{ url_for('admin_editar_produto', id=produto['id']) }}" class="btn-edit">✏️ Editar</a>
-                    <form action="{{ url_for('admin_remover_produto', id=produto['id']) }}" method="POST" style="display: inline;">
-                        <button type="button" class="btn-delete" 
-                                onclick="abrirModalExclusao({{ produto['id'] }}, '{{ produto['nome'] }}')">
+                    <form action="{{ url_for('admin_remover_produto', id=produto['id']) }}" method="POST"
+                        style="display: inline;">
+                        <button type="button" class="btn-delete"
+                            onclick="abrirModalExclusao({{ produto['id'] }}, '{{ produto['nome'] }}')">
                             🗑️ Excluir
                         </button>
                     </form>
@@ -370,7 +397,8 @@
                 <span class="modal-close">&times;</span>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja excluir o produto <strong id="nome-produto-excluir">[Nome do Produto]</strong>?</p>
+                <p>Tem certeza que deseja excluir o produto <strong id="nome-produto-excluir">[Nome do
+                        Produto]</strong>?</p>
                 <p>Esta ação não pode ser desfeita.</p>
             </div>
             <div class="modal-footer">
@@ -381,54 +409,55 @@
     </div>
 
     <script>
-    // 👇 VARIÁVEIS GLOBAIS
-    let produtoIdParaExcluir = null;
-    let produtoNomeParaExcluir = null;
+        // 👇 VARIÁVEIS GLOBAIS
+        let produtoIdParaExcluir = null;
+        let produtoNomeParaExcluir = null;
 
-    // 👇 ABRIR MODAL
-    function abrirModalExclusao(id, nome) {
-        produtoIdParaExcluir = id;
-        produtoNomeParaExcluir = nome;
-        
-        document.getElementById('nome-produto-excluir').textContent = nome;
-        document.getElementById('modalConfirmacao').style.display = 'block';
-    }
+        // 👇 ABRIR MODAL
+        function abrirModalExclusao(id, nome) {
+            produtoIdParaExcluir = id;
+            produtoNomeParaExcluir = nome;
 
-    // 👇 FECHAR MODAL
-    function fecharModal() {
-        document.getElementById('modalConfirmacao').style.display = 'none';
-        produtoIdParaExcluir = null;
-        produtoNomeParaExcluir = null;
-    }
-
-    // 👇 CONFIRMAR EXCLUSÃO
-    function confirmarExclusao() {
-        if (produtoIdParaExcluir) {
-            // Envia o formulário de exclusão
-            const form = document.querySelector(`form[action="/admin/produto/${produtoIdParaExcluir}/remover"]`);
-            if (form) {
-                form.submit();
-            }
+            document.getElementById('nome-produto-excluir').textContent = nome;
+            document.getElementById('modalConfirmacao').style.display = 'block';
         }
-        fecharModal();
-    }
 
-    // 👇 EVENT LISTENERS
-    document.addEventListener('DOMContentLoaded', function() {
-        // Fechar modal ao clicar no X ou no botão cancelar
-        document.querySelector('.modal-close').addEventListener('click', fecharModal);
-        document.querySelector('.btn-cancelar-modal').addEventListener('click', fecharModal);
-        
-        // Confirmar exclusão
-        document.querySelector('.btn-confirmar-modal').addEventListener('click', confirmarExclusao);
-        
-        // Fechar modal ao clicar fora do conteúdo
-        document.getElementById('modalConfirmacao').addEventListener('click', function(e) {
-            if (e.target === this) {
-                fecharModal();
+        // 👇 FECHAR MODAL
+        function fecharModal() {
+            document.getElementById('modalConfirmacao').style.display = 'none';
+            produtoIdParaExcluir = null;
+            produtoNomeParaExcluir = null;
+        }
+
+        // 👇 CONFIRMAR EXCLUSÃO
+        function confirmarExclusao() {
+            if (produtoIdParaExcluir) {
+                // Envia o formulário de exclusão
+                const form = document.querySelector(`form[action="/admin/produto/${produtoIdParaExcluir}/remover"]`);
+                if (form) {
+                    form.submit();
+                }
             }
+            fecharModal();
+        }
+
+        // 👇 EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fechar modal ao clicar no X ou no botão cancelar
+            document.querySelector('.modal-close').addEventListener('click', fecharModal);
+            document.querySelector('.btn-cancelar-modal').addEventListener('click', fecharModal);
+
+            // Confirmar exclusão
+            document.querySelector('.btn-confirmar-modal').addEventListener('click', confirmarExclusao);
+
+            // Fechar modal ao clicar fora do conteúdo
+            document.getElementById('modalConfirmacao').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    fecharModal();
+                }
+            });
         });
-    });
     </script>
 </body>
+
 </html>
