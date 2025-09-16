@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,7 @@
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         .admin-header {
             display: flex;
             justify-content: space-between;
@@ -20,25 +21,25 @@
             padding-bottom: 15px;
             border-bottom: 3px solid #ff6b8b;
         }
-        
+
         .form-editar {
             background: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
             color: #333;
         }
-        
+
         .form-group input {
             width: 100%;
             padding: 12px;
@@ -46,13 +47,13 @@
             border-radius: 8px;
             font-size: 16px;
         }
-        
+
         .form-actions {
             display: flex;
             gap: 15px;
             margin-top: 25px;
         }
-        
+
         .btn-salvar {
             background: linear-gradient(135deg, #27ae60, #219653);
             color: white;
@@ -62,7 +63,7 @@
             cursor: pointer;
             font-weight: bold;
         }
-        
+
         .btn-cancelar {
             background: linear-gradient(135deg, #95a5a6, #7f8c8d);
             color: white;
@@ -81,89 +82,94 @@
             font-weight: bold;
             margin-bottom: 20px;
         }
-        
+
         .badge-master {
             background: linear-gradient(135deg, #ff6b8b, #ff4d73);
             color: white;
             border: 2px solid gold;
         }
-        
+
         .badge-admin {
             background: #ff6b8b;
             color: white;
         }
-        
+
         .badge-user {
             background: #3498db;
             color: white;
         }
     </style>
 </head>
+
 <body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1>✏️ Editar Usuário</h1>
-            <div>
-                <a href="{{ url_for('admin_usuarios') }}" class="btn-cancelar">← Voltar</a>
-            </div>
-        </div>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-        
-        <div class="form-editar">
-            <!-- Badge de tipo de usuário -->
-            {% if usuario.email == 'saviosales@cupcakestore.com' %}
-                <div class="user-type-badge badge-master">👑 Conta Master</div>
-            {% elif usuario.is_admin == 1 %}
-                <div class="user-type-badge badge-admin">Administrador</div>
-            {% else %}
-                <div class="user-type-badge badge-user">Usuário</div>
-            {% endif %}
-            
-            <form action="{{ url_for('admin_editar_usuario', user_id=usuario.id) }}" method="POST">
-                <div class="form-group">
-                    <label for="username">Nome de usuário:</label>
-                    <input type="text" id="username" name="username" value="{{ usuario.username }}" required 
-                           {% if usuario.email == 'saviosales@cupcakestore.com' %}disabled{% endif %}>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="{{ usuario.email }}" required
-                           {% if usuario.email == 'saviosales@cupcakestore.com' %}disabled{% endif %}>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Nova senha (deixe em branco para não alterar):</label>
-                    <input type="password" id="password" name="password" placeholder="••••••••">
-                </div>
-                
-                {% if usuario.email != 'saviosales@cupcakestore.com' %}
-                <div class="form-group">
-                    <label for="is_admin">
-                        <input type="checkbox" id="is_admin" name="is_admin" value="1" 
-                               {% if usuario.is_admin == 1 %}checked{% endif %}>
-                        É administrador
-                    </label>
-                </div>
-                {% endif %}
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn-salvar">💾 Salvar Alterações</button>
-                    <a href="{{ url_for('admin_usuarios') }}" class="btn-cancelar">❌ Cancelar</a>
-                </div>
-            </form>
+    <div class="admin-header">
+        <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none;">
+            <h1 style="margin: 0; color: #ff6b8b;">🍰 CupcakeStore </h1>
+        </a>
+        <h1>Editar Usuário</h1>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn-voltar">← Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
         </div>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="form-editar">
+        <!-- Badge de tipo de usuário -->
+        {% if usuario.email == 'saviosales@cupcakestore.com' %}
+        <div class="user-type-badge badge-master">👑 Conta Master</div>
+        {% elif usuario.is_admin == 1 %}
+        <div class="user-type-badge badge-admin">Administrador</div>
+        {% else %}
+        <div class="user-type-badge badge-user">Usuário</div>
+        {% endif %}
+
+        <form action="{{ url_for('admin_editar_usuario', user_id=usuario.id) }}" method="POST">
+            <div class="form-group">
+                <label for="username">Nome de usuário:</label>
+                <input type="text" id="username" name="username" value="{{ usuario.username }}" required {% if
+                    usuario.email=='saviosales@cupcakestore.com' %}disabled{% endif %}>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ usuario.email }}" required {% if
+                    usuario.email=='saviosales@cupcakestore.com' %}disabled{% endif %}>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Nova senha (deixe em branco para não alterar):</label>
+                <input type="password" id="password" name="password" placeholder="••••••••">
+            </div>
+
+            {% if usuario.email != 'saviosales@cupcakestore.com' %}
+            <div class="form-group">
+                <label for="is_admin">
+                    <input type="checkbox" id="is_admin" name="is_admin" value="1" {% if usuario.is_admin==1 %}checked{%
+                        endif %}>
+                    É administrador
+                </label>
+            </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn-salvar">💾 Salvar Alterações</button>
+                <a href="{{ url_for('admin_usuarios') }}" class="btn-cancelar">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+    </div>
 </body>
+
 </html>

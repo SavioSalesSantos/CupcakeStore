@@ -1015,3 +1015,38 @@ h1 {
         font-size: 14px !important;
     }
 }
+
+/* 🎨 ESTILOS DA LOGO */
+.logo {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo h1 {
+    margin: 0;
+    color: #ff6b8b;
+    font-size: 2.2em;
+    transition: all 0.3s ease;
+}
+
+.logo:hover h1 {
+    color: #ff4d73;
+    text-shadow: 0 2px 10px rgba(255, 107, 139, 0.3);
+}
+
+/* 🔽 RESPONSIVIDADE */
+@media (max-width: 768px) {
+    .logo h1 {
+        font-size: 1.8em;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
