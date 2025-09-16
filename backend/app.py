@@ -207,7 +207,10 @@ def get_nome_produto(id_produto):
     except Exception as e:
         return {'nome': 'Produto'}
 
-# === ROTAS DE AUTENTICAÇÃO ===
+#============================================
+# 👇 ROTAS DE AUTENTICAÇÃO
+#============================================
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -283,7 +286,10 @@ def logout():
     flash('Você fez logout com sucesso!', 'success')
     return redirect(url_for('home'))
 
-# === ROTAS DE PEDIDOS ===
+# =============================================
+# 👇 ROTAS DE PEDIDOS
+# =============================================
+
 @app.route('/finalizar-compra')
 def finalizar_compra():
     """Página de confirmação de compra finalizada (AGORA SALVA NO BANCO)"""
@@ -368,6 +374,43 @@ def meus_pedidos():
         print(f"❌ Erro ao carregar pedidos: {e}")
         flash('Erro ao carregar seus pedidos.', 'error')
         return redirect(url_for('home'))
+    
+@app.route('/admin/pedidos/resetar-numeracao', methods=['POST'])
+@admin_required
+def admin_resetar_numeracao_pedidos():
+    """Reinicia a numeração automática dos pedidos"""
+    try:
+        conn = get_db_connection()
+        
+        # Busca o próximo ID que seria usado
+        next_id = conn.execute("SELECT seq FROM sqlite_sequence WHERE name='orders'").fetchone()
+        
+        if next_id:
+            # Reseta a sequência para o próximo ID disponível
+            max_id = conn.execute("SELECT COALESCE(MAX(id), 0) FROM orders").fetchone()[0]
+            next_val = max_id + 1 if max_id > 0 else 1
+            
+            conn.execute("UPDATE sqlite_sequence SET seq = ? WHERE name='orders'", (next_val,))
+            conn.commit()
+            
+            flash(f'Numeração resetada! Próximo pedido será #{(max_id + 1) if max_id > 0 else 1}', 'success')
+        else:
+            # Se não existir sequência, cria uma
+            max_id = conn.execute("SELECT COALESCE(MAX(id), 0) FROM orders").fetchone()[0]
+            next_val = max_id + 1 if max_id > 0 else 1
+            
+            conn.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('orders', ?)", (next_val,))
+            conn.commit()
+            
+            flash(f'Sequência criada! Próximo pedido será #{(max_id + 1) if max_id > 0 else 1}', 'success')
+        
+        conn.close()
+        return jsonify({'success': True, 'proximo_id': next_val})
+        
+    except Exception as e:
+        print(f"❌ Erro ao resetar numeração: {e}")
+        flash('Erro ao resetar numeração de pedidos', 'error')
+        return jsonify({'success': False, 'message': str(e)})
 
 # =============================================
 # 👇 ROTAS DO PAINEL ADMIN

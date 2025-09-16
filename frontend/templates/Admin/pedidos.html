@@ -108,6 +108,17 @@
             color: white;
         }
 
+        .btn-status.reset-numeracao {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
+        .btn-status.reset-numeracao:hover {
+            background: linear-gradient(135deg, #8e44ad, #6c3483);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        }
+
         .btn-status:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -594,6 +605,9 @@
                     onclick="filtrarPorStatus('cancelado')">
                     ❌ Cancelados
                 </button>
+                <button class="btn-status reset-numeracao" onclick="abrirModalResetNumeracao()">
+                    🔄 Resetar Numeração
+                </button>
             </div>
         </div>
 
@@ -690,6 +704,25 @@
             <div class="modal-footer">
                 <button class="btn-cancelar-modal" onclick="fecharModalPedido()">❌ Cancelar</button>
                 <button class="btn-confirmar-modal" onclick="confirmarExclusaoPedido()">f🗑️ Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA RESET DE NUMERAÇÃO -->
+    <div id="modalResetNumeracao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔄 Resetar Numeração de Pedidos</h3>
+                <span class="modal-close" onclick="fecharModalResetNumeracao()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja resetar a numeração dos pedidos?</p>
+                <p>📝 <strong>Próximo pedido começará do número sequencial correto.</strong></p>
+                <p>⚠️ Esta ação não afeta os pedidos existentes, apenas a numeração futura.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancelar-modal" onclick="fecharModalResetNumeracao()">❌ Cancelar</button>
+                <button class="btn-confirmar-modal" onclick="confirmarResetNumeracao()">🔄 Sim, Resetar</button>
             </div>
         </div>
     </div>
@@ -846,6 +879,45 @@
             const termo = document.getElementById('searchPedidos').value.toLowerCase();
             // Implementar busca futuramente
         }
+
+        // 👇 FUNÇÕES PARA RESET DE NUMERAÇÃO
+        function abrirModalResetNumeracao() {
+            document.getElementById('modalResetNumeracao').style.display = 'block';
+        }
+
+        function fecharModalResetNumeracao() {
+            document.getElementById('modalResetNumeracao').style.display = 'none';
+        }
+
+        function confirmarResetNumeracao() {
+            fetch('/admin/pedidos/resetar-numeracao', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Fecha o modal e recarrega a página para ver a mensagem flash
+                        fecharModalResetNumeracao();
+                        window.location.href = '/admin/pedidos?status=' + (new URLSearchParams(window.location.search).get('status') || 'todos');
+                    } else {
+                        alert('Erro: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao resetar numeração');
+                });
+        }
+
+        // 👇 FECHAR MODAL AO CLICAR FORA
+        document.getElementById('modalResetNumeracao').addEventListener('click', function (e) {
+            if (e.target === this) {
+                fecharModalResetNumeracao();
+            }
+        });
     </script>
 </body>
 
