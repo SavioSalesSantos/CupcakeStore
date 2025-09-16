@@ -1,3 +1,7 @@
+# =============================================
+# 👇 IMPORTS (todas as importações)
+# =============================================
+
 from flask import Flask, render_template, session, redirect, url_for, request, flash, jsonify
 import os
 import sqlite3
@@ -6,6 +10,10 @@ import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from functools import wraps
+from werkzeug.utils import secure_filename 
+import uuid  
+from PIL import Image  
+import io 
 
 try:
     from database.database import get_db_connection
@@ -15,7 +23,9 @@ except ModuleNotFoundError:
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
     from database.database import get_db_connection
 
-# Obtém o caminho absoluto para as pastas frontend
+# =============================================
+# 👇 CONFIGURAÇÃO DO FLASK
+# =============================================
 base_dir = os.path.dirname(os.path.abspath(__file__))
 frontend_dir = os.path.join(base_dir, '..', 'frontend')
 template_dir = os.path.join(frontend_dir, 'templates')
@@ -25,7 +35,22 @@ app = Flask(__name__,
             template_folder=template_dir,
             static_folder=static_dir)
 
+# =============================================
+# 👇 CONFIGURAÇÕES DE UPLOAD
+# =============================================
+
+app.config['UPLOAD_FOLDER'] = os.path.join(static_dir, 'uploads')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# =============================================
 # 🔐 Chave secreta para sessions
+# =============================================
+
 app.secret_key = 'sua_chave_secreta_super_segura_aqui_2024'
 app.permanent_session_lifetime = timedelta(days=7)
 
@@ -130,7 +155,10 @@ def home():
     
     return render_template('index.html', produtos=produtos_list, termo_pesquisa=termo_pesquisa)
 
-# === ROTAS DO CARRINHO ===
+# =============================================
+# 👇 ROTAS DO CARRINHO  
+# =============================================
+
 @app.route('/adicionar/<int:id_produto>')
 def adicionar_carrinho(id_produto):
     if 'carrinho' not in session:
@@ -639,16 +667,38 @@ def toggle_admin_usuario(user_id):
 @app.route('/admin/produto/adicionar', methods=['POST'])
 @admin_required
 def admin_adicionar_produto():
-    """Adiciona um novo produto ao banco de dados"""
+    """Adiciona um novo produto com imagem"""
     try:
         nome = request.form['nome']
         preco = float(request.form['preco'])
         descricao = request.form['descricao']
         
+        # Processar upload da imagem
+        imagem_path = None
+        if 'imagem' in request.files:
+            file = request.files['imagem']
+            if file and file.filename != '' and allowed_file(file.filename):
+                # Gera nome único para a imagem
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                imagem_path = os.path.join('uploads', unique_filename)
+                
+                # Salva a imagem
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                
+                # 🔥 OPcional: Redimensiona a imagem
+                try:
+                    img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                    img.thumbnail((500, 500))
+                    img.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                except Exception as e:
+                    print(f"⚠️ Erro ao redimensionar imagem: {e}")
+                    # Continua mesmo se não conseguir redimensionar
+
         conn = get_db_connection()
         conn.execute(
-            'INSERT INTO produtos (nome, preco, descricao) VALUES (?, ?, ?)',
-            (nome, preco, descricao)
+            'INSERT INTO produtos (nome, preco, descricao, imagem) VALUES (?, ?, ?, ?)',
+            (nome, preco, descricao, imagem_path)
         )
         conn.commit()
         conn.close()
@@ -682,27 +732,51 @@ def admin_remover_produto(id):
 @app.route('/admin/produto/<int:id>/editar', methods=['GET', 'POST'])
 @admin_required
 def admin_editar_produto(id):
-    """Edita um produto existente"""
+    """Edita um produto existente com suporte a imagem"""
     try:
         conn = get_db_connection()
         
         if request.method == 'POST':
-            # Processar edição
             nome = request.form['nome']
             preco = float(request.form['preco'])
             descricao = request.form['descricao']
             
-            conn.execute(
-                'UPDATE produtos SET nome = ?, preco = ?, descricao = ? WHERE id = ?',
-                (nome, preco, descricao, id)
-            )
+            # Processar upload da nova imagem
+            imagem_path = None
+            if 'imagem' in request.files:
+                file = request.files['imagem']
+                if file and file.filename != '' and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                    imagem_path = os.path.join('uploads', unique_filename)
+                    
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                    
+                    # Remove imagem antiga se existir
+                    produto_antigo = conn.execute('SELECT imagem FROM produtos WHERE id = ?', (id,)).fetchone()
+                    if produto_antigo and produto_antigo['imagem']:
+                        old_image_path = os.path.join(static_dir, produto_antigo['imagem'])
+                        if os.path.exists(old_image_path):
+                            os.remove(old_image_path)
+            
+            # Atualiza o produto
+            if imagem_path:
+                conn.execute(
+                    'UPDATE produtos SET nome = ?, preco = ?, descricao = ?, imagem = ? WHERE id = ?',
+                    (nome, preco, descricao, imagem_path, id)
+                )
+            else:
+                conn.execute(
+                    'UPDATE produtos SET nome = ?, preco = ?, descricao = ? WHERE id = ?',
+                    (nome, preco, descricao, id)
+                )
+            
             conn.commit()
             conn.close()
             
             flash('Produto atualizado com sucesso!', 'success')
             return redirect(url_for('admin_produtos'))
         else:
-            # Mostrar formulário de edição
             produto = conn.execute('SELECT * FROM produtos WHERE id = ?', (id,)).fetchone()
             conn.close()
             

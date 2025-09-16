@@ -1,63 +1,66 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loja de Cupcakes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
     <header>
         <div class="header-content">
             <h1>🍰 CupcakeStore</h1>
             <div class="carrinho-info">
                 {% if session.get('user_id') %}
-                    <!-- 👇 USUÁRIO LOGADO - MENU DROPDOWN MELHORADO -->
-                    <div class="user-info">
-                        <div class="user-menu">
-                            <div class="user-trigger">
-                                <span class="user-avatar">👤</span>
-                                <span class="user-name">{{ session['username'] }}</span>
-                                <span class="dropdown-arrow">▼</span>
-                            </div>
-                            <div class="dropdown-content">
-                                <a href="{{ url_for('meus_pedidos') }}" class="dropdown-item">
-                                    <span class="item-icon">📦</span>
-                                    Meus Pedidos
-                                </a>
-                                
-                                <!-- 👇 NOVO ITEM - SÓ APARECE PARA ADMINS -->
-                                {% if is_admin() %}
-                                <a href="{{ url_for('admin_dashboard') }}" class="dropdown-item">
-                                    <span class="item-icon">👑</span>
-                                    Menu Admin
-                                </a>
-                                {% endif %}
-                                
-                                <a href="{{ url_for('logout') }}" class="dropdown-item">
-                                    <span class="item-icon">🚪</span>
-                                    Sair
-                                </a>
-                            </div>
+                <!-- 👇 USUÁRIO LOGADO - MENU DROPDOWN MELHORADO -->
+                <div class="user-info">
+                    <div class="user-menu">
+                        <div class="user-trigger">
+                            <span class="user-avatar">👤</span>
+                            <span class="user-name">{{ session['username'] }}</span>
+                            <span class="dropdown-arrow">▼</span>
                         </div>
-                        <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('meus_pedidos') }}" class="dropdown-item">
+                                <span class="item-icon">📦</span>
+                                Meus Pedidos
+                            </a>
+
+                            <!-- 👇 NOVO ITEM - SÓ APARECE PARA ADMINS -->
+                            {% if is_admin() %}
+                            <a href="{{ url_for('admin_dashboard') }}" class="dropdown-item">
+                                <span class="item-icon">👑</span>
+                                Menu Admin
+                            </a>
+                            {% endif %}
+
+                            <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                <span class="item-icon">🚪</span>
+                                Sair
+                            </a>
+                        </div>
                     </div>
+                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                </div>
                 {% else %}
-                    <!-- 👇 USUÁRIO NÃO LOGADO -->
-                    <div class="auth-buttons">
-                        <a href="{{ url_for('login') }}" class="btn-login">🔑 Login</a>
-                        <a href="{{ url_for('register') }}" class="btn-register">📝 Cadastrar</a>
-                        <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
-                    </div>
+                <!-- 👇 USUÁRIO NÃO LOGADO -->
+                <div class="auth-buttons">
+                    <a href="{{ url_for('login') }}" class="btn-login">🔑 Login</a>
+                    <a href="{{ url_for('register') }}" class="btn-register">📝 Cadastrar</a>
+                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                </div>
                 {% endif %}
             </div>
         </div>
         <p>A melhor loja de cupcakes da internet!</p>
-        
+
         <!-- Barra de pesquisa -->
         <div class="barra-pesquisa">
             <form action="{{ url_for('home') }}" method="GET">
-                <input type="text" name="q" placeholder="🔍 Pesquisar cupcakes..." value="{{ request.args.get('q', '') }}">
+                <input type="text" name="q" placeholder="🔍 Pesquisar cupcakes..."
+                    value="{{ request.args.get('q', '') }}">
                 <button type="submit">Buscar</button>
             </form>
         </div>
@@ -66,32 +69,42 @@
     <main>
         <div class="produtos">
             <h2>Nossos Cupcakes</h2>
-            
+
             <!-- VERIFICA SE EXISTEM PRODUTOS -->
             {% if produtos %}
-                <div class="grid-produtos">
-                    <!-- LOOP PARA CADA PRODUTO -->
-                    {% for produto in produtos %}
-                    <div class="produto">
-                        <h3>{{ produto['nome'] }}</h3>
-                        <p class="descricao">{{ produto['descricao'] }}</p>
-                        <p class="preco">R$ {{ "%.2f"|format(produto['preco']) }}</p>
-                        <button onclick="comprar({{ produto['id'] }}, '{{ produto['nome'] }}', this)">🛒 Comprar</button>
+            <div class="grid-produtos">
+                <!-- LOOP PARA CADA PRODUTO -->
+                {% for produto in produtos %}
+                <div class="produto">
+                    {% if produto['imagem'] is defined and produto['imagem'] %}
+                    <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}"
+                        style="max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                    {% else %}
+                    <div
+                        style="height: 200px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        🧁 Sem imagem
                     </div>
-                    {% endfor %}
+                    {% endif %}
+                    <h3>{{ produto['nome'] }}</h3>
+                    <p class="descricao">{{ produto['descricao'] }}</p>
+                    <p class="preco">R$ {{ "%.2f"|format(produto['preco']) }}</p>
+                    <button onclick="comprar({{ produto['id'] }}, '{{ produto['nome'] }}', this)">🛒 Comprar</button>
                 </div>
+                {% endfor %}
+            </div>
             {% else %}
-                <!-- 🔽 MENSAGEM PARA NENHUM RESULTADO ENCONTRADO 🔽 -->
-                {% if termo_pesquisa %}
-                    <p class="nenhum-resultado">Nenhum cupcake encontrado para "{{ termo_pesquisa }}". 😢</p>
-                    <a href="{{ url_for('home') }}" class="btn-comprar">Ver Todos os Cupcakes</a>
-                {% else %}
-                    <p>Nenhum produto disponível no momento.</p>
-                {% endif %}
+            <!-- 🔽 MENSAGEM PARA NENHUM RESULTADO ENCONTRADO 🔽 -->
+            {% if termo_pesquisa %}
+            <p class="nenhum-resultado">Nenhum cupcake encontrado para "{{ termo_pesquisa }}". 😢</p>
+            <a href="{{ url_for('home') }}" class="btn-comprar">Ver Todos os Cupcakes</a>
+            {% else %}
+            <p>Nenhum produto disponível no momento.</p>
+            {% endif %}
             {% endif %}
         </div>
     </main>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
+
 </html>

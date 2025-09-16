@@ -13,18 +13,39 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def atualizar_banco():
+    """Adiciona campo de imagem aos produtos existentes"""
+    try:
+        conn = get_db_connection()
+        
+        # Verifica se a coluna imagem já existe
+        colunas = conn.execute("PRAGMA table_info(produtos)").fetchall()
+        coluna_existe = any(coluna[1] == 'imagem' for coluna in colunas)
+        
+        if not coluna_existe:
+            print("🔄 Adicionando coluna 'imagem' à tabela produtos...")
+            conn.execute("ALTER TABLE produtos ADD COLUMN imagem TEXT")
+            conn.commit()
+            print("✅ Coluna 'imagem' adicionada com sucesso!")
+        
+        conn.close()
+    except Exception as e:
+        print(f"❌ Erro ao atualizar banco: {e}")
+
 def init_db():
     """Inicializa o banco de dados com todas as tabelas necessárias."""
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Tabela de produtos
+    # Tabela de produtos (ATUALIZADA com campo de imagem)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS produtos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             preco REAL NOT NULL,
-            descricao TEXT
+            descricao TEXT,
+            imagem TEXT,  -- 👈 NOVO CAMPO - VÍRGULA CORRIGIDA
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
@@ -57,11 +78,11 @@ def init_db():
     cursor.execute("SELECT COUNT(*) FROM produtos")
     if cursor.fetchone()[0] == 0:
         produtos = [
-            ('Cupcake de Chocolate', 8.50, 'Delicioso cupcake de chocolate com cobertura cremosa'),
-            ('Cupcake de Baunilha', 7.00, 'Cupcake de baunilha com frosting de buttercream'),
-            ('Cupcake de Morango', 9.00, 'Recheado com geléia de morango natural')
+            ('Cupcake de Chocolate', 8.50, 'Delicioso cupcake de chocolate com cobertura cremosa', None),
+            ('Cupcake de Baunilha', 7.00, 'Cupcake de baunilha com frosting de buttercream', None),
+            ('Cupcake de Morango', 9.00, 'Recheado com geléia de morango natural', None)
         ]
-        cursor.executemany('INSERT INTO produtos (nome, preco, descricao) VALUES (?, ?, ?)', produtos)
+        cursor.executemany('INSERT INTO produtos (nome, preco, descricao, imagem) VALUES (?, ?, ?, ?)', produtos)
         
         # 👇 USUÁRIO ADMIN DE TESTE
         senha_hash = generate_password_hash('admin123')
@@ -75,6 +96,9 @@ def init_db():
     
     conn.commit()
     conn.close()
+    
+    # 👇 CHAMA A ATUALIZAÇÃO PARA PRODUTOS EXISTENTES
+    atualizar_banco()
     
     print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 

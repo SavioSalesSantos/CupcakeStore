@@ -14,3 +14,21 @@
 
 
 
+## 🚀 Funcionalidades Implementadas
+
+### Menu carrinho 
+
+### Finalização de compras 
+
+### Sistema de loguin e cadastro  
+
+### Menu meus pedidos
+
+### Painel Administrativo 15/09/2025
+- ✅ Dashboard com estatísticas
+- ✅ Gerenciamento completo de produtos (CRUD)
+- ✅ Gerenciamento de usuários e permissões
+- ✅ Gerenciamento de pedidos com exclusão completa
+- ✅ Sistema de status de pedidos (pendente, processando, enviado, entregue, cancelado)
+
+### Criação de usuário admin e usuário master 
