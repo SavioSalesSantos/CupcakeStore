@@ -137,3 +137,33 @@ function gerenciarNotificacoes() {
 
 // Atualiza a posição das notificações a cada 100ms
 setInterval(gerenciarNotificacoes, 100);
+
+// 🔍 FILTRAR CUPCAKES EM TEMPO REAL (igual ao admin)
+function filtrarCupcakes() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const url = new URL(window.location.href);
+    
+    if (searchTerm.trim()) {
+        url.searchParams.set('q', searchTerm);
+    } else {
+        url.searchParams.delete('q');
+    }
+    
+    window.location.href = url.toString();
+}
+
+// 🔍 BUSCA EM TEMPO REAL (digitação)
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchInput) {
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filtrarCupcakes();
+            }, 500); // Busca após 500ms de inatividade
+        });
+    }
+});

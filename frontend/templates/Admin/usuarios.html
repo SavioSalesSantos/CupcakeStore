@@ -408,7 +408,14 @@
 
         <div class="usuarios-list">
             <h2>📋 Todos os Usuários ({{ usuarios|length }})</h2>
-
+            <!-- 🔽 MENSAGEM DE NENHUM RESULTADO -->
+            {% if usuarios|length == 0 %}
+            <div class="nenhum-resultado"
+                style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <h3 style="color: #ff6b8b;">👥 Nenhum usuário encontrado</h3>
+                <p>Não há usuários cadastrados no sistema.</p>
+            </div>
+            {% else %}
             <table class="usuarios-table">
                 <thead>
                     <tr>
@@ -481,6 +488,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
         </div>
     </div>
 
@@ -583,18 +591,72 @@
                 });
         }
 
-        // 👇 EVENT LISTENERS PARA A MODAL
+        // 👇 BUSCA EM TEMPO REAL PARA USUÁRIOS (já existe, mas vamos melhorar)
         document.addEventListener('DOMContentLoaded', function () {
-            // Fechar modal ao clicar fora do conteúdo
-            document.getElementById('modalExclusaoUsuario').addEventListener('click', function (e) {
-                if (e.target === this) {
-                    fecharModalUsuario();
+            const searchInput = document.getElementById('searchInput');
+
+            if (searchInput) {
+                let searchTimeout;
+
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        filtrarUsuarios();
+                    }, 300);
+                });
+            }
+        });
+
+        // 👇 FILTRAR USUÁRIOS COM MENSAGEM DE NENHUM RESULTADO
+        function filtrarUsuarios() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('.usuario-row');
+            let resultadosEncontrados = 0;
+
+            rows.forEach(row => {
+                const username = row.cells[1].textContent.toLowerCase();
+                const email = row.cells[2].textContent.toLowerCase();
+
+                if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                    row.style.display = '';
+                    resultadosEncontrados++;
+                } else {
+                    row.style.display = 'none';
                 }
             });
 
-            // Busca em tempo real
-            document.getElementById('searchInput').addEventListener('input', filtrarUsuarios);
-        });
+            // 🔽 MOSTRAR MENSAGEM SE NÃO HOUVER RESULTADOS
+            const tabela = document.querySelector('.usuarios-table');
+            const mensagemExistente = document.getElementById('mensagem-nenhum-resultado');
+
+            if (resultadosEncontrados === 0 && searchTerm.trim() !== '') {
+                if (!mensagemExistente) {
+                    const mensagem = document.createElement('div');
+                    mensagem.id = 'mensagem-nenhum-resultado';
+                    mensagem.style.textAlign = 'center';
+                    mensagem.style.padding = '40px';
+                    mensagem.style.background = 'white';
+                    mensagem.style.borderRadius = '12px';
+                    mensagem.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+                    mensagem.style.marginTop = '20px';
+                    mensagem.innerHTML = `
+                <h3 style="color: #ff6b8b;">🔍 Nenhum usuário encontrado</h3>
+                <p>Não há resultados para "<strong>${searchTerm}</strong>"</p>
+            `;
+
+                    if (tabela) {
+                        tabela.parentNode.insertBefore(mensagem, tabela.nextSibling);
+                    }
+                } else {
+                    mensagemExistente.innerHTML = `
+                <h3 style="color: #ff6b8b;">🔍 Nenhum usuário encontrado</h3>
+                <p>Não há resultados para "<strong>${searchTerm}</strong>"</p>
+            `;
+                }
+            } else if (mensagemExistente) {
+                mensagemExistente.remove();
+            }
+        }
     </script>
 </body>
 

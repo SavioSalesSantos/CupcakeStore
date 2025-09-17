@@ -60,12 +60,9 @@
             <p>A melhor loja de cupcakes da internet!</p>
 
             <!-- Barra de pesquisa -->
-            <div class="barra-pesquisa">
-                <form action="{{ url_for('home') }}" method="GET">
-                    <input type="text" name="q" placeholder="🔍 Pesquisar cupcakes..."
-                        value="{{ request.args.get('q', '') }}">
-                    <button type="submit">Buscar</button>
-                </form>
+            <div class="search-bar">
+                <input type="text" placeholder="🔍 Pesquisar cupcakes..." id="searchInput" value="{{ termo_pesquisa }}">
+                <button onclick="filtrarCupcakes()">Buscar</button>
             </div>
         </header>
 
@@ -97,12 +94,19 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <!-- 🔽 MENSAGEM PARA NENHUM RESULTADO ENCONTRADO 🔽 -->
+                <!-- 🔽 MENSAGEM MELHORADA PARA NENHUM RESULTADO -->
                 {% if termo_pesquisa %}
-                <p class="nenhum-resultado">Nenhum cupcake encontrado para "{{ termo_pesquisa }}". 😢</p>
-                <a href="{{ url_for('home') }}" class="btn-comprar">Ver Todos os Cupcakes</a>
+                <div class="nenhum-resultado"
+                    style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="color: #ff6b8b;">😢 Nenhum cupcake encontrado</h3>
+                    <p>Não encontramos resultados para "<strong>{{ termo_pesquisa }}</strong>"</p>
+                    <a href="{{ url_for('home') }}" class="btn-comprar" style="margin-top: 15px;">Ver Todos os
+                        Cupcakes</a>
+                </div>
                 {% else %}
-                <p>Nenhum produto disponível no momento.</p>
+                <div style="text-align: center; padding: 40px;">
+                    <p>Nenhum produto disponível no momento.</p>
+                </div>
                 {% endif %}
                 {% endif %}
             </div>

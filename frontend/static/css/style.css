@@ -412,47 +412,43 @@ h1 {
     animation: subirESumir 1s ease-in-out forwards;
 }
 
-/* 🔽 BARRA DE PESQUISA 🔽 */
-.barra-pesquisa {
+/* 🔍 BARRA DE PESQUISA ESTILO ADMIN NA PÁGINA INICIAL */
+.search-bar {
     margin: 20px 0;
-    text-align: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }
 
-.barra-pesquisa form {
-    display: inline-flex;
-    max-width: 500px;
-    width: 100%;
-}
-
-.barra-pesquisa input {
+.search-bar input {
     flex: 1;
-    padding: 12px 15px;
-    border: 2px solid #ff6b8b;
-    border-radius: 25px 0 0 25px;
+    max-width: 500px;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
     font-size: 16px;
-    outline: none;
 }
 
-.barra-pesquisa button {
+.search-bar button {
     padding: 12px 20px;
-    background: #ff6b8b;
+    background: linear-gradient(135deg, #ff6b8b, #ff4d73);
     color: white;
-    border: 2px solid #ff6b8b;
-    border-radius: 0 25px 25px 0;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-weight: bold;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
 }
 
-.barra-pesquisa button:hover {
-    background: #ff4d73;
-    border-color: #ff4d73;
+.search-bar button:hover {
+    background: linear-gradient(135deg, #ff4d73, #ff3366);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
 }
 
-.nenhum-resultado {
-    font-size: 1.2em;
-    color: #ff6b8b;
-    margin: 30px 0;
+.search-bar button:active {
+    transform: translateY(1px) scale(0.98);
 }
 
 /* 🔽 COMPRA FINALIZADA 🔽 */
