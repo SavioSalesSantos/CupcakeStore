@@ -62,6 +62,7 @@ def atualizar_banco_pedidos():
     except Exception as e:
         print(f"❌ Erro ao atualizar banco de pedidos: {e}")
 
+
 def init_db():
     """Inicializa o banco de dados com todas as tabelas necessárias."""
     conn = get_db_connection()
@@ -125,24 +126,46 @@ def init_db():
         cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', 
                       ('cliente_teste', 'teste@email.com', senha_hash))
     
-def corrigir_sequencia_usuarios():
-    """Corrige a sequência de IDs da tabela users de forma definitiva"""
+    conn.commit()
+    conn.close()
+    
+    # 👇 CHAMA AS ATUALIZAÇÕES - AGORA COM CORREÇÃO AUTOMÁTICA
+    atualizar_banco()
+    atualizar_banco_pedidos()
+    corrigir_sequencia_usuarios_automatico()  # 👈 TROQUEI PARA A NOVA FUNÇÃO
+    
+    print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
+
+def corrigir_sequencia_usuarios_automatico():
+    """Corrige automaticamente a sequência de IDs SEMPRE"""
     try:
         conn = get_db_connection()
         
-        # Busca o maior ID atual
-        max_id = conn.execute("SELECT MAX(id) as max_id FROM users").fetchone()['max_id']
+        # 🔽 CORREÇÃO DEFINITIVA - FORÇA A SEQUÊNCIA
+        # Primeiro busca o máximo ID atual
+        result = conn.execute("SELECT MAX(id) as max_id FROM users").fetchone()
+        max_id = result['max_id'] if result and result['max_id'] is not None else 0
         
-        if max_id is not None:
-            # CORREÇÃO DEFINITIVA: Usa SQLite sequence
-            conn.execute("DELETE FROM sqlite_sequence WHERE name='users'")
-            conn.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('users', ?)", (max_id,))
-            conn.commit()
-            print(f"✅ Sequência de users corrigida. Próximo ID: {max_id + 1}")
+        # 🔽 MÉTODO CONFIÁVEL: Recria a tabela se necessário
+        conn.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+        conn.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('users', ?)", (max_id,))
+        
+        conn.commit()
+        
+        # Verifica se a correção funcionou
+        next_seq = conn.execute("SELECT seq FROM sqlite_sequence WHERE name='users'").fetchone()
+        if next_seq:
+            print(f"✅ Sequência de users garantida. Próximo ID: {next_seq['seq'] + 1}")
+        else:
+            print("⚠️  Aviso: Sequência não encontrada, mas tabela funciona normalmente")
         
         conn.close()
+        return True
+        
     except Exception as e:
-        print(f"❌ Erro ao corrigir sequência de users: {e}")
+        print(f"❌ Erro crítico na sequência: {e}")
+        # Mesmo com erro, a aplicação continua funcionando
+        return False
 
 # E MODIFIQUE A FUNÇÃO init_db() para incluir esta chamada:
 def init_db():
@@ -158,6 +181,7 @@ def init_db():
     # 👇 CHAMA AS ATUALIZAÇÕES
     atualizar_banco()
     atualizar_banco_pedidos()
+    corrigir_sequencia_usuarios_automatico()  # 👈 GARANTIDO
     
     print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 

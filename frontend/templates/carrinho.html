@@ -24,10 +24,17 @@
             --radius: 12px;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #fff5f5 0%, #ffecef 100%);
             min-height: 100vh;
+            padding: 1rem;
         }
 
         .header-content {
@@ -74,12 +81,13 @@
             margin-bottom: 1rem;
         }
 
+        /* 🔽 ESTILOS DOS BOTÕES - TODOS ROSA/ROXO AGORA */
         .btn-padrao {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
+            padding: 12px 24px !important;
+            border-radius: 25px !important;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -87,37 +95,16 @@
             cursor: pointer;
             font-size: 14px;
             justify-content: center;
+            min-width: 180px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3) !important;
         }
 
-        .btn-rosa {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .btn-rosa:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+        .btn-padrao:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary)) !important;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-        }
-
-        .btn-cinza {
-            background: linear-gradient(135deg, var(--gray), #7f8c8d);
-            color: white;
-        }
-
-        .btn-cinza:hover {
-            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
-            transform: translateY(-2px);
-        }
-
-        .btn-verde {
-            background: linear-gradient(135deg, var(--accent), #219653);
-            color: white;
-        }
-
-        .btn-verde:hover {
-            background: linear-gradient(135deg, #219653, #1e8449);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4) !important;
         }
 
         .itens-carrinho {
@@ -402,13 +389,13 @@
                 </div>
 
                 <div class="acoes-carrinho">
-                    <a href="{{ url_for('home') }}" class="btn-padrao btn-cinza">
-                        <i class="fas fa-arrow-left"></i> Continuar Comprando
+                    <a href="{{ url_for('home') }}" class="btn-padrao">
+                        <i class="fas fa-store"></i> Continuar Comprando  <!-- 👈 Ícone CORRIGIDO -->
                     </a>
-                    <a href="{{ url_for('limpar_carrinho') }}" class="btn-padrao btn-cinza">
+                    <a href="{{ url_for('limpar_carrinho') }}" class="btn-padrao">
                         <i class="fas fa-trash"></i> Limpar Carrinho
                     </a>
-                    <button class="btn-padrao btn-verde" onclick="finalizarCompra()">
+                    <button class="btn-padrao" onclick="finalizarCompra()">
                         <i class="fas fa-check"></i> Finalizar Compra
                     </button>
                 </div>
@@ -417,7 +404,7 @@
             <div class="carrinho-vazio">
                 <h2><i class="fas fa-shopping-cart"></i> Seu carrinho está vazio</h2>
                 <p>Que tal dar uma olhada em nossos deliciosos cupcakes?</p>
-                <a href="{{ url_for('home') }}" class="btn-padrao btn-rosa">
+                <a href="{{ url_for('home') }}" class="btn-padrao">
                     <i class="fas fa-store"></i> Ir às Compras
                 </a>
             </div>
@@ -427,14 +414,11 @@
     <script>
         let metodoPagamentoSelecionado = null;
 
-        // 👇 FUNÇÃO PARA SELECIONAR MÉTODO DE PAGAMENTO
         function selecionarPagamento(metodo) {
-            // Remove a seleção de todos
             document.querySelectorAll('.opcao-pagamento').forEach(opcao => {
                 opcao.classList.remove('selecionado');
             });
             
-            // Adiciona a seleção no método clicado
             const elemento = document.querySelector(`.opcao-pagamento[data-metodo="${metodo}"]`);
             if (elemento) {
                 elemento.classList.add('selecionado');
@@ -442,10 +426,8 @@
             }
         }
 
-        // 👇 FUNÇÃO PARA FINALIZAR COMPRA 
         function finalizarCompra() {
             if (!metodoPagamentoSelecionado) {
-                // Mostrar mensagem de erro
                 const notification = document.createElement('div');
                 notification.style.position = 'fixed';
                 notification.style.top = '20px';
@@ -462,7 +444,6 @@
                 setTimeout(() => {
                     notification.remove();
                 }, 3000);
-
                 return;
             }
 

@@ -1,3 +1,4 @@
+<!-- templates/register.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -149,22 +150,30 @@
             text-decoration: underline;
         }
 
-        .btn-voltar {
+        /* 🔽 BOTÃO PADRONIZADO */
+        .btn-padrao {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.7rem 1.5rem;
-            background: var(--gray);
-            color: white;
+            padding: 12px 24px !important;
+            border-radius: 25px !important;
             text-decoration: none;
-            border-radius: 50px;
             font-weight: 600;
             transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            justify-content: center;
+            min-width: 180px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3) !important;
         }
 
-        .btn-voltar:hover {
-            background: #7f8c8d;
+        .btn-padrao:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary)) !important;
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4) !important;
         }
 
         .alert {
@@ -234,8 +243,8 @@
         </div>
 
         <div style="text-align: center;">
-            <a href="{{ url_for('home') }}" class="btn-voltar">
-                <i class="fas fa-arrow-left"></i> Voltar à Loja
+            <a href="{{ url_for('home') }}" class="btn-padrao">  <!-- 👈 BOTÃO PADRONIZADO -->
+                <i class="fas fa-store"></i> Voltar à Loja
             </a>
         </div>
     </div>

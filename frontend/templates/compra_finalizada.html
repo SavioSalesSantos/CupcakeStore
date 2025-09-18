@@ -1,4 +1,4 @@
-<!-- templates/compra_finalizada.html (versão atualizada) -->
+<!-- templates/compra_finalizada.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -21,7 +21,13 @@
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             --radius: 12px;
         }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #fff5f5 0%, #ffecef 100%);
@@ -32,7 +38,7 @@
             justify-content: center;
             padding: 1rem;
         }
-        
+
         .compra-finalizada {
             background: var(--white);
             border-radius: var(--radius);
@@ -42,32 +48,32 @@
             max-width: 600px;
             width: 100%;
         }
-        
+
         .icone-sucesso {
             font-size: 4rem;
-            color: var(--accent);
+            color: var(--primary);
             margin-bottom: 1.5rem;
             animation: pulse 1.5s infinite;
         }
-        
+
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
-        
+
         .compra-finalizada h2 {
-            color: var(--accent);
+            color: var(--primary);
             margin-bottom: 1rem;
             font-weight: 700;
         }
-        
+
         .compra-finalizada p {
             color: var(--dark);
             margin-bottom: 1.5rem;
             line-height: 1.6;
         }
-        
+
         .detalhes-pedido {
             background: #f8f9fa;
             border-radius: var(--radius);
@@ -75,24 +81,24 @@
             margin: 1.5rem 0;
             text-align: left;
         }
-        
+
         .detalhes-pedido h3 {
             color: var(--primary);
             margin-bottom: 1rem;
             text-align: center;
             font-weight: 600;
         }
-        
+
         .detalhes-pedido p {
             margin: 0.5rem 0;
             display: flex;
             justify-content: space-between;
         }
-        
+
         .detalhes-pedido strong {
             color: var(--dark);
         }
-        
+
         .metodo-pagamento {
             display: flex;
             align-items: center;
@@ -103,17 +109,43 @@
             background: rgba(255, 107, 139, 0.1);
             border-radius: var(--radius);
         }
-        
+
         .metodo-pagamento i {
             font-size: 1.5rem;
             color: var(--primary);
         }
-        
+
         .metodo-pagamento span {
             font-weight: 600;
             color: var(--dark);
         }
-        
+
+        /* 🔽 BOTÕES PADRONIZADOS IGUAL AO CARRINHO */
+        .btn-padrao {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 24px !important;
+            border-radius: 25px !important;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            justify-content: center;
+            min-width: 180px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3) !important;
+        }
+
+        .btn-padrao:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary)) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4) !important;
+        }
+
         .acoes-finalizadas {
             display: flex;
             gap: 1rem;
@@ -121,38 +153,7 @@
             flex-wrap: wrap;
             margin-top: 2rem;
         }
-        
-        .btn-comprar, .btn-finalizar {
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .btn-comprar {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-        
-        .btn-comprar:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
-            transform: translateY(-2px);
-        }
-        
-        .btn-finalizar {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-        }
-        
-        .btn-finalizar:hover {
-            background: linear-gradient(135deg, #2980b9, #1c6ea4);
-            transform: translateY(-2px);
-        }
-        
+
         @media (max-width: 576px) {
             .compra-finalizada {
                 padding: 2rem 1.5rem;
@@ -162,7 +163,7 @@
                 flex-direction: column;
             }
             
-            .btn-comprar, .btn-finalizar {
+            .btn-padrao {
                 width: 100%;
                 justify-content: center;
             }
@@ -198,10 +199,10 @@
         </div>
 
         <div class="acoes-finalizadas">
-            <a href="{{ url_for('home') }}" class="btn-comprar">
+            <a href="{{ url_for('home') }}" class="btn-padrao">
                 <i class="fas fa-store"></i> Continuar Comprando
             </a>
-            <a href="{{ url_for('meus_pedidos') }}" class="btn-finalizar">
+            <a href="{{ url_for('meus_pedidos') }}" class="btn-padrao">
                 <i class="fas fa-clipboard-list"></i> Ver Meus Pedidos
             </a>
         </div>
