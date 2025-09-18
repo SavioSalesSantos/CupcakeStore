@@ -454,7 +454,7 @@ def meus_pedidos():
 @app.route('/admin/pedidos/resetar-numeracao', methods=['POST'])
 @admin_required
 def admin_resetar_numeracao_pedidos():
-    """Reinicia a numeração automática dos pedidos - SOLUÇÃO RADICAL"""
+    """Reinicia a numeração automática dos pedidos - VERSÃO CORRIGIDA"""
     try:
         conn = get_db_connection()
         
@@ -469,34 +469,33 @@ def admin_resetar_numeracao_pedidos():
             message = 'Numeração resetada! Próximo pedido será #1'
             
         else:
-            # 🔽 CASO 2: HÁ PEDIDOS - SOLUÇÃO RADICAL
-            # Precisamos recriar a tabela para forçar o reset completo
-            
-            # Primeiro backup dos dados
+            # 🔽 CASO 2: HÁ PEDIDOS - SOLUÇÃO QUE MANTÉM OS DADOS
+            # Primeiro backup dos dados COMPLETOS incluindo metodo_pagamento
             pedidos_backup = conn.execute("SELECT * FROM orders").fetchall()
             
             # Drop da tabela existente
             conn.execute("DROP TABLE orders")
             
-            # Recria a tabela com AUTOINCREMENT
+            # Recria a tabela com AUTOINCREMENT e metodo_pagamento
             conn.execute('''
                 CREATE TABLE orders (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER NOT NULL,
                     order_data TEXT NOT NULL,
                     total_amount REAL NOT NULL,
+                    metodo_pagamento TEXT DEFAULT 'cartao',
                     status TEXT DEFAULT 'pendente',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id)
                 )
             ''')
             
-            # Restaura os dados (os IDs serão regenerados a partir de 1)
+            # Restaura os dados mantendo metodo_pagamento
             for pedido in pedidos_backup:
                 conn.execute(
-                    'INSERT INTO orders (user_id, order_data, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)',
+                    'INSERT INTO orders (user_id, order_data, total_amount, metodo_pagamento, status, created_at) VALUES (?, ?, ?, ?, ?, ?)',
                     (pedido['user_id'], pedido['order_data'], pedido['total_amount'], 
-                     pedido['status'], pedido['created_at'])
+                     pedido['metodo_pagamento'], pedido['status'], pedido['created_at'])
                 )
             
             # Agora o próximo ID será automaticamente 1 + quantidade de pedidos
@@ -657,6 +656,37 @@ def admin_usuarios():
         print(f"❌ Erro ao carregar usuários: {e}")
         flash('Erro ao carregar usuários.', 'error')
         return redirect(url_for('admin_dashboard'))
+    
+def corrigir_sequencia_usuarios():
+    """Corrige a sequência de IDs da tabela users"""
+    try:
+        conn = get_db_connection()
+        
+        # Busca o maior ID atual
+        max_id = conn.execute("SELECT MAX(id) as max_id FROM users").fetchone()['max_id']
+        
+        if max_id is not None:
+            # Atualiza a sequência SQLite
+            conn.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+            conn.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('users', ?)", (max_id,))
+            conn.commit()
+            print(f"✅ Sequência de users corrigida. Próximo ID: {max_id + 1}")
+        
+        conn.close()
+    except Exception as e:
+        print(f"❌ Erro ao corrigir sequência de users: {e}")
+
+# Chame esta função após a inicialização do banco
+def init_db():
+    """Inicializa o banco de dados com todas as tabelas necessárias."""
+    # ... (código existente) ...
+    
+    # 👇 CHAMA AS ATUALIZAÇÕES
+    atualizar_banco()
+    atualizar_banco_pedidos()
+    corrigir_sequencia_usuarios()  # 👈 ADICIONE ESTA LINHA
+    
+    print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 
 @app.route('/admin/pedido/<int:pedido_id>/status', methods=['POST'])
 @admin_required

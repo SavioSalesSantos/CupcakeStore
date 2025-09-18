@@ -1,4 +1,4 @@
-<!-- templates/carrinho.html (versão atualizada) -->
+<!-- templates/carrinho.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -38,8 +38,13 @@
             margin: 1rem auto;
             max-width: 1200px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            text-decoration: none;
         }
 
         .logo h1 {
@@ -332,6 +337,11 @@
             .opcoes-pagamento {
                 flex-direction: column;
             }
+
+            .acoes-carrinho {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -342,11 +352,6 @@
             <a href="{{ url_for('home') }}" class="logo">
                 <h1>🍰 CupcakeStore</h1>
             </a>
-            <div class="carrinho-info">
-                <a href="{{ url_for('home') }}" class="btn-voltar">
-                    <i class="fas fa-arrow-left"></i> Voltar às Compras
-                </a>
-            </div>
         </div>
     </header>
 
@@ -390,15 +395,15 @@
                 <div class="metodo-pagamento">
                     <h4>Método de Pagamento</h4>
                     <div class="opcoes-pagamento">
-                        <div class="opcao-pagamento" onclick="selecionarPagamento(this)" data-metodo="dinheiro">
+                        <div class="opcao-pagamento" onclick="selecionarPagamento('dinheiro')" data-metodo="dinheiro">
                             <i class="fas fa-money-bill-wave"></i>
                             <span>Dinheiro</span>
                         </div>
-                        <div class="opcao-pagamento" onclick="selecionarPagamento(this)" data-metodo="cartao">
+                        <div class="opcao-pagamento" onclick="selecionarPagamento('cartao')" data-metodo="cartao">
                             <i class="fas fa-credit-card"></i>
                             <span>Cartão</span>
                         </div>
-                        <div class="opcao-pagamento" onclick="selecionarPagamento(this)" data-metodo="pix">
+                        <div class="opcao-pagamento" onclick="selecionarPagamento('pix')" data-metodo="pix">
                             <i class="fas fa-qrcode"></i>
                             <span>PIX</span>
                         </div>
@@ -410,6 +415,9 @@
                 </div>
 
                 <div class="acoes-carrinho">
+                    <a href="{{ url_for('home') }}" class="btn-voltar">
+                        <i class="fas fa-arrow-left"></i> Continuar Comprando
+                    </a>
                     <a href="{{ url_for('limpar_carrinho') }}" class="btn-limpar">
                         <i class="fas fa-trash"></i> Limpar Carrinho
                     </a>
@@ -430,51 +438,26 @@
         </div>
     </main>
     <script>
-        // 👇 FUNÇÃO PARA MOSTRAR NOTIFICAÇÕES NO CARRINHO
-        function mostrarNotificacaoCarrinho(mensagem, tipo = 'erro') {
-            // Remove notificações existentes
-            const notificacoesExistentes = document.querySelectorAll('.notificacao-carrinho');
-            notificacoesExistentes.forEach(notificacao => notificacao.remove());
-
-            const notificacao = document.createElement('div');
-            notificacao.className = `notificacao-carrinho ${tipo}`;
-            notificacao.style.position = 'fixed';
-            notificacao.style.top = '20px';
-            notificacao.style.right = '20px';
-            notificacao.style.background = tipo === 'erro' ? '#e74c3c' : '#27ae60';
-            notificacao.style.color = 'white';
-            notificacao.style.padding = '15px';
-            notificacao.style.borderRadius = '8px';
-            notificacao.style.zIndex = '10000';
-            notificacao.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-            notificacao.textContent = mensagem;
-
-            document.body.appendChild(notificacao);
-
-            // Remove automaticamente após 3 segundos
-            setTimeout(() => {
-                if (notificacao.parentNode) {
-                    notificacao.parentNode.removeChild(notificacao);
-                }
-            }, 3000);
-        }
+        let metodoPagamentoSelecionado = null;
 
         // 👇 FUNÇÃO PARA SELECIONAR MÉTODO DE PAGAMENTO (CORRIGIDA)
         function selecionarPagamento(metodo) {
+            // Remove a seleção de todos
             document.querySelectorAll('.opcao-pagamento').forEach(opcao => {
                 opcao.classList.remove('selecionado');
             });
-
-            event.currentTarget.classList.add('selecionado');
-            // Armazena o valor do método, não o elemento
-            sessionStorage.setItem('metodoPagamento', metodo);
+            
+            // Adiciona a seleção no método clicado
+            const elemento = document.querySelector(`.opcao-pagamento[data-metodo="${metodo}"]`);
+            if (elemento) {
+                elemento.classList.add('selecionado');
+                metodoPagamentoSelecionado = metodo;
+            }
         }
 
         // 👇 FUNÇÃO PARA FINALIZAR COMPRA 
         function finalizarCompra() {
-            const metodoPagamento = sessionStorage.getItem('metodoPagamento');
-
-            if (!metodoPagamento) {
+            if (!metodoPagamentoSelecionado) {
                 // Mostrar mensagem de erro
                 const notification = document.createElement('div');
                 notification.style.position = 'fixed';
@@ -496,7 +479,7 @@
                 return;
             }
 
-            window.location.href = "/finalizar-compra?metodo=" + metodoPagamento;
+            window.location.href = "/finalizar-compra?metodo=" + metodoPagamentoSelecionado;
         }
 
         // 👇 ATUALIZAR CONTADOR DO CARRINHO

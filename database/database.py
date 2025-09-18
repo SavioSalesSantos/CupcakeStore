@@ -31,6 +31,18 @@ def atualizar_banco():
     except Exception as e:
         print(f"❌ Erro ao atualizar banco: {e}")
 
+# Chame esta função após a inicialização do banco
+def init_db():
+    """Inicializa o banco de dados com todas as tabelas necessárias."""
+    # ... (código existente) ...
+    
+    # 👇 CHAMA AS ATUALIZAÇÕES
+    atualizar_banco()
+    atualizar_banco_pedidos()
+    corrigir_sequencia_usuarios()  # 👈 ADICIONE ESTA LINHA
+    
+    print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
+
 def atualizar_banco_pedidos():
     """Adiciona campo de metodo_pagamento aos pedidos existentes"""
     try:

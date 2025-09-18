@@ -47,6 +47,7 @@
         .logo {
             flex: 1;
             min-width: 200px;
+            text-decoration: none;
         }
 
         .logo h1 {
@@ -85,14 +86,14 @@
         }
 
         .auth-buttons a.btn-login {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
         }
 
         .auth-buttons a.btn-login:hover {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
         .auth-buttons a.btn-register {
@@ -103,10 +104,11 @@
         .auth-buttons a.btn-register:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
         .carrinho-info button {
-            background: linear-gradient(135deg, var(--accent), #219653);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             padding: 8px 15px;
             border: none;
@@ -121,8 +123,9 @@
         }
 
         .carrinho-info button:hover {
-            background: linear-gradient(135deg, #219653, #1e8449);
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
         /* User menu e dropdown */
@@ -252,11 +255,9 @@
             width: 100%;
             height: 200px;
             object-fit: contain;
-            /* Alterado de cover para contain */
             border-radius: 8px;
             margin-bottom: 15px;
             background: #f8f9fa;
-            /* Adiciona fundo para imagens transparentes */
         }
 
         .produto h3 {
