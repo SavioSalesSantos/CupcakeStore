@@ -339,16 +339,16 @@ def logout():
 
 @app.route('/finalizar-compra')
 def finalizar_compra():
-    metodo_pagamento = request.args.get('metodo', 'cartao')
-    print(f"Método de pagamento: {metodo_pagamento}")
     """Página de confirmação de compra finalizada"""
+    metodo_pagamento = request.args.get('metodo', 'cartao')
+    print(f"DEBUG - Método de pagamento recebido: {metodo_pagamento}")
+    
     if 'user_id' not in session:
         flash('Você precisa fazer login para finalizar a compra!', 'error')
         return redirect(url_for('login'))
     
     user_id = session['user_id']
     carrinho_ids = session.get('carrinho', [])
-    metodo_pagamento = request.args.get('metodo', 'cartao')  # Padrão: cartão
     
     if not carrinho_ids:
         flash('Seu carrinho está vazio!', 'error')
@@ -366,21 +366,23 @@ def finalizar_compra():
         
         itens_pedido = []
         for produto in produtos_carrinho:
+            produto_dict = dict(produto)
             itens_pedido.append({
-                'id': produto['id'],
-                'nome': produto['nome'],
-                'preco': produto['preco'],
-                'quantidade': quantidades[produto['id']]
+                'id': produto_dict['id'],
+                'nome': produto_dict['nome'],
+                'preco': produto_dict['preco'],
+                'quantidade': quantidades[produto_dict['id']]
             })
         
         total = sum(produto['preco'] * quantidades[produto['id']] for produto in produtos_carrinho)
         
-        # Incluir método de pagamento nos dados do pedido
+        # Prepara os dados do pedido
         pedido_data = {
             'itens': itens_pedido,
             'metodo_pagamento': metodo_pagamento
         }
         
+        # Insere no banco de dados
         conn.execute(
             'INSERT INTO orders (user_id, order_data, total_amount, metodo_pagamento) VALUES (?, ?, ?, ?)',
             (user_id, json.dumps(pedido_data), total, metodo_pagamento)
@@ -388,9 +390,13 @@ def finalizar_compra():
         conn.commit()
         conn.close()
         
+        # Limpa o carrinho
         session.pop('carrinho', None)
+        
+        # Gera ID do pedido para exibição
         pedido_id = f"{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
         
+        # Renderiza a página de confirmação
         return render_template('compra_finalizada.html', 
                              pedido_id=pedido_id,
                              data_pedido=datetime.now().strftime('%d/%m/%Y %H:%M'),
@@ -417,12 +423,25 @@ def meus_pedidos():
         ).fetchall()
         conn.close()
         
-        # Converte para lista de dicionários e já processa os dados JSON
+        # Converte para lista de dicionários e processa os dados JSON
         pedidos_processados = []
         for pedido in pedidos:
             pedido_dict = dict(pedido)
-            # Converte a string JSON para objeto Python aqui mesmo
-            pedido_dict['itens'] = json.loads(pedido_dict['order_data'])
+            try:
+                # Tenta converter a string JSON para objeto Python
+                dados_pedido = json.loads(pedido_dict['order_data'])
+                
+                # Verifica se é a estrutura nova (com 'itens') ou antiga
+                if isinstance(dados_pedido, dict) and 'itens' in dados_pedido:
+                    pedido_dict['itens'] = dados_pedido['itens']
+                else:
+                    # Estrutura antiga - trata como lista direta de itens
+                    pedido_dict['itens'] = dados_pedido
+                    
+            except Exception as e:
+                print(f"❌ Erro ao processar pedido {pedido_dict['id']}: {e}")
+                pedido_dict['itens'] = []
+                
             pedidos_processados.append(pedido_dict)
         
         return render_template('meus_pedidos.html', pedidos=pedidos_processados)

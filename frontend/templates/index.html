@@ -155,23 +155,20 @@
         }
 
         .dropdown-content {
-            display: none;
             position: absolute;
             top: 100%;
             right: 0;
-            background: var(--white);
+            background: white;
             min-width: 200px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             border-radius: 0 0 12px 12px;
             z-index: 1000;
             overflow: hidden;
-            margin-top: 5px;
+            margin-top: 0;
+            display: none;
         }
 
-        .user-menu:hover .dropdown-content {
-            display: block;
-        }
-
+        .user-menu:hover .dropdown-content,
         .dropdown-content:hover {
             display: block;
         }
@@ -577,9 +574,6 @@
             botao.classList.add('carregando');
             botao.textContent = 'Adicionando...';
 
-            // Criar contador flutuante - POSIÇÃO CORRIGIDA
-            criarContadorFlutuante(retangulo);
-
             // Tocar som
             tocarSomCaixa();
 
@@ -631,28 +625,6 @@
             } catch (e) {
                 console.log("Erro ao reproduzir som:", e);
             }
-        }
-
-        // Função para criar contador flutuante
-        function criarContadorFlutuante(rect) {
-            const contador = document.createElement('div');
-            contador.className = 'contador-flutuante';
-            contador.textContent = '+1';
-
-            // Posiciona próximo ao botão que foi clicado
-            contador.style.position = 'fixed';
-            contador.style.top = `${rect.top + window.scrollY - 30}px`; // 30px acima do botão
-            contador.style.left = `${rect.left + (rect.width / 2) - 15}px`;
-            contador.style.zIndex = '9999';
-
-            document.body.appendChild(contador);
-
-            // Remove após animação
-            setTimeout(() => {
-                if (contador.parentNode) {
-                    contador.parentNode.removeChild(contador);
-                }
-            }, 1000);
         }
 
         // Função para atualizar contador do carrinho

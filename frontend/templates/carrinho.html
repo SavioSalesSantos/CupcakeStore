@@ -390,15 +390,15 @@
                 <div class="metodo-pagamento">
                     <h4>Método de Pagamento</h4>
                     <div class="opcoes-pagamento">
-                        <div class="opcao-pagamento" onclick="selecionarPagamento('dinheiro')">
+                        <div class="opcao-pagamento" onclick="selecionarPagamento(this)" data-metodo="dinheiro">
                             <i class="fas fa-money-bill-wave"></i>
                             <span>Dinheiro</span>
                         </div>
-                        <div class="opcao-pagamento" onclick="selecionarPagamento('cartao')">
+                        <div class="opcao-pagamento" onclick="selecionarPagamento(this)" data-metodo="cartao">
                             <i class="fas fa-credit-card"></i>
                             <span>Cartão</span>
                         </div>
-                        <div class="opcao-pagamento" onclick="selecionarPagamento('pix')">
+                        <div class="opcao-pagamento" onclick="selecionarPagamento(this)" data-metodo="pix">
                             <i class="fas fa-qrcode"></i>
                             <span>PIX</span>
                         </div>
@@ -459,26 +459,43 @@
             }, 3000);
         }
 
-        // 👇 FUNÇÃO PARA SELECIONAR MÉTODO DE PAGAMENTO
+        // 👇 FUNÇÃO PARA SELECIONAR MÉTODO DE PAGAMENTO (CORRIGIDA)
         function selecionarPagamento(metodo) {
             document.querySelectorAll('.opcao-pagamento').forEach(opcao => {
                 opcao.classList.remove('selecionado');
             });
 
             event.currentTarget.classList.add('selecionado');
+            // Armazena o valor do método, não o elemento
             sessionStorage.setItem('metodoPagamento', metodo);
         }
 
-        // 👇 FUNÇÃO PARA FINALIZAR COMPRA (CORRIGIDA)
+        // 👇 FUNÇÃO PARA FINALIZAR COMPRA 
         function finalizarCompra() {
             const metodoPagamento = sessionStorage.getItem('metodoPagamento');
 
             if (!metodoPagamento) {
-                mostrarNotificacaoCarrinho('Por favor, selecione um método de pagamento.', 'erro');
+                // Mostrar mensagem de erro
+                const notification = document.createElement('div');
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.background = '#e74c3c';
+                notification.style.color = 'white';
+                notification.style.padding = '15px';
+                notification.style.borderRadius = '5px';
+                notification.style.zIndex = '10000';
+                notification.textContent = 'Por favor, selecione um método de pagamento.';
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+
                 return;
             }
 
-            // Redireciona para finalizar a compra
             window.location.href = "/finalizar-compra?metodo=" + metodoPagamento;
         }
 

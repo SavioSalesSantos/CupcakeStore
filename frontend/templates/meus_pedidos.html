@@ -1,66 +1,239 @@
+<!-- templates/meus_pedidos.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meus Pedidos - CupcakeStore</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff6b8b;
+            --primary-dark: #ff4d73;
+            --secondary: #9b59b6;
+            --accent: #27ae60;
+            --light: #fff5f5;
+            --dark: #333;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffecef 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+        
+        .header-content {
+            background: var(--white);
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .pedidos-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .pedido-card {
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .pedido-header h3 {
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .pedido-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processando {
+            background: #cce7ff;
+            color: #004085;
+        }
+        
+        .status-enviado {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-entregue {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .pedido-info {
+            margin-bottom: 1rem;
+        }
+        
+        .pedido-info p {
+            margin: 0.5rem 0;
+            color: var(--dark);
+        }
+        
+        .pedido-itens {
+            margin-top: 1rem;
+        }
+        
+        .pedido-itens h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .item-pedido {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item-pedido:last-child {
+            border-bottom: none;
+        }
+        
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            background: var(--gray);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-voltar:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .sem-pedidos {
+            text-align: center;
+            padding: 3rem;
+            color: var(--dark);
+        }
+        
+        .sem-pedidos h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
-
 <body>
-    <header>
-        <div class="header-content">
-            <a href="{{ url_for('home') }}" class="logo">
-                <h1>🍰 CupcakeStore</h1>
-            </a>
-            <div class="carrinho-info">
-                <a href="{{ url_for('home') }}" class="btn-voltar">← Voltar</a>
-            </div>
-        </div>
-        <p>Meus Pedidos</p>
-    </header>
+    <div class="header-content">
+        <a href="{{ url_for('home') }}" class="logo">
+            <h1>🍰 CupcakeStore</h1>
+        </a>
+        <a href="{{ url_for('home') }}" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar à Loja
+        </a>
+    </div>
 
-    <main>
-        <div class="pedidos-container">
-            {% if pedidos %}
-            <h2>Histórico de Pedidos</h2>
+    <div class="pedidos-container">
+        <h2>📦 Meus Pedidos</h2>
 
+        {% if pedidos %}
             {% for pedido in pedidos %}
             <div class="pedido-card">
                 <div class="pedido-header">
                     <h3>Pedido #{{ pedido['id'] }}</h3>
-                    <span class="pedido-status {{ pedido['status'] }}">{{ pedido['status'] }}</span>
+                    <span class="pedido-status status-{{ pedido['status'] }}">
+                        {{ pedido['status']|title }}
+                    </span>
                 </div>
 
-                <div class="pedido-detalhes">
+                <div class="pedido-info">
                     <p><strong>Data:</strong> {{ pedido['created_at'] }}</p>
                     <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido['total_amount']) }}</p>
+                    {% if pedido['metodo_pagamento'] %}
+                    <p><strong>Pagamento:</strong> 
+                        {% if pedido['metodo_pagamento'] == 'dinheiro' %}💵 Dinheiro{% endif %}
+                        {% if pedido['metodo_pagamento'] == 'cartao' %}💳 Cartão{% endif %}
+                        {% if pedido['metodo_pagamento'] == 'pix' %}📱 PIX{% endif %}
+                    </p>
+                    {% endif %}
+                </div>
 
-                    <div class="pedido-itens">
-                        <h4>Itens do Pedido:</h4>
-                        <!-- 🔽 LINHA CORRIGIDA - REMOVENDO json.loads 🔽 -->
-                        {% for item in pedido['itens'] %}
+                <div class="pedido-itens">
+                    <h4>Itens do Pedido:</h4>
+                    {% if pedido.itens %}
+                        {% for item in pedido.itens %}
                         <div class="item-pedido">
-                            <span>{{ item['quantidade'] }}x {{ item['nome'] }}</span>
-                            <span>R$ {{ "%.2f"|format(item['preco'] * item['quantidade']) }}</span>
+                            <span>
+                                {% if item.quantidade %}{{ item.quantidade }}x {% endif %}
+                                {{ item.nome if item.nome else 'Item' }}
+                            </span>
+                            <span>
+                                R$ 
+                                {% if item.preco and item.quantidade %}
+                                    {{ "%.2f"|format(item.preco * item.quantidade) }}
+                                {% else %}
+                                    0.00
+                                {% endif %}
+                            </span>
                         </div>
                         {% endfor %}
-                        <!-- 🔼 FIM DA CORREÇÃO 🔼 -->
-                    </div>
+                    {% else %}
+                        <p>Nenhum item disponível</p>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
-
-            {% else %}
+        {% else %}
             <div class="sem-pedidos">
                 <h2>📦 Você ainda não fez nenhum pedido</h2>
                 <p>Que tal dar uma olhada em nossos deliciosos cupcakes?</p>
                 <a href="{{ url_for('home') }}" class="btn-comprar">Ir às Compras</a>
             </div>
-            {% endif %}
-        </div>
-    </main>
+        {% endif %}
+    </div>
 </body>
-
 </html>
