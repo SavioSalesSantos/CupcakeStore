@@ -40,7 +40,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
         }
 
         .logo {
@@ -75,19 +74,49 @@
             margin-bottom: 1rem;
         }
 
-        .btn-comprar {
-            display: inline-block;
+        .btn-padrao {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
             padding: 0.8rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            text-decoration: none;
             border-radius: 50px;
+            text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            justify-content: center;
         }
 
-        .btn-comprar:hover {
+        .btn-rosa {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-rosa:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        .btn-cinza {
+            background: linear-gradient(135deg, var(--gray), #7f8c8d);
+            color: white;
+        }
+
+        .btn-cinza:hover {
+            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+            transform: translateY(-2px);
+        }
+
+        .btn-verde {
+            background: linear-gradient(135deg, var(--accent), #219653);
+            color: white;
+        }
+
+        .btn-verde:hover {
+            background: linear-gradient(135deg, #219653, #1e8449);
             transform: translateY(-2px);
         }
 
@@ -166,7 +195,7 @@
             gap: 0.5rem;
         }
 
-        .botoes-controle a {
+        .btn-controle {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -178,9 +207,11 @@
             text-decoration: none;
             font-weight: bold;
             transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
 
-        .botoes-controle a:hover {
+        .btn-controle:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             transform: scale(1.1);
         }
@@ -269,55 +300,6 @@
             margin-top: 1.5rem;
         }
 
-        .btn-limpar {
-            padding: 0.8rem 1.5rem;
-            background: var(--gray);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-limpar:hover {
-            background: #7f8c8d;
-            transform: translateY(-2px);
-        }
-
-        .btn-finalizar {
-            padding: 0.8rem 1.5rem;
-            background: linear-gradient(135deg, var(--accent), #219653);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-finalizar:hover {
-            background: linear-gradient(135deg, #219653, #1e8449);
-            transform: translateY(-2px);
-        }
-
-        .btn-voltar {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.7rem 1.5rem;
-            background: var(--gray);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-voltar:hover {
-            background: #7f8c8d;
-            transform: translateY(-2px);
-        }
-
         @media (max-width: 768px) {
             .item-carrinho {
                 flex-direction: column;
@@ -341,6 +323,11 @@
             .acoes-carrinho {
                 flex-direction: column;
                 align-items: center;
+            }
+            
+            .btn-padrao {
+                width: 100%;
+                max-width: 250px;
             }
         }
     </style>
@@ -381,8 +368,8 @@
                         <p class="preco">R$ {{ "%.2f"|format(produto['preco'] * quantidades[produto['id']]) }}</p>
                         <p class="preco-unitario">(R$ {{ "%.2f"|format(produto['preco']) }} cada)</p>
                         <div class="botoes-controle">
-                            <a href="{{ url_for('adicionar_carrinho', id_produto=produto['id']) }}">+</a>
-                            <a href="{{ url_for('remover_carrinho', id_produto=produto['id']) }}">-</a>
+                            <button class="btn-controle" onclick="window.location.href='{{ url_for('adicionar_carrinho', id_produto=produto['id']) }}'">+</button>
+                            <button class="btn-controle" onclick="window.location.href='{{ url_for('remover_carrinho', id_produto=produto['id']) }}'">-</button>
                         </div>
                     </div>
                 </div>
@@ -415,13 +402,13 @@
                 </div>
 
                 <div class="acoes-carrinho">
-                    <a href="{{ url_for('home') }}" class="btn-voltar">
+                    <a href="{{ url_for('home') }}" class="btn-padrao btn-cinza">
                         <i class="fas fa-arrow-left"></i> Continuar Comprando
                     </a>
-                    <a href="{{ url_for('limpar_carrinho') }}" class="btn-limpar">
+                    <a href="{{ url_for('limpar_carrinho') }}" class="btn-padrao btn-cinza">
                         <i class="fas fa-trash"></i> Limpar Carrinho
                     </a>
-                    <button class="btn-finalizar" onclick="finalizarCompra()">
+                    <button class="btn-padrao btn-verde" onclick="finalizarCompra()">
                         <i class="fas fa-check"></i> Finalizar Compra
                     </button>
                 </div>
@@ -430,7 +417,7 @@
             <div class="carrinho-vazio">
                 <h2><i class="fas fa-shopping-cart"></i> Seu carrinho está vazio</h2>
                 <p>Que tal dar uma olhada em nossos deliciosos cupcakes?</p>
-                <a href="{{ url_for('home') }}" class="btn-comprar">
+                <a href="{{ url_for('home') }}" class="btn-padrao btn-rosa">
                     <i class="fas fa-store"></i> Ir às Compras
                 </a>
             </div>
@@ -440,7 +427,7 @@
     <script>
         let metodoPagamentoSelecionado = null;
 
-        // 👇 FUNÇÃO PARA SELECIONAR MÉTODO DE PAGAMENTO (CORRIGIDA)
+        // 👇 FUNÇÃO PARA SELECIONAR MÉTODO DE PAGAMENTO
         function selecionarPagamento(metodo) {
             // Remove a seleção de todos
             document.querySelectorAll('.opcao-pagamento').forEach(opcao => {
@@ -481,23 +468,6 @@
 
             window.location.href = "/finalizar-compra?metodo=" + metodoPagamentoSelecionado;
         }
-
-        // 👇 ATUALIZAR CONTADOR DO CARRINHO
-        function atualizarContadorCarrinho() {
-            fetch('/get-contador-carrinho')
-                .then(response => response.json())
-                .then(data => {
-                    const contadorCarrinho = document.getElementById('contador-carrinho');
-                    if (contadorCarrinho) {
-                        contadorCarrinho.textContent = data.quantidade;
-                    }
-                });
-        }
-
-        // Atualiza o contador quando a página carrega
-        document.addEventListener('DOMContentLoaded', function () {
-            atualizarContadorCarrinho();
-        });
     </script>
 </body>
 

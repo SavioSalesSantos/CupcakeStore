@@ -36,10 +36,10 @@ def init_db():
     """Inicializa o banco de dados com todas as tabelas necessárias."""
     # ... (código existente) ...
     
-    # 👇 CHAMA AS ATUALIZAÇÕES
+    # 👇 CHAMA AS ATUALIZAÇÕES - ADICIONE A LINHA corrigir_sequencia_usuarios()
     atualizar_banco()
     atualizar_banco_pedidos()
-    corrigir_sequencia_usuarios()  # 👈 ADICIONE ESTA LINHA
+    corrigir_sequencia_usuarios()  # 👈 ESTA LINHA DEVE SER ADICIONADA
     
     print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 
@@ -124,6 +124,33 @@ def init_db():
         senha_hash = generate_password_hash('teste123')
         cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', 
                       ('cliente_teste', 'teste@email.com', senha_hash))
+    
+def corrigir_sequencia_usuarios():
+    """Corrige a sequência de IDs da tabela users de forma definitiva"""
+    try:
+        conn = get_db_connection()
+        
+        # Busca o maior ID atual
+        max_id = conn.execute("SELECT MAX(id) as max_id FROM users").fetchone()['max_id']
+        
+        if max_id is not None:
+            # CORREÇÃO DEFINITIVA: Usa SQLite sequence
+            conn.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+            conn.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('users', ?)", (max_id,))
+            conn.commit()
+            print(f"✅ Sequência de users corrigida. Próximo ID: {max_id + 1}")
+        
+        conn.close()
+    except Exception as e:
+        print(f"❌ Erro ao corrigir sequência de users: {e}")
+
+# E MODIFIQUE A FUNÇÃO init_db() para incluir esta chamada:
+def init_db():
+    """Inicializa o banco de dados com todas as tabelas necessárias."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # ... (código existente das tabelas) ...
     
     conn.commit()
     conn.close()
