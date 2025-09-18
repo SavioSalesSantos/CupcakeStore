@@ -637,6 +637,15 @@
                         <p><strong>Cliente:</strong> {{ pedido['username'] }}</p>
                         <p><strong>Data:</strong> {{ pedido['created_at'] }}</p>
                         <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido['total_amount']) }}</p>
+                        <p><strong>Pagamento:</strong>
+                            {% if pedido['metodo_pagamento'] == 'dinheiro' %}
+                            <span style="color: #27ae60;">💵 Dinheiro</span>
+                            {% elif pedido['metodo_pagamento'] == 'cartao' %}
+                            <span style="color: #3498db;">💳 Cartão</span>
+                            {% elif pedido['metodo_pagamento'] == 'pix' %}
+                            <span style="color: #9b59b6;">📱 PIX</span>
+                            {% endif %}
+                        </p>
                     </div>
                     <span class="pedido-status status-{{ pedido['status'] }}">
                         {{ pedido['status']|title }}

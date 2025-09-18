@@ -2,13 +2,13 @@
 function mostrarNotificacao(mensagem, tipo = 'sucesso', titulo = 'Sucesso!') {
     const notificacao = document.createElement('div');
     notificacao.className = `notificacao ${tipo}`;
-    
+
     const icons = {
         sucesso: '🎉',
         erro: '❌',
         info: 'ℹ️'
     };
-    
+
     notificacao.innerHTML = `
         <span class="notificacao-icon">${icons[tipo] || '🎉'}</span>
         <div class="notificacao-conteudo">
@@ -17,12 +17,12 @@ function mostrarNotificacao(mensagem, tipo = 'sucesso', titulo = 'Sucesso!') {
         </div>
         <button class="btn-fechar" onclick="this.parentElement.remove()">×</button>
     `;
-    
+
     document.body.appendChild(notificacao);
-    
+
     // Mostra a notificação com animação
     setTimeout(() => notificacao.classList.add('mostrar'), 100);
-    
+
     // Remove automaticamente após 4 segundos
     setTimeout(() => {
         if (notificacao.parentElement) {
@@ -34,14 +34,19 @@ function mostrarNotificacao(mensagem, tipo = 'sucesso', titulo = 'Sucesso!') {
 
 function comprar(idProduto, nomeProduto, element) {
     const botao = element;
-    
+    const rect = botao.getBoundingClientRect();
+
     // Animação no botão
     botao.classList.add('carregando');
     botao.textContent = 'Adicionando...';
-    
+
     // Criar contador flutuante
-    criarContadorFlutuante(botao);
-    
+    criarContadorFlutuante(rect);
+
+    // Tocar som
+    const audio = new Audio('{{ url_for("static", filename="sounds/caixa.mp3") }}');
+    audio.play().catch(e => console.log("Audio play failed:", e));
+
     fetch(`/adicionar/${idProduto}`)
         .then(response => {
             if (response.ok) {
@@ -49,18 +54,20 @@ function comprar(idProduto, nomeProduto, element) {
                 botao.classList.remove('carregando');
                 botao.classList.add('adicionado');
                 botao.textContent = 'Adicionado!';
-                
+                botao.style.backgroundColor = '#27ae60'; // Verde
+
                 atualizarContadorCarrinho();
                 mostrarNotificacao(
                     `${nomeProduto} adicionado ao carrinho! 🧁`,
                     'sucesso',
                     'Produto Adicionado!'
                 );
-                
+
                 // Volta ao normal após 2 segundos
                 setTimeout(() => {
                     botao.classList.remove('adicionado');
                     botao.textContent = '🛒 Comprar';
+                    botao.style.backgroundColor = ''; // Volta à cor original
                 }, 2000);
             }
         })
@@ -71,7 +78,7 @@ function comprar(idProduto, nomeProduto, element) {
             setTimeout(() => {
                 botao.textContent = '🛒 Comprar';
             }, 2000);
-            
+
             mostrarNotificacao(
                 'Erro ao adicionar ao carrinho. Tente novamente.',
                 'erro',
@@ -80,18 +87,18 @@ function comprar(idProduto, nomeProduto, element) {
         });
 }
 
-function criarContadorFlutuante(botao) {
+// Função para criar contador flutuante
+function criarContadorFlutuante(rect) {
     const contador = document.createElement('div');
     contador.className = 'contador-flutuante';
     contador.textContent = '+1';
-    
-    // Posiciona onde estava o botão
-    const rect = botao.getBoundingClientRect();
+    contador.style.position = 'fixed';
     contador.style.top = `${rect.top + window.scrollY}px`;
-    contador.style.left = `${rect.left + (rect.width / 2) - 15}px`; // Centraliza
-    
+    contador.style.left = `${rect.left + (rect.width / 2) - 15}px`;
+    contador.style.zIndex = '9999';
+
     document.body.appendChild(contador);
-    
+
     // Remove após animação
     setTimeout(() => {
         contador.remove();
@@ -99,7 +106,7 @@ function criarContadorFlutuante(botao) {
 }
 
 // Atualize também o carregamento inicial
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     atualizarContadorCarrinho();
 });
 
@@ -119,7 +126,7 @@ function verCarrinho() {
 }
 
 // Atualiza o contador quando a página carrega
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     atualizarContadorCarrinho();
 });
 
@@ -128,7 +135,7 @@ function gerenciarNotificacoes() {
     const notificacoes = document.querySelectorAll('.notificacao');
     const bottomStart = 20;
     const spacing = 80; /* Espaço entre notificações */
-    
+
     notificacoes.forEach((notificacao, index) => {
         notificacao.style.bottom = `${bottomStart + (index * spacing)}px`;
         notificacao.style.right = '20px';
@@ -142,24 +149,24 @@ setInterval(gerenciarNotificacoes, 100);
 function filtrarCupcakes() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const url = new URL(window.location.href);
-    
+
     if (searchTerm.trim()) {
         url.searchParams.set('q', searchTerm);
     } else {
         url.searchParams.delete('q');
     }
-    
+
     window.location.href = url.toString();
 }
 
 // 🔍 BUSCA EM TEMPO REAL (digitação)
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
-    
+
     if (searchInput) {
         let searchTimeout;
-        
-        searchInput.addEventListener('input', function() {
+
+        searchInput.addEventListener('input', function () {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 filtrarCupcakes();

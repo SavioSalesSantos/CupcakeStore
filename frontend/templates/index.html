@@ -6,113 +6,707 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loja de Cupcakes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff6b8b;
+            --primary-dark: #ff4d73;
+            --secondary: #9b59b6;
+            --accent: #27ae60;
+            --light: #fff5f5;
+            --dark: #333;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffecef 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: var(--white);
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            margin: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover h1 {
+            transform: scale(1.05);
+        }
+
+        .carrinho-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .auth-buttons a {
+            padding: 8px 15px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .auth-buttons a.btn-login {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .auth-buttons a.btn-login:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.btn-register {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .auth-buttons a.btn-register:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+        }
+
+        .carrinho-info button {
+            background: linear-gradient(135deg, var(--accent), #219653);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .carrinho-info button:hover {
+            background: linear-gradient(135deg, #219653, #1e8449);
+            transform: translateY(-2px);
+        }
+
+        /* User menu e dropdown */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .user-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 0 0 12px 12px;
+            z-index: 1000;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .user-menu:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content:hover {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: var(--primary);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Barra de pesquisa */
+        .search-bar {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .search-bar input {
+            flex: 1;
+            max-width: 500px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+        }
+
+        /* Grid de produtos */
+        .grid-produtos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px auto;
+            max-width: 1200px;
+        }
+
+        .produto {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .produto:hover {
+            transform: translateY(-5px);
+        }
+
+        .produto img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            /* Alterado de cover para contain */
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            /* Adiciona fundo para imagens transparentes */
+        }
+
+        .produto h3 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .produto .descricao {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .produto .preco {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .produto button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .produto button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+        }
+
+        .produto button.carregando {
+            background: #95a5a6;
+        }
+
+        .produto button.adicionado {
+            background: var(--accent);
+        }
+
+        /* Paginação */
+        .paginacao {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .paginacao a {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 0 4px;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--primary);
+            background: white;
+        }
+
+        .paginacao a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .paginacao a.ativa {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Notificações */
+        .notificacao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--secondary), #8e44ad);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(50px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 350px;
+        }
+
+        .notificacao.mostrar {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .notificacao.erro {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .notificacao.sucesso {
+            background: linear-gradient(135deg, var(--accent), #219653);
+        }
+
+        .contador-flutuante {
+            position: fixed;
+            background: #ff6b8b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 50%;
+            font-weight: bold;
+            z-index: 9998;
+            pointer-events: none;
+            animation: subirESumir 1s ease-in-out forwards;
+        }
+
+        @keyframes subirESumir {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            70% {
+                transform: translateY(-40px) scale(1.2);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-60px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Mensagem de nenhum resultado */
+        .nenhum-resultado {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nenhum-resultado h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .auth-buttons {
+                justify-content: center;
+            }
+
+            .grid-produtos {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <header>
-        <header>
-            <div class="header-content">
-                <a href="{{ url_for('home') }}" class="logo">
-                    <h1>🍰 CupcakeStore</h1>
-                </a>
-                <div class="carrinho-info">
-                    {% if session.get('user_id') %}
-                    <!-- 👇 USUÁRIO LOGADO - MENU DROPDOWN MELHORADO -->
-                    <div class="user-info">
-                        <div class="user-menu">
-                            <div class="user-trigger">
-                                <span class="user-avatar">👤</span>
-                                <span class="user-name">{{ session['username'] }}</span>
-                                <span class="dropdown-arrow">▼</span>
-                            </div>
-                            <div class="dropdown-content">
-                                <a href="{{ url_for('meus_pedidos') }}" class="dropdown-item">
-                                    <span class="item-icon">📦</span>
-                                    Meus Pedidos
-                                </a>
-
-                                <!-- 👇 NOVO ITEM - SÓ APARECE PARA ADMINS -->
-                                {% if is_admin() %}
-                                <a href="{{ url_for('admin_dashboard') }}" class="dropdown-item">
-                                    <span class="item-icon">👑</span>
-                                    Menu Admin
-                                </a>
-                                {% endif %}
-
-                                <a href="{{ url_for('logout') }}" class="dropdown-item">
-                                    <span class="item-icon">🚪</span>
-                                    Sair
-                                </a>
-                            </div>
+        <div class="header-content">
+            <a href="{{ url_for('home') }}" class="logo">
+                <h1>🍰 CupcakeStore</h1>
+            </a>
+            <div class="carrinho-info">
+                {% if session.get('user_id') %}
+                <div class="user-info">
+                    <div class="user-menu">
+                        <div class="user-trigger">
+                            <span class="user-avatar">👤</span>
+                            <span class="user-name">{{ session['username'] }}</span>
+                            <span class="dropdown-arrow">▼</span>
                         </div>
-                        <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('meus_pedidos') }}" class="dropdown-item">
+                                <span class="item-icon">📦</span>
+                                Meus Pedidos
+                            </a>
+                            {% if is_admin() %}
+                            <a href="{{ url_for('admin_dashboard') }}" class="dropdown-item">
+                                <span class="item-icon">👑</span>
+                                Menu Admin
+                            </a>
+                            {% endif %}
+                            <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                <span class="item-icon">🚪</span>
+                                Sair
+                            </a>
+                        </div>
                     </div>
+                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                </div>
+                {% else %}
+                <div class="auth-buttons">
+                    <a href="{{ url_for('login') }}" class="btn-login">🔑 Login</a>
+                    <a href="{{ url_for('register') }}" class="btn-register">📝 Cadastrar</a>
+                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p>A melhor loja de cupcakes da internet!</p>
+        </div>
+
+        <!-- Barra de pesquisa -->
+        <div class="search-bar">
+            <input type="text" placeholder="🔍 Pesquisar cupcakes..." id="searchInput" value="{{ termo_pesquisa }}">
+            <button onclick="filtrarCupcakes()">Buscar</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="produtos">
+            <h2 style="text-align: center;">Nossos Cupcakes</h2>
+
+            {% if produtos %}
+            <div class="grid-produtos">
+                {% for produto in produtos %}
+                <div class="produto">
+                    {% if produto['imagem'] is defined and produto['imagem'] %}
+                    <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}">
                     {% else %}
-                    <!-- 👇 USUÁRIO NÃO LOGADO -->
-                    <div class="auth-buttons">
-                        <a href="{{ url_for('login') }}" class="btn-login">🔑 Login</a>
-                        <a href="{{ url_for('register') }}" class="btn-register">📝 Cadastrar</a>
-                        <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                    <div
+                        style="height: 200px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        🧁 Sem imagem
                     </div>
                     {% endif %}
+                    <h3>{{ produto['nome'] }}</h3>
+                    <p class="descricao">{{ produto['descricao'] }}</p>
+                    <p class="preco">R$ {{ "%.2f"|format(produto['preco']) }}</p>
+                    <button onclick="comprar({{ produto['id'] }}, '{{ produto['nome'] }}', this)">🛒 Comprar</button>
                 </div>
+                {% endfor %}
             </div>
-            <p>A melhor loja de cupcakes da internet!</p>
 
-            <!-- Barra de pesquisa -->
-            <div class="search-bar">
-                <input type="text" placeholder="🔍 Pesquisar cupcakes..." id="searchInput" value="{{ termo_pesquisa }}">
-                <button onclick="filtrarCupcakes()">Buscar</button>
+            {% if total_paginas > 1 %}
+            <div class="paginacao">
+                {% for p in range(1, total_paginas + 1) %}
+                <a href="{{ url_for('home', pagina=p, q=termo_pesquisa) }}"
+                    class="{% if p == pagina %}ativa{% endif %}">
+                    {{ p }}
+                </a>
+                {% endfor %}
             </div>
-        </header>
+            {% endif %}
 
-        <main>
-            <div class="produtos">
-                <h2>Nossos Cupcakes</h2>
-
-                <!-- VERIFICA SE EXISTEM PRODUTOS -->
-                {% if produtos %}
-                <div class="grid-produtos">
-                    <!-- LOOP PARA CADA PRODUTO -->
-                    {% for produto in produtos %}
-                    <div class="produto">
-                        {% if produto['imagem'] is defined and produto['imagem'] %}
-                        <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}"
-                            style="max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-                        {% else %}
-                        <div
-                            style="height: 200px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                            🧁 Sem imagem
-                        </div>
-                        {% endif %}
-                        <h3>{{ produto['nome'] }}</h3>
-                        <p class="descricao">{{ produto['descricao'] }}</p>
-                        <p class="preco">R$ {{ "%.2f"|format(produto['preco']) }}</p>
-                        <button onclick="comprar({{ produto['id'] }}, '{{ produto['nome'] }}', this)">🛒
-                            Comprar</button>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <!-- 🔽 MENSAGEM MELHORADA PARA NENHUM RESULTADO -->
+            {% else %}
+            <div class="nenhum-resultado">
                 {% if termo_pesquisa %}
-                <div class="nenhum-resultado"
-                    style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                    <h3 style="color: #ff6b8b;">😢 Nenhum cupcake encontrado</h3>
-                    <p>Não encontramos resultados para "<strong>{{ termo_pesquisa }}</strong>"</p>
-                    <a href="{{ url_for('home') }}" class="btn-comprar" style="margin-top: 15px;">Ver Todos os
-                        Cupcakes</a>
-                </div>
+                <h3>😢 Nenhum cupcake encontrado</h3>
+                <p>Não encontramos resultados para "<strong>{{ termo_pesquisa }}</strong>"</p>
+                <a href="{{ url_for('home') }}" class="btn-comprar" style="margin-top: 15px;">Ver Todos os Cupcakes</a>
                 {% else %}
-                <div style="text-align: center; padding: 40px;">
-                    <p>Nenhum produto disponível no momento.</p>
-                </div>
-                {% endif %}
+                <h3>😢 Nenhum produto disponível</h3>
+                <p>Volte em breve para conhecer nossos cupcakes!</p>
                 {% endif %}
             </div>
-        </main>
+            {% endif %}
+        </div>
+    </main>
 
-        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Função para mostrar notificação
+        function mostrarNotificacao(mensagem, tipo = 'sucesso', titulo = 'Sucesso!') {
+            const notificacao = document.createElement('div');
+            notificacao.className = `notificacao ${tipo}`;
+
+            const icons = {
+                sucesso: '🎉',
+                erro: '❌',
+                info: 'ℹ️'
+            };
+
+            notificacao.innerHTML = `
+                <span class="notificacao-icon">${icons[tipo] || '🎉'}</span>
+                <div class="notificacao-conteudo">
+                    <div class="notificacao-titulo">${titulo}</div>
+                    <div class="notificacao-mensagem">${mensagem}</div>
+                </div>
+                <button class="btn-fechar" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            document.body.appendChild(notificacao);
+
+            // Mostra a notificação com animação
+            setTimeout(() => notificacao.classList.add('mostrar'), 100);
+
+            // Remove automaticamente após 4 segundos
+            setTimeout(() => {
+                if (notificacao.parentElement) {
+                    notificacao.classList.remove('mostrar');
+                    setTimeout(() => notificacao.remove(), 400);
+                }
+            }, 4000);
+        }
+
+        // Função para comprar
+        function comprar(idProduto, nomeProduto, element) {
+            const botao = element;
+            const retangulo = botao.getBoundingClientRect();
+
+            // Animação no botão
+            botao.classList.add('carregando');
+            botao.textContent = 'Adicionando...';
+
+            // Criar contador flutuante - POSIÇÃO CORRIGIDA
+            criarContadorFlutuante(retangulo);
+
+            // Tocar som
+            tocarSomCaixa();
+
+            fetch(`/adicionar/${idProduto}`)
+                .then(response => {
+                    if (response.ok) {
+                        // Animações de sucesso
+                        botao.classList.remove('carregando');
+                        botao.classList.add('adicionado');
+                        botao.textContent = 'Adicionado!';
+                        botao.style.backgroundColor = '#27ae60'; // Verde
+
+                        atualizarContadorCarrinho();
+                        mostrarNotificacao(
+                            `${nomeProduto} adicionado ao carrinho! 🧁`,
+                            'sucesso',
+                            'Produto Adicionado!'
+                        );
+
+                        // Volta ao normal após 2 segundos
+                        setTimeout(() => {
+                            botao.classList.remove('adicionado');
+                            botao.textContent = '🛒 Comprar';
+                            botao.style.backgroundColor = '';
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    botao.classList.remove('carregando');
+                    botao.textContent = '🛒 Tentar Novamente';
+                    setTimeout(() => {
+                        botao.textContent = '🛒 Comprar';
+                    }, 2000);
+
+                    mostrarNotificacao(
+                        'Erro ao adicionar ao carrinho. Tente novamente.',
+                        'erro',
+                        'Oops!'
+                    );
+                });
+        }
+
+        // Função para tocar som
+        function tocarSomCaixa() {
+            try {
+                const audio = new Audio('{{ url_for("static", filename="sounds/caixa.mp3") }}');
+                audio.play();
+            } catch (e) {
+                console.log("Erro ao reproduzir som:", e);
+            }
+        }
+
+        // Função para criar contador flutuante
+        function criarContadorFlutuante(rect) {
+            const contador = document.createElement('div');
+            contador.className = 'contador-flutuante';
+            contador.textContent = '+1';
+
+            // Posiciona próximo ao botão que foi clicado
+            contador.style.position = 'fixed';
+            contador.style.top = `${rect.top + window.scrollY - 30}px`; // 30px acima do botão
+            contador.style.left = `${rect.left + (rect.width / 2) - 15}px`;
+            contador.style.zIndex = '9999';
+
+            document.body.appendChild(contador);
+
+            // Remove após animação
+            setTimeout(() => {
+                if (contador.parentNode) {
+                    contador.parentNode.removeChild(contador);
+                }
+            }, 1000);
+        }
+
+        // Função para atualizar contador do carrinho
+        function atualizarContadorCarrinho() {
+            fetch('/get-contador-carrinho')
+                .then(response => response.json())
+                .then(data => {
+                    const contadorCarrinho = document.getElementById('contador-carrinho');
+                    if (contadorCarrinho) {
+                        contadorCarrinho.textContent = data.quantidade;
+                    }
+                });
+        }
+
+        // Função para ver carrinho
+        function verCarrinho() {
+            window.location.href = "/carrinho";
+        }
+
+        // Função para filtrar cupcakes
+        function filtrarCupcakes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const url = new URL(window.location.href);
+
+            if (searchTerm.trim()) {
+                url.searchParams.set('q', searchTerm);
+            } else {
+                url.searchParams.delete('q');
+            }
+
+            // Resetar para primeira página ao buscar
+            url.searchParams.set('pagina', 1);
+
+            window.location.href = url.toString();
+        }
+
+        // Atualiza o contador quando a página carrega
+        document.addEventListener('DOMContentLoaded', function () {
+            atualizarContadorCarrinho();
+
+            // Busca em tempo real
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                let searchTimeout;
+
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        filtrarCupcakes();
+                    }, 500);
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -1,3 +1,4 @@
+<!-- templates/carrinho.html (versão atualizada) -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -6,6 +7,333 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrinho - CupcakeStore</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff6b8b;
+            --primary-dark: #ff4d73;
+            --secondary: #9b59b6;
+            --accent: #27ae60;
+            --light: #fff5f5;
+            --dark: #333;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffecef 100%);
+            min-height: 100vh;
+        }
+
+        .header-content {
+            background: var(--white);
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin: 1rem auto;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .carrinho-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .carrinho-vazio {
+            text-align: center;
+            background: var(--white);
+            padding: 3rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .carrinho-vazio h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .btn-comprar {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-comprar:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+        }
+
+        .itens-carrinho {
+            margin-bottom: 2rem;
+        }
+
+        .itens-carrinho h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f1f1f1;
+        }
+
+        .item-carrinho {
+            display: flex;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .item-carrinho img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: var(--radius);
+            margin-right: 1.5rem;
+        }
+
+        .info-produto {
+            flex: 1;
+        }
+
+        .info-produto h3 {
+            color: var(--dark);
+            margin: 0 0 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .descricao {
+            color: #666;
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .quantidade {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .controles {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        .preco {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .preco-unitario {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .botoes-controle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .botoes-controle a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .botoes-controle a:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: scale(1.1);
+        }
+
+        .resumo-carrinho {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+
+        .resumo-carrinho h3 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .total {
+            font-size: 1.5rem;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 2px dashed var(--primary);
+        }
+
+        .total strong {
+            color: var(--primary);
+        }
+
+        .metodo-pagamento {
+            margin: 1.5rem 0;
+        }
+
+        .metodo-pagamento h4 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .opcoes-pagamento {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .opcao-pagamento {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .opcao-pagamento:hover {
+            border-color: var(--primary);
+        }
+
+        .opcao-pagamento.selecionado {
+            border-color: var(--primary);
+            background: rgba(255, 107, 139, 0.1);
+        }
+
+        .opcao-pagamento i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .opcao-pagamento span {
+            display: block;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .acoes-carrinho {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .btn-limpar {
+            padding: 0.8rem 1.5rem;
+            background: var(--gray);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-limpar:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .btn-finalizar {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent), #219653);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-finalizar:hover {
+            background: linear-gradient(135deg, #219653, #1e8449);
+            transform: translateY(-2px);
+        }
+
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            background: var(--gray);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-voltar:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .item-carrinho {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .item-carrinho img {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .controles {
+                align-items: center;
+                margin-top: 1rem;
+            }
+
+            .opcoes-pagamento {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -15,10 +343,11 @@
                 <h1>🍰 CupcakeStore</h1>
             </a>
             <div class="carrinho-info">
-                <a href="{{ url_for('home') }}">← Voltar às Compras</a>
+                <a href="{{ url_for('home') }}" class="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Voltar às Compras
+                </a>
             </div>
         </div>
-        <p>Seu carrinho de compras</p>
     </header>
 
     <main>
@@ -29,6 +358,15 @@
 
                 {% for produto in produtos %}
                 <div class="item-carrinho">
+                    {% if produto['imagem'] is defined and produto['imagem'] %}
+                    <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}">
+                    {% else %}
+                    <div
+                        style="width: 100px; height: 100px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        🧁
+                    </div>
+                    {% endif %}
+
                     <div class="info-produto">
                         <h3>{{ produto['nome'] }}</h3>
                         <p class="descricao">{{ produto['descricao'] }}</p>
@@ -38,8 +376,8 @@
                         <p class="preco">R$ {{ "%.2f"|format(produto['preco'] * quantidades[produto['id']]) }}</p>
                         <p class="preco-unitario">(R$ {{ "%.2f"|format(produto['preco']) }} cada)</p>
                         <div class="botoes-controle">
-                            <a href="{{ url_for('adicionar_carrinho', id_produto=produto['id']) }}">➕</a>
-                            <a href="{{ url_for('remover_carrinho', id_produto=produto['id']) }}">➖</a>
+                            <a href="{{ url_for('adicionar_carrinho', id_produto=produto['id']) }}">+</a>
+                            <a href="{{ url_for('remover_carrinho', id_produto=produto['id']) }}">-</a>
                         </div>
                     </div>
                 </div>
@@ -48,25 +386,119 @@
 
             <div class="resumo-carrinho">
                 <h3>Resumo do Pedido</h3>
+
+                <div class="metodo-pagamento">
+                    <h4>Método de Pagamento</h4>
+                    <div class="opcoes-pagamento">
+                        <div class="opcao-pagamento" onclick="selecionarPagamento('dinheiro')">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Dinheiro</span>
+                        </div>
+                        <div class="opcao-pagamento" onclick="selecionarPagamento('cartao')">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Cartão</span>
+                        </div>
+                        <div class="opcao-pagamento" onclick="selecionarPagamento('pix')">
+                            <i class="fas fa-qrcode"></i>
+                            <span>PIX</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="total">
                     <p>Total: <strong>R$ {{ "%.2f"|format(total) }}</strong></p>
                 </div>
+
                 <div class="acoes-carrinho">
-                    <a href="{{ url_for('limpar_carrinho') }}" class="btn-limpar">🗑️ Limpar Carrinho</a>
-                    <button class="btn-finalizar" onclick="finalizarCompra()">✅ Finalizar Compra</button>
+                    <a href="{{ url_for('limpar_carrinho') }}" class="btn-limpar">
+                        <i class="fas fa-trash"></i> Limpar Carrinho
+                    </a>
+                    <button class="btn-finalizar" onclick="finalizarCompra()">
+                        <i class="fas fa-check"></i> Finalizar Compra
+                    </button>
                 </div>
             </div>
             {% else %}
             <div class="carrinho-vazio">
-                <h2>🛒 Seu carrinho está vazio</h2>
+                <h2><i class="fas fa-shopping-cart"></i> Seu carrinho está vazio</h2>
                 <p>Que tal dar uma olhada em nossos deliciosos cupcakes?</p>
-                <a href="{{ url_for('home') }}" class="btn-comprar">Ir às Compras</a>
+                <a href="{{ url_for('home') }}" class="btn-comprar">
+                    <i class="fas fa-store"></i> Ir às Compras
+                </a>
             </div>
             {% endif %}
         </div>
     </main>
+    <script>
+        // 👇 FUNÇÃO PARA MOSTRAR NOTIFICAÇÕES NO CARRINHO
+        function mostrarNotificacaoCarrinho(mensagem, tipo = 'erro') {
+            // Remove notificações existentes
+            const notificacoesExistentes = document.querySelectorAll('.notificacao-carrinho');
+            notificacoesExistentes.forEach(notificacao => notificacao.remove());
 
-    <script src="{{ url_for('static', filename='js/carrinho.js') }}"></script>
+            const notificacao = document.createElement('div');
+            notificacao.className = `notificacao-carrinho ${tipo}`;
+            notificacao.style.position = 'fixed';
+            notificacao.style.top = '20px';
+            notificacao.style.right = '20px';
+            notificacao.style.background = tipo === 'erro' ? '#e74c3c' : '#27ae60';
+            notificacao.style.color = 'white';
+            notificacao.style.padding = '15px';
+            notificacao.style.borderRadius = '8px';
+            notificacao.style.zIndex = '10000';
+            notificacao.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+            notificacao.textContent = mensagem;
+
+            document.body.appendChild(notificacao);
+
+            // Remove automaticamente após 3 segundos
+            setTimeout(() => {
+                if (notificacao.parentNode) {
+                    notificacao.parentNode.removeChild(notificacao);
+                }
+            }, 3000);
+        }
+
+        // 👇 FUNÇÃO PARA SELECIONAR MÉTODO DE PAGAMENTO
+        function selecionarPagamento(metodo) {
+            document.querySelectorAll('.opcao-pagamento').forEach(opcao => {
+                opcao.classList.remove('selecionado');
+            });
+
+            event.currentTarget.classList.add('selecionado');
+            sessionStorage.setItem('metodoPagamento', metodo);
+        }
+
+        // 👇 FUNÇÃO PARA FINALIZAR COMPRA (CORRIGIDA)
+        function finalizarCompra() {
+            const metodoPagamento = sessionStorage.getItem('metodoPagamento');
+
+            if (!metodoPagamento) {
+                mostrarNotificacaoCarrinho('Por favor, selecione um método de pagamento.', 'erro');
+                return;
+            }
+
+            // Redireciona para finalizar a compra
+            window.location.href = "/finalizar-compra?metodo=" + metodoPagamento;
+        }
+
+        // 👇 ATUALIZAR CONTADOR DO CARRINHO
+        function atualizarContadorCarrinho() {
+            fetch('/get-contador-carrinho')
+                .then(response => response.json())
+                .then(data => {
+                    const contadorCarrinho = document.getElementById('contador-carrinho');
+                    if (contadorCarrinho) {
+                        contadorCarrinho.textContent = data.quantidade;
+                    }
+                });
+        }
+
+        // Atualiza o contador quando a página carrega
+        document.addEventListener('DOMContentLoaded', function () {
+            atualizarContadorCarrinho();
+        });
+    </script>
 </body>
 
 </html>

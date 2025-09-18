@@ -1,7 +1,11 @@
 # =============================================
 # 👇 IMPORTS (todas as importações)
 # =============================================
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+from database.database import get_db_connection, init_db, atualizar_banco, atualizar_banco_pedidos
 from flask import Flask, render_template, session, redirect, url_for, request, flash, jsonify
 import os
 import sqlite3
@@ -140,6 +144,9 @@ def get_produtos():
 @app.route('/')
 def home():
     termo_pesquisa = request.args.get('q', '').lower()
+    pagina = request.args.get('pagina', 1, type=int)
+    produtos_por_pagina = 8
+
     produtos = get_produtos()
     
     if termo_pesquisa:
@@ -153,7 +160,19 @@ def home():
     else:
         produtos_list = [dict(produto) for produto in produtos]
     
-    return render_template('index.html', produtos=produtos_list, termo_pesquisa=termo_pesquisa)
+    # Calcular paginação
+    total_produtos = len(produtos_list)
+    total_paginas = (total_produtos + produtos_por_pagina - 1) // produtos_por_pagina
+    inicio = (pagina - 1) * produtos_por_pagina
+    fim = inicio + produtos_por_pagina
+    produtos_paginados = produtos_list[inicio:fim]
+    
+    return render_template('index.html', 
+                         produtos=produtos_paginados, 
+                         termo_pesquisa=termo_pesquisa,
+                         pagina=pagina,
+                         total_paginas=total_paginas,
+                         total_produtos=total_produtos)
 
 # =============================================
 # 👇 ROTAS DO CARRINHO  
@@ -320,13 +339,16 @@ def logout():
 
 @app.route('/finalizar-compra')
 def finalizar_compra():
-    """Página de confirmação de compra finalizada (AGORA SALVA NO BANCO)"""
+    metodo_pagamento = request.args.get('metodo', 'cartao')
+    print(f"Método de pagamento: {metodo_pagamento}")
+    """Página de confirmação de compra finalizada"""
     if 'user_id' not in session:
         flash('Você precisa fazer login para finalizar a compra!', 'error')
         return redirect(url_for('login'))
     
     user_id = session['user_id']
     carrinho_ids = session.get('carrinho', [])
+    metodo_pagamento = request.args.get('metodo', 'cartao')  # Padrão: cartão
     
     if not carrinho_ids:
         flash('Seu carrinho está vazio!', 'error')
@@ -353,9 +375,15 @@ def finalizar_compra():
         
         total = sum(produto['preco'] * quantidades[produto['id']] for produto in produtos_carrinho)
         
+        # Incluir método de pagamento nos dados do pedido
+        pedido_data = {
+            'itens': itens_pedido,
+            'metodo_pagamento': metodo_pagamento
+        }
+        
         conn.execute(
-            'INSERT INTO orders (user_id, order_data, total_amount) VALUES (?, ?, ?)',
-            (user_id, json.dumps(itens_pedido), total)
+            'INSERT INTO orders (user_id, order_data, total_amount, metodo_pagamento) VALUES (?, ?, ?, ?)',
+            (user_id, json.dumps(pedido_data), total, metodo_pagamento)
         )
         conn.commit()
         conn.close()
@@ -366,7 +394,8 @@ def finalizar_compra():
         return render_template('compra_finalizada.html', 
                              pedido_id=pedido_id,
                              data_pedido=datetime.now().strftime('%d/%m/%Y %H:%M'),
-                             total=total)
+                             total=total,
+                             metodo_pagamento=metodo_pagamento)
                              
     except Exception as e:
         print(f"❌ Erro ao finalizar compra: {e}")
@@ -982,13 +1011,7 @@ def admin_editar_usuario(user_id):
 # =============================================
 
 if __name__ == '__main__':
-    print(f"📁 Templates path: {template_dir}")
-    print(f"📁 Static path: {static_dir}")
-    print(f"✅ Template exists: {os.path.exists(template_dir)}")
-    print(f"✅ Static exists: {os.path.exists(static_dir)}")
-    
-    db_path = os.path.join(base_dir, '..', 'database', 'cupcakes.db')
-    print(f"✅ Database exists: {os.path.exists(db_path)}")
-    
-    print("🚀 Server running at http://localhost:5000")
+    print("🔄 Inicializando banco de dados...")
+    init_db()
+    print("✅ Banco de dados inicializado")
     app.run(debug=True)

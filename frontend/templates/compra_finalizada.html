@@ -1,44 +1,210 @@
+<!-- templates/compra_finalizada.html (versão atualizada) -->
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compra Finalizada - CupcakeStore</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff6b8b;
+            --primary-dark: #ff4d73;
+            --secondary: #9b59b6;
+            --accent: #27ae60;
+            --light: #fff5f5;
+            --dark: #333;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffecef 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .compra-finalizada {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 3rem;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .icone-sucesso {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .compra-finalizada h2 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .compra-finalizada p {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .detalhes-pedido {
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .detalhes-pedido h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .detalhes-pedido p {
+            margin: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .detalhes-pedido strong {
+            color: var(--dark);
+        }
+        
+        .metodo-pagamento {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: rgba(255, 107, 139, 0.1);
+            border-radius: var(--radius);
+        }
+        
+        .metodo-pagamento i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .metodo-pagamento span {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .acoes-finalizadas {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .btn-comprar, .btn-finalizar {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-comprar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-comprar:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+        }
+        
+        .btn-finalizar {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-finalizar:hover {
+            background: linear-gradient(135deg, #2980b9, #1c6ea4);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 576px) {
+            .compra-finalizada {
+                padding: 2rem 1.5rem;
+            }
+            
+            .acoes-finalizadas {
+                flex-direction: column;
+            }
+            
+            .btn-comprar, .btn-finalizar {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <header>
-        <div class="header-content">
-            <a href="{{ url_for('home') }}" class="logo">
-                <h1>🍰 CupcakeStore</h1>
-            </a>
+    <div class="compra-finalizada">
+        <div class="icone-sucesso">
+            <i class="fas fa-check-circle"></i>
         </div>
-    </header>
+        <h2>Compra Finalizada com Sucesso!</h2>
+        <p>Obrigado pela sua preferência! Seu pedido foi processado e em breve estará a caminho.</p>
 
-    <main>
-        <div class="carrinho-container">
-            <div class="compra-finalizada">
-                <div class="icone-sucesso">🎉</div>
-                <h2>Compra Finalizada com Sucesso!</h2>
-                <p>Obrigado pela sua preferência! Seu pedido foi processado e em breve estará a caminho.</p>
-                <p>Um email de confirmação foi enviado para você (simulação).</p>
-
-                <div class="detalhes-pedido">
-                    <h3>Resumo do Pedido</h3>
-                    <p><strong>Número do Pedido:</strong> #{{ pedido_id }}</p>
-                    <p><strong>Data:</strong> {{ data_pedido }}</p>
-                    <p><strong>Total:</strong> R$ {{ "%.2f"|format(total) }}</p>
-                </div>
-
-                <div class="acoes-finalizadas">
-                    <a href="{{ url_for('home') }}" class="btn-comprar">🏠 Continuar Comprando</a>
-                    <a href="{{ url_for('meus_pedidos') }}" class="btn-finalizar">📦 Ver Meus Pedidos</a>
-                </div>
+        <div class="detalhes-pedido">
+            <h3>Resumo do Pedido</h3>
+            <p><strong>Número do Pedido:</strong> #{{ pedido_id }}</p>
+            <p><strong>Data:</strong> {{ data_pedido }}</p>
+            <p><strong>Total:</strong> R$ {{ "%.2f"|format(total) }}</p>
+            
+            <div class="metodo-pagamento">
+                {% if metodo_pagamento == 'dinheiro' %}
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Pagamento em Dinheiro</span>
+                {% elif metodo_pagamento == 'cartao' %}
+                <i class="fas fa-credit-card"></i>
+                <span>Pagamento com Cartão</span>
+                {% elif metodo_pagamento == 'pix' %}
+                <i class="fas fa-qrcode"></i>
+                <span>Pagamento via PIX</span>
+                {% endif %}
             </div>
         </div>
-    </main>
-</body>
 
+        <div class="acoes-finalizadas">
+            <a href="{{ url_for('home') }}" class="btn-comprar">
+                <i class="fas fa-store"></i> Continuar Comprando
+            </a>
+            <a href="{{ url_for('meus_pedidos') }}" class="btn-finalizar">
+                <i class="fas fa-clipboard-list"></i> Ver Meus Pedidos
+            </a>
+        </div>
+    </div>
+</body>
 </html>

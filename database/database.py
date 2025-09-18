@@ -1,8 +1,7 @@
 import sqlite3
 import os
-from werkzeug.security import generate_password_hash  # 👈 Import para criptografia
+from werkzeug.security import generate_password_hash
 
-# 👇 DEFINIMOS base_dir FORA das funções para poder usar em qualquer lugar
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 def get_db_connection():
@@ -32,24 +31,43 @@ def atualizar_banco():
     except Exception as e:
         print(f"❌ Erro ao atualizar banco: {e}")
 
+def atualizar_banco_pedidos():
+    """Adiciona campo de metodo_pagamento aos pedidos existentes"""
+    try:
+        conn = get_db_connection()
+        
+        # Verifica se a coluna metodo_pagamento já existe
+        colunas = conn.execute("PRAGMA table_info(orders)").fetchall()
+        coluna_existe = any(coluna[1] == 'metodo_pagamento' for coluna in colunas)
+        
+        if not coluna_existe:
+            print("🔄 Adicionando coluna 'metodo_pagamento' à tabela orders...")
+            conn.execute("ALTER TABLE orders ADD COLUMN metodo_pagamento TEXT DEFAULT 'cartao'")
+            conn.commit()
+            print("✅ Coluna 'metodo_pagamento' adicionada com sucesso!")
+        
+        conn.close()
+    except Exception as e:
+        print(f"❌ Erro ao atualizar banco de pedidos: {e}")
+
 def init_db():
     """Inicializa o banco de dados com todas as tabelas necessárias."""
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Tabela de produtos (ATUALIZADA com campo de imagem)
+    # Tabela de produtos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS produtos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             preco REAL NOT NULL,
             descricao TEXT,
-            imagem TEXT,  -- 👈 NOVO CAMPO - VÍRGULA CORRIGIDA
+            imagem TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
-    # Tabela de usuários (ATUALIZADA com campo is_admin)
+    # Tabela de usuários
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,6 +86,7 @@ def init_db():
             user_id INTEGER NOT NULL,
             order_data TEXT NOT NULL,
             total_amount REAL NOT NULL,
+            metodo_pagamento TEXT DEFAULT 'cartao',
             status TEXT DEFAULT 'pendente',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
@@ -97,8 +116,9 @@ def init_db():
     conn.commit()
     conn.close()
     
-    # 👇 CHAMA A ATUALIZAÇÃO PARA PRODUTOS EXISTENTES
+    # 👇 CHAMA AS ATUALIZAÇÕES
     atualizar_banco()
+    atualizar_banco_pedidos()
     
     print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 

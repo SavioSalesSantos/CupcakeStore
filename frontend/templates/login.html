@@ -6,32 +6,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - CupcakeStore</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff6b8b;
+            --primary-dark: #ff4d73;
+            --secondary: #9b59b6;
+            --accent: #27ae60;
+            --light: #fff5f5;
+            --dark: #333;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffecef 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header a {
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .auth-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .auth-header h1:hover {
+            transform: scale(1.05);
+        }
+
+        .auth-header p {
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .auth-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #e9ecef;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.2);
+            outline: none;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-auth:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--dark);
+        }
+
+        .auth-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            background: var(--gray);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-voltar:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
 </head>
 
 <body>
-    <header>
-        <div class="header-content">
-            <a href="{{ url_for('home') }}" class="logo">
+    <div class="auth-container">
+        <div class="auth-header">
+            <a href="{{ url_for('home') }}">
                 <h1>🍰 CupcakeStore</h1>
             </a>
+            <p>Faça login em sua conta</p>
         </div>
-        <p>Faça login em sua conta</p> 
-    </header>
 
-    <main>
-        <div class="form-container">
-            <a href="{{ url_for('home') }}" class="btn-voltar">← Voltar ao Início</a>
-            <form class="form-auth" action="{{ url_for('login') }}" method="POST">
-                <h2>Login</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-
+        <div class="auth-card">
+            <h2>Login</h2>
+            <form action="{{ url_for('login') }}" method="POST">
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" required>
@@ -42,21 +220,20 @@
                     <input type="password" id="password" name="password" required>
                 </div>
 
-                <button type="submit">Entrar</button>
-
-                <p class="auth-link">
-                    Não tem uma conta? <a href="{{ url_for('register') }}">Cadastre-se</a>
-                </p>
-
-                <!-- 👇 USUÁRIO DE TESTE (OPCIONAL) -->
-                <div class="test-user">
-                    <p><strong>Usuário de teste:</strong></p>
-                    <p>Email: teste@email.com</p>
-                    <p>Senha: teste123</p>
-                </div>
+                <button type="submit" class="btn-auth">Entrar</button>
             </form>
+
+            <p class="auth-link">
+                Não tem uma conta? <a href="{{ url_for('register') }}">Cadastre-se</a>
+            </p>
         </div>
-    </main>
+
+        <div style="text-align: center;">
+            <a href="{{ url_for('home') }}" class="btn-voltar">
+                <i class="fas fa-arrow-left"></i> Voltar à Loja
+            </a>
+        </div>
+    </div>
 </body>
 
 </html>
