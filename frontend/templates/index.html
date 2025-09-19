@@ -16,7 +16,7 @@
             --secondary: #9b59b6;
             --accent: #27ae60;
             --light: #fff5f5;
-            --dark: #333;
+            --dark: 333;
             --gray: #95a5a6;
             --white: #ffffff;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -304,31 +304,57 @@
             background: var(--accent);
         }
 
-        /* Paginação */
+        /* 🔽 PAGINAÇÃO PADRONIZADA */
         .paginacao {
             margin: 30px 0;
             text-align: center;
         }
 
         .paginacao a {
-            display: inline-block;
-            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
             margin: 0 4px;
-            border: 1px solid var(--primary);
-            border-radius: 4px;
+            border-radius: 25px;
             text-decoration: none;
-            color: var(--primary);
-            background: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
         }
 
         .paginacao a:hover {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
         .paginacao a.ativa {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, #ff4d73, #ff3366) !important;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4) !important;
+        }
+
+        /* 🔽 SETAS DE NAVEGAÇÃO (se houver) */
+        .paginacao .seta {
+            padding: 10px 14px;
+        }
+
+        .paginacao .seta i {
+            font-size: 14px;
+        }
+
+        /* 🔽 RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .paginacao a {
+                padding: 8px 12px;
+                min-width: 35px;
+                font-size: 14px;
+                margin: 0 2px;
+            }
         }
 
         /* Notificações */
@@ -423,6 +449,117 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* 1. MENU DROPDOWN ROSA COM ÍCONES BRANCOS */
+        .dropdown-content {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+            border: none;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .dropdown-item {
+            color: white !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary)) !important;
+            color: white !important;
+        }
+
+        .dropdown-item i {
+            color: white !important;
+        }
+
+        /* 2. ÍCONES BRANCOS PARA TODOS OS BOTÕES */
+        .auth-buttons a i,
+        .carrinho-info button i,
+        .produto button i,
+        .user-info button i {
+            color: white !important;
+            font-size: 14px;
+        }
+
+        /* 3. GARANTE ÍCONES DURANTE ANIMAÇÕES */
+        .produto button.carregando i,
+        .produto button.adicionado i {
+            color: white !important;
+        }
+
+        /* 4. MELHORIA VISUAL NO DROPDOWN */
+        .user-menu:hover .user-trigger {
+            border-radius: 25px 25px 0 0;
+            margin-bottom: -1px;
+        }
+
+        .dropdown-content {
+            border-radius: 0 0 15px 15px;
+        }
+
+        /* Ícones do user trigger */
+        .user-trigger .fa-user {
+            color: white !important;
+            font-size: 16px;
+            margin-right: 5px;
+        }
+
+        .user-trigger .fa-chevron-down {
+            color: white !important;
+            font-size: 12px;
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .user-trigger .fa-chevron-down {
+            color: white !important;
+            font-size: 12px;
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+            transform: rotate(180deg);
+        }
+
+        .user-menu:hover .fa-chevron-down {
+            transform: rotate(0deg);
+        }
+
+        .user-menu .fa-chevron-down {
+            transition: transform 0.3s ease;
+        }
+
+        /* Ícones do carrinho em todas as situações */
+        .carrinho-info button i,
+        .user-info button i,
+        .auth-buttons button i {
+            color: white !important;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        /* Remove qualquer estilo de emoji antigo */
+        .user-avatar,
+        .dropdown-arrow {
+            display: none;
+        }
+
+        .nenhum-resultado .btn-padrao {
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+        }
+
+        .nenhum-resultado .btn-padrao:hover {
+            background: linear-gradient(135deg, #ff4d73, #9b59b6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
     </style>
 </head>
 
@@ -437,34 +574,42 @@
                 <div class="user-info">
                     <div class="user-menu">
                         <div class="user-trigger">
-                            <span class="user-avatar">👤</span>
+                            <i class="fas fa-user"></i>
                             <span class="user-name">{{ session['username'] }}</span>
-                            <span class="dropdown-arrow">▼</span>
+                            <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="dropdown-content">
                             <a href="{{ url_for('meus_pedidos') }}" class="dropdown-item">
-                                <span class="item-icon">📦</span>
+                                <i class="fas fa-clipboard-list"></i>
                                 Meus Pedidos
                             </a>
                             {% if is_admin() %}
                             <a href="{{ url_for('admin_dashboard') }}" class="dropdown-item">
-                                <span class="item-icon">👑</span>
+                                <i class="fas fa-crown"></i>
                                 Menu Admin
                             </a>
                             {% endif %}
                             <a href="{{ url_for('logout') }}" class="dropdown-item">
-                                <span class="item-icon">🚪</span>
+                                <i class="fas fa-sign-out-alt"></i>
                                 Sair
                             </a>
                         </div>
                     </div>
-                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                    <button onclick="verCarrinho()">
+                        <i class="fas fa-shopping-cart"></i> Carrinho (<span id="contador-carrinho">0</span>)
+                    </button>
                 </div>
                 {% else %}
                 <div class="auth-buttons">
-                    <a href="{{ url_for('login') }}" class="btn-login">🔑 Login</a>
-                    <a href="{{ url_for('register') }}" class="btn-register">📝 Cadastrar</a>
-                    <button onclick="verCarrinho()">🛒 Carrinho (<span id="contador-carrinho">0</span>)</button>
+                    <a href="{{ url_for('login') }}" class="btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn-register">
+                        <i class="fas fa-user-plus"></i> Cadastrar
+                    </a>
+                    <button onclick="verCarrinho()">
+                        <i class="fas fa-shopping-cart"></i> Carrinho (<span id="contador-carrinho">0</span>)
+                    </button>
                 </div>
                 {% endif %}
             </div>
@@ -500,7 +645,9 @@
                     <h3>{{ produto['nome'] }}</h3>
                     <p class="descricao">{{ produto['descricao'] }}</p>
                     <p class="preco">R$ {{ "%.2f"|format(produto['preco']) }}</p>
-                    <button onclick="comprar({{ produto['id'] }}, '{{ produto['nome'] }}', this)">🛒 Comprar</button>
+                    <button onclick="comprar({{ produto['id'] }}, '{{ produto['nome'] }}', this)">
+                        <i class="fas fa-cart-plus"></i> Comprar
+                    </button>
                 </div>
                 {% endfor %}
             </div>
@@ -519,11 +666,13 @@
             {% else %}
             <div class="nenhum-resultado">
                 {% if termo_pesquisa %}
-                <h3>😢 Nenhum cupcake encontrado</h3>
+                <h3>Nenhum cupcake encontrado 😢</h3>
                 <p>Não encontramos resultados para "<strong>{{ termo_pesquisa }}</strong>"</p>
-                <a href="{{ url_for('home') }}" class="btn-comprar" style="margin-top: 15px;">Ver Todos os Cupcakes</a>
+                <a href="{{ url_for('home') }}" class="btn-padrao" style="margin-top: 15px;">
+                    <i class="fas fa-store"></i> Ver Todos os Cupcakes
+                </a>
                 {% else %}
-                <h3>😢 Nenhum produto disponível</h3>
+                <h3> Nenhum produto disponível 😢 </h3>
                 <p>Volte em breve para conhecer nossos cupcakes!</p>
                 {% endif %}
             </div>
@@ -570,10 +719,11 @@
         function comprar(idProduto, nomeProduto, element) {
             const botao = element;
             const retangulo = botao.getBoundingClientRect();
+            const iconHtml = '<i class="fas fa-cart-plus"></i> '; // 👈 Guarda o ícone
 
             // Animação no botão
             botao.classList.add('carregando');
-            botao.textContent = 'Adicionando...';
+            botao.innerHTML = iconHtml + 'Adicionando...'; // 👈 Mantém o ícone
 
             // Tocar som
             tocarSomCaixa();
@@ -584,8 +734,8 @@
                         // Animações de sucesso
                         botao.classList.remove('carregando');
                         botao.classList.add('adicionado');
-                        botao.textContent = 'Adicionado!';
-                        botao.style.backgroundColor = '#27ae60'; // Verde
+                        botao.innerHTML = iconHtml + 'Adicionado!'; // 👈 Mantém o ícone
+                        botao.style.backgroundColor = '#27ae60';
 
                         atualizarContadorCarrinho();
                         mostrarNotificacao(
@@ -597,7 +747,7 @@
                         // Volta ao normal após 2 segundos
                         setTimeout(() => {
                             botao.classList.remove('adicionado');
-                            botao.textContent = '🛒 Comprar';
+                            botao.innerHTML = iconHtml + 'Comprar'; // 👈 Mantém o ícone
                             botao.style.backgroundColor = '';
                         }, 2000);
                     }
@@ -605,9 +755,9 @@
                 .catch(error => {
                     console.error('Erro:', error);
                     botao.classList.remove('carregando');
-                    botao.textContent = '🛒 Tentar Novamente';
+                    botao.innerHTML = iconHtml + 'Tentar Novamente'; // 👈 Mantém o ícone
                     setTimeout(() => {
-                        botao.textContent = '🛒 Comprar';
+                        botao.innerHTML = iconHtml + 'Comprar'; // 👈 Mantém o ícone
                     }, 2000);
 
                     mostrarNotificacao(
