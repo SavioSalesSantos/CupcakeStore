@@ -44,10 +44,18 @@
             margin-bottom: 1rem;
         }
 
-        .logo {
+        .logo-container {
             flex: 1;
+            display: flex;
+            justify-content: center;
+            /* Centraliza a logo */
             min-width: 200px;
+        }
+
+        .logo {
             text-decoration: none;
+            display: inline-block;
+            /* Limita a área clicável */
         }
 
         .logo h1 {
@@ -58,6 +66,8 @@
             font-weight: 700;
             margin: 0;
             transition: transform 0.3s ease;
+            display: inline-block;
+            /* Limita o hover apenas ao texto */
         }
 
         .logo:hover h1 {
@@ -566,9 +576,11 @@
 <body>
     <header>
         <div class="header-content">
-            <a href="{{ url_for('home') }}" class="logo">
-                <h1>🍰 CupcakeStore</h1>
-            </a>
+            <div class="logo-container"> 
+                <a href="{{ url_for('home') }}" class="logo">
+                    <h1>🍰 CupcakeStore</h1>
+                </a>
+            </div>
             <div class="carrinho-info">
                 {% if session.get('user_id') %}
                 <div class="user-info">
