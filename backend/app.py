@@ -125,6 +125,19 @@ def is_master_account(user_id):
     except Exception as e:
         print(f"❌ Erro ao verificar conta master: {e}")
         return False
+    
+# =============================================
+# 👇 filtro personalizado para parse de JSON
+# =============================================
+
+@app.template_filter('parse_json')
+def parse_json_filter(data):
+    try:
+        if isinstance(data, str):
+            return json.loads(data)
+        return data
+    except:
+        return data
 
 # =============================================
 # 👇 ROTAS PRINCIPAIS

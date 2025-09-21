@@ -27,6 +27,9 @@
             min-height: 100vh;
             margin: 0;
             padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .header-content {
@@ -35,9 +38,19 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             margin-bottom: 2rem;
+            width: 100%;
+            max-width: 800px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+        }
+
+        .logo {
+            text-align: center;
+        }
+
+        .logo a {
+            text-decoration: none;
         }
 
         .logo h1 {
@@ -47,15 +60,22 @@
             -webkit-text-fill-color: transparent;
             font-weight: 700;
             margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        .logo h1:hover {
+            transform: scale(1.05);
+            text-shadow: 0 2px 10px rgba(255, 107, 139, 0.3);
         }
 
         .user-container {
             max-width: 600px;
-            margin: 0 auto;
+            width: 100%;
             background: var(--white);
             padding: 2rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+            margin-bottom: 2rem;
         }
 
         .user-container h2 {
@@ -81,11 +101,14 @@
             border: 2px solid #e9ecef;
             border-radius: var(--radius);
             font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
         }
 
         .form-group input:focus {
             border-color: var(--primary);
             outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.2);
         }
 
         .btn-padrao {
@@ -101,11 +124,37 @@
             color: white;
             border: none;
             cursor: pointer;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
         }
 
         .btn-padrao:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        .btn-cancelar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            cursor: pointer;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+        }
+
+        .btn-cancelar:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
         .form-actions {
@@ -132,16 +181,25 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
+        @media (max-width: 600px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn-padrao, .btn-cancelar {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="header-content">
-        <a href="{{ url_for('home') }}" class="logo">
-            <h1>🧁 CupcakeStore</h1>
-        </a>
-        <a href="{{ url_for('home') }}" class="btn-padrao">
-            <i class="fas fa-store"></i> Voltar à Loja
-        </a>
+        <div class="logo">
+            <a href="{{ url_for('home') }}">
+                <h1>🧁 CupcakeStore</h1>
+            </a>
+        </div>
     </div>
 
     <div class="user-container">
@@ -176,7 +234,7 @@
                 <button type="submit" class="btn-padrao">
                     <i class="fas fa-save"></i> Salvar Alterações
                 </button>
-                <a href="{{ url_for('home') }}" class="btn-padrao" style="background: var(--gray);">
+                <a href="{{ url_for('home') }}" class="btn-cancelar">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>

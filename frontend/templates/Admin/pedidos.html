@@ -1,1074 +1,667 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+{% extends "Admin/base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Pedidos - CupcakeStore</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .admin-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
+{% block title %}Pedidos - CupcakeStore{% endblock %}
+
+{% block content %}
+<!-- 👇 ESTATÍSTICAS -->
+<div class="estatisticas">
+    {% for stat in contagem_status %}
+    <div class="estatistica-card">
+        <h3>{{ stat['status']|title }}</h3>
+        <div class="estatistica-numero">{{ stat['count'] }}</div>
+        <small>Pedidos</small>
+    </div>
+    {% endfor %}
+    <div class="estatistica-card">
+        <h3>Total</h3>
+        <div class="estatistica-numero">{{ pedidos|length }}</div>
+        <small>Pedidos</small>
+    </div>
+</div>
+
+<!-- 👇 FILTROS -->
+<div class="filtros-pedidos">
+    <div class="filtro-status">
+        <button class="btn-status todos {% if status_filter == 'todos' %}ativo{% endif %}" onclick="filtrarPorStatus('todos')">
+            📦 Todos
+        </button>
+        <button class="btn-status pendente {% if status_filter == 'pendente' %}ativo{% endif %}" onclick="filtrarPorStatus('pendente')">
+            ⏳ Pendentes
+        </button>
+        <button class="btn-status processando {% if status_filter == 'processando' %}ativo{% endif %}" onclick="filtrarPorStatus('processando')">
+            🧑‍🍳 Processando
+        </button>
+        <button class="btn-status enviado {% if status_filter == 'enviado' %}ativo{% endif %}" onclick="filtrarPorStatus('enviado')">
+            🚚 Enviados
+        </button>
+        <button class="btn-status entregue {% if status_filter == 'entregue' %}ativo{% endif %}" onclick="filtrarPorStatus('entregue')">
+            ✅ Entregues
+        </button>
+        <button class="btn-status cancelado {% if status_filter == 'cancelado' %}ativo{% endif %}" onclick="filtrarPorStatus('cancelado')">
+            ❌ Cancelados
+        </button>
+        <button class="btn-status reset-numeracao" onclick="abrirModalResetNumeracao()">
+            🔄 Resetar Numeração
+        </button>
+        <button class="btn-status excluir-todos" onclick="abrirModalExcluirTodos()" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+            🗑️ Excluir Todos
+        </button>
+    </div>
+</div>
+
+<!-- 👇 LISTA DE PEDIDOS -->
+<div class="pedidos-grid">
+    {% if pedidos %}
+    {% for pedido in pedidos %}
+    <div class="pedido-card {{ pedido['status'] }}">
+        <div class="pedido-header">
+            <div class="pedido-info">
+                <h3>Pedido #{{ pedido['id'] }}</h3>
+                <p><strong>Cliente:</strong> {{ pedido['username'] }}</p>
+                <p><strong>Data:</strong> {{ pedido['created_at'] }}</p>
+                <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido['total_amount']) }}</p>
+                <p><strong>Pagamento:</strong>
+                    {% if pedido['metodo_pagamento'] == 'dinheiro' %}💵 Dinheiro{% endif %}
+                    {% if pedido['metodo_pagamento'] == 'cartao' %}💳 Cartão{% endif %}
+                    {% if pedido['metodo_pagamento'] == 'pix' %}📱 PIX{% endif %}
+                    {% if not pedido['metodo_pagamento'] %}💳 Cartão (padrão){% endif %}
+                </p>
+            </div>
+            <span class="pedido-status status-{{ pedido['status'] }}">
+                {{ pedido['status']|title }}
+            </span>
+        </div>
+
+        <div class="pedido-itens">
+            <strong>Itens do Pedido:</strong>
+            {% if pedido.order_data %}
+                {% set order_data = pedido.order_data %}
+                {% if order_data is string %}
+                    {% set order_data = order_data|parse_json %}
+                {% endif %}
+                
+                {% if order_data.itens is defined %}
+                    {% for item in order_data.itens %}
+                        <div class="item-pedido">
+                            <span>{{ item.quantidade }}x {{ item.nome }}</span>
+                            <span>R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% for item in order_data %}
+                        <div class="item-pedido">
+                            <span>
+                                {% if item.quantidade %}{{ item.quantidade }}x {% endif %}
+                                {{ item.nome if item.nome else 'Item' }}
+                            </span>
+                            <span>
+                                R$ 
+                                {% if item.preco and item.quantidade %}
+                                    {{ "%.2f"|format(item.preco * item.quantidade) }}
+                                {% elif item.preco %}
+                                    {{ "%.2f"|format(item.preco) }}
+                                {% else %}
+                                    0.00
+                                {% endif %}
+                            </span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% else %}
+                <p>Nenhum item disponível</p>
+            {% endif %}
+        </div>
+
+        <div class="pedido-acoes">
+            <select class="select-status" id="status-{{ pedido['id'] }}">
+                <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>⏳ Pendente</option>
+                <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>🧑‍🍳 Processando</option>
+                <option value="enviado" {% if pedido['status']=='enviado' %}selected{% endif %}>🚚 Enviado</option>
+                <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>✅ Entregue</option>
+                <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>❌ Cancelado</option>
+            </select>
+            <button class="btn-atualizar" onclick="atualizarStatus({{ pedido['id'] }})">
+                💾 Atualizar
+            </button>
+            <button class="btn-excluir-pedido" onclick="abrirModalExclusaoPedido({{ pedido['id'] }}, {{ pedido['total_amount'] }})">
+                🗑️ Excluir
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="nenhum-pedido">
+        <h2>📦 Nenhum pedido encontrado</h2>
+        <p>Não há pedidos con o status selecionado.</p>
+        <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
+            Ver Todos os Pedidos
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO DE PEDIDOS -->
+<div id="modalExclusaoPedido" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3>📦 Confirmar Exclusão de Pedido</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalPedido()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p>Tem certeza que deseja excluir o pedido <strong id="id-pedido-excluir">#000</strong>?</p>
+            <p>Valor total: <strong id="valor-pedido-excluir">R$ 0,00</strong></p>
+            <p>⚠️ Esta ação não pode ser desfeita!</p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModalPedido()">❌ Cancelar</button>
+            <button class="btn-modal btn-modal-confirmar" onclick="confirmarExclusaoPedido()">🗑️ Sim, Excluir</button>
+        </div>
+    </div>
+</div>
+
+<!-- 👇 MODAL DE CONFIRMAÇÃO PARA RESET DE NUMERAÇÃO -->
+<div id="modalResetNumeracao" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3>🔄 Resetar Numeração de Pedidos</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalResetNumeracao()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p>Tem certeza que deseja resetar a numeração dos pedidos?</p>
+            <p>📝 <strong>Próximo pedido começará do número sequencial correto.</strong></p>
+            <p>⚠️ Esta ação não afeta os pedidos existentes, apenas a numeração futura.</p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModalResetNumeracao()">❌ Cancelar</button>
+            <button class="btn-modal btn-modal-confirmar" onclick="confirmarResetNumeracao()">🔄 Sim, Resetar</button>
+        </div>
+    </div>
+</div>
+
+<!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO DE TODOS OS PEDIDOS -->
+<div id="modalExcluirTodos" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3>🗑️ Confirmar Exclusão Total</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalExcluirTodos()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p>Tem certeza que deseja excluir <strong>TODOS</strong> os pedidos do sistema?</p>
+            <p>⚠️ Esta ação não pode ser desfeita e removerá todos os registros de pedidos!</p>
+            <p>📊 Total de pedidos: <strong id="total-pedidos-excluir">0</strong></p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModalExcluirTodos()">❌ Cancelar</button>
+            <button class="btn-modal btn-modal-confirmar" onclick="confirmarExclusaoTodos()">🗑️ Sim, Excluir Tudo</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 👇 VARIÁVEIS GLOBAIS PARA EXCLUSÃO DE PEDIDOS
+    let pedidoIdParaExcluir = null;
+    let pedidoValorParaExcluir = null;
+
+    // 👇 FILTRAR POR STATUS
+    function filtrarPorStatus(status) {
+        window.location.href = `/admin/pedidos?status=${status}`;
+    }
+
+    // 👇 ATUALIZAR STATUS
+    function atualizarStatus(pedidoId) {
+        const select = document.getElementById(`status-${pedidoId}`);
+        const novoStatus = select.value;
+        const statusAnterior = select.getAttribute('data-status-anterior');
+
+        // Se não mudou, não faz nada
+        if (novoStatus === statusAnterior) {
+            return;
         }
 
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #ff6b8b;
-        }
+        fetch(`/admin/pedido/${pedidoId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: novoStatus })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.redirect) {
+                    // Redireciona para a mesma página para mostrar a flash message
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const statusFilter = urlParams.get('status') || 'todos';
+                    window.location.href = `/admin/pedidos?status=${statusFilter}`;
+                } else if (!data.success && data.redirect) {
+                    // Também redireciona para mostrar mensagem de erro
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const statusFilter = urlParams.get('status') || 'todos';
+                    window.location.href = `/admin/pedidos?status=${statusFilter}`;
+                } else if (!data.success) {
+                    alert('Erro ao atualizar status: ' + (data.message || 'Erro desconhecido'));
+                    // Reverte o select para o status anterior
+                    select.value = statusAnterior;
+                }
+            })
+            .catch(error => {
+                alert('Erro de conexão ao atualizar status');
+                select.value = statusAnterior;
+            });
+    }
 
-        .admin-nav {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
+    // 👇 ABRIR MODAL DE EXCLUSÃO DE PEDIDO
+    function abrirModalExclusaoPedido(id, valor) {
+        pedidoIdParaExcluir = id;
+        pedidoValorParaExcluir = valor;
 
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+        document.getElementById('id-pedido-excluir').textContent = '#' + id;
+        document.getElementById('valor-pedido-excluir').textContent = 'R$ ' + valor.toFixed(2);
+        document.getElementById('modalExclusaoPedido').style.display = 'block';
+    }
 
-        .nav-links a {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
+    // 👇 FECHAR MODAL DE PEDIDO
+    function fecharModalPedido() {
+        document.getElementById('modalExclusaoPedido').style.display = 'none';
+        pedidoIdParaExcluir = null;
+        pedidoValorParaExcluir = null;
+    }
 
-        .nav-links a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    // 👇 CONFIRMAR EXCLUSÃO DE PEDIDO
+    function confirmarExclusaoPedido() {
+        if (pedidoIdParaExcluir) {
+            fetch(`/admin/pedido/${pedidoIdParaExcluir}/excluir`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 🔥 REDIRECIONA PARA A MESMA PÁGINA PARA MOSTRAR A MENSAGEM FLASH
+                        window.location.href = '/admin/pedidos?status=' + (new URLSearchParams(window.location.search).get('status') || 'todos');
+                    } else {
+                        // Mostra alerta temporário se der erro
+                        alert('Erro: ' + data.message);
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    location.reload();
+                });
         }
+        fecharModalPedido();
+    }
 
-        .nav-links a.active {
-            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+    // 👇 FUNÇÕES PARA RESET DE NUMERAÇÃO
+    function abrirModalResetNumeracao() {
+        document.getElementById('modalResetNumeracao').style.display = 'block';
+    }
+
+    function fecharModalResetNumeracao() {
+        document.getElementById('modalResetNumeracao').style.display = 'none';
+    }
+
+    function confirmarResetNumeracao() {
+        fetch('/admin/pedidos/resetar-numeracao', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fecha o modal e recarrega a página para ver a mensagem flash
+                    fecharModalResetNumeracao();
+                    window.location.href = '/admin/pedidos?status=' + (new URLSearchParams(window.location.search).get('status') || 'todos');
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao resetar numeração');
+            });
+    }
+
+    // 👇 FUNÇÕES PARA EXCLUSÃO DE TODOS OS PEDIDOS
+    function abrirModalExcluirTodos() {
+        document.getElementById('modalExcluirTodos').style.display = 'block';
+    }
+
+    function fecharModalExcluirTodos() {
+        document.getElementById('modalExcluirTodos').style.display = 'none';
+    }
+
+    function confirmarExclusaoTodos() {
+        fetch('/admin/pedidos/excluir-todos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recarrega a página para mostrar a mensagem de sucesso
+                    window.location.href = '/admin/pedidos?status=todos';
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao excluir todos os pedidos');
+            });
+        
+        fecharModalExcluirTodos();
+    }
+
+    // 👇 FECHAR MODAL AO CLICAR FORA
+    document.getElementById('modalExclusaoPedido').addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModalPedido();
         }
+    });
 
-        .filtros-pedidos {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            align-items: center;
+    document.getElementById('modalResetNumeracao').addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModalResetNumeracao();
+        }
+    });
+
+    document.getElementById('modalExcluirTodos').addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModalExcluirTodos();
+        }
+    });
+</script>
+
+<style>
+    .estatisticas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .estatistica-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .estatistica-numero {
+        font-size: 2em;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .filtros-pedidos {
+        margin-bottom: 25px;
+    }
+
+    .filtro-status {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-status {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .btn-status.todos {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+    }
+
+    .btn-status.todos:hover {
+        background: linear-gradient(135deg, #ff4d73, #ff3366);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+    }
+
+    .btn-status.pendente {
+        background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+        color: #d63031;
+    }
+
+    .btn-status.processando {
+        background: linear-gradient(135deg, #81ecec, #74b9ff);
+        color: #2d3436;
+    }
+
+    .btn-status.enviado {
+        background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+        color: white;
+    }
+
+    .btn-status.entregue {
+        background: linear-gradient(135deg, #00b894, #00a085);
+        color: white;
+    }
+
+    .btn-status.cancelado {
+        background: linear-gradient(135deg, #636e72, #2d3436);
+        color: white;
+    }
+
+    .btn-status.reset-numeracao {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+    }
+
+    .btn-status.excluir-todos {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+    }
+
+    .btn-status:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-status.ativo {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .pedidos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+    }
+
+    .pedido-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-left: 5px solid;
+    }
+
+    .pedido-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .pedido-card.pendente {
+        border-left-color: #fdcb6e;
+    }
+
+    .pedido-card.processando {
+        border-left-color: #74b9ff;
+    }
+
+    .pedido-card.enviado {
+        border-left-color: #6c5ce7;
+    }
+
+    .pedido-card.entregue {
+        border-left-color: #00b894;
+    }
+
+    .pedido-card.cancelado {
+        border-left-color: #636e72;
+    }
+
+    .pedido-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .pedido-info h3 {
+        color: #ff6b8b;
+        margin: 0 0 5px 0;
+    }
+
+    .pedido-status {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-processando {
+        background: #cce7ff;
+        color: #004085;
+    }
+
+    .status-enviado {
+        background: #e0cffc;
+        color: #4a3c7d;
+    }
+
+    .status-entregue {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-cancelado {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .pedido-detalhes {
+        margin-bottom: 20px;
+    }
+
+    .pedido-itens {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #ddd;
+    }
+
+    .item-pedido {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 0.9em;
+    }
+
+    .pedido-acoes {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .select-status {
+        flex: 1;
+        min-width: 150px;
+        padding: 8px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .btn-atualizar {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .btn-atualizar:hover {
+        background: linear-gradient(135deg, #ff4d73, #ff3366);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+    }
+
+    .btn-excluir-pedido {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .btn-excluir-pedido:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    .nenhum-pedido {
+        text-align: center;
+        padding: 50px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .pedidos-grid {
+            grid-template-columns: 1fr;
         }
 
         .filtro-status {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-status {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-status.todos {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            color: white;
-        }
-
-        .btn-status.pendente {
-            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-            color: #d63031;
-        }
-
-        .btn-status.processando {
-            background: linear-gradient(135deg, #81ecec, #74b9ff);
-            color: #2d3436;
-        }
-
-        .btn-status.enviado {
-            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
-            color: white;
-        }
-
-        .btn-status.entregue {
-            background: linear-gradient(135deg, #00b894, #00a085);
-            color: white;
-        }
-
-        .btn-status.cancelado {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            color: white;
-        }
-
-        .btn-status.reset-numeracao {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: white;
-        }
-
-        .btn-status.reset-numeracao:hover {
-            background: linear-gradient(135deg, #8e44ad, #6c3483);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
-        }
-
-        .btn-status:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-status.ativo {
-            transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .estatisticas {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .estatistica-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .estatistica-numero {
-            font-size: 2em;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .pedidos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-        }
-
-        .pedido-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid;
-            transition: transform 0.3s ease;
-        }
-
-        .pedido-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .pedido-card.pendente {
-            border-left-color: #fdcb6e;
-        }
-
-        .pedido-card.processando {
-            border-left-color: #74b9ff;
-        }
-
-        .pedido-card.enviado {
-            border-left-color: #6c5ce7;
-        }
-
-        .pedido-card.entregue {
-            border-left-color: #00b894;
-        }
-
-        .pedido-card.cancelado {
-            border-left-color: #636e72;
-        }
-
-        .pedido-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .pedido-info h3 {
-            color: #ff6b8b;
-            margin: 0 0 5px 0;
-        }
-
-        .pedido-status {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-
-        .status-pendente {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-processando {
-            background: #cce7ff;
-            color: #004085;
-        }
-
-        .status-enviado {
-            background: #e0cffc;
-            color: #4a3c7d;
-        }
-
-        .status-entregue {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-cancelado {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .pedido-detalhes {
-            margin-bottom: 20px;
-        }
-
-        .pedido-detalhes p {
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .pedido-itens {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed #ddd;
-        }
-
-        .item-pedido {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            font-size: 0.9em;
-        }
-
-        .pedido-acoes {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .select-status {
-            padding: 8px 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            flex: 1;
-        }
-
-        .btn-atualizar {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
-        }
-
-        .btn-atualizar:hover {
-            background: linear-gradient(135deg, #219653, #1e8449);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-        }
-
-        .btn-atualizar:active {
-            transform: translateY(1px) scale(0.98);
-        }
-
-        .btn-detalhes {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .btn-excluir-pedido {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-excluir-pedido:hover {
-            background: linear-gradient(135deg, #c0392b, #a93226);
-            transform: translateY(-2px);
-        }
-
-        .nenhum-pedido {
-            text-align: center;
-            padding: 50px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-bar {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-bar input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .search-bar button {
-            padding: 12px 20px;
-            background: #ff6b8b;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* 👇 ESTILOS DO MODAL DE EXCLUSÃO */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: white;
-            margin: 10% auto;
-            padding: 0;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.3s ease;
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-            color: white;
-            padding: 20px;
-            border-radius: 15px 15px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.4em;
-        }
-
-        .modal-close {
-            font-size: 1.8em;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .modal-close:hover {
-            transform: scale(1.2);
-        }
-
-        .modal-body {
-            padding: 30px;
-            text-align: center;
-        }
-
-        .modal-body p {
-            margin: 10px 0;
-            font-size: 1.1em;
-            color: #333;
-        }
-
-        .modal-footer {
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 15px;
             justify-content: center;
         }
 
-        .btn-cancelar-modal {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            border: none;
+        .btn-status {
+            padding: 8px 15px;
+            font-size: 14px;
         }
 
-        .btn-confirmar-modal {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            border: none;
+        .pedido-header {
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .btn-cancelar-modal:hover {
-            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
-            transform: translateY(-2px);
+        .pedido-acoes {
+            flex-direction: column;
+            align-items: stretch;
         }
-
-        .btn-confirmar-modal:hover {
-            background: linear-gradient(135deg, #c0392b, #a93226);
-            transform: translateY(-2px);
+        
+        .select-status {
+            min-width: 100%;
         }
-
-        /* 👇 ANIMAÇÕES */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* Estilos para mensagens flash */
-        .flash-messages {
-            margin-bottom: 20px;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        @media (max-width: 768px) {
-            .pedidos-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filtro-status {
-                justify-content: center;
-            }
-
-            .btn-status {
-                padding: 8px 15px;
-                font-size: 14px;
-            }
-
-            .pedido-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .pedido-acoes {
-                flex-direction: column;
-            }
-
-            .modal-content {
-                margin: 20% auto;
-                width: 95%;
-            }
-
-            .modal-footer {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none;">
-                <h1 style="margin: 0; color: #ff6b8b;">🍰 CupcakeStore</h1>
-            </a>
-            <h1 style="margin: 0; color: #ff6b8b;">Pedidos</h1>
-            <div>
-                <a href="{{ url_for('home') }}" class="btn-voltar">← Voltar à Loja</a>
-                <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
-            </div>
-        </div>
-
-        <div class="admin-nav">
-            <div class="nav-links">
-                <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
-                <a href="/admin/produtos">📦 Produtos</a>
-                <a href="/admin/pedidos" class="active">📋 Pedidos</a>
-                <a href="/admin/usuarios">👥 Usuários</a>
-            </div>
-        </div>
-
-        <!-- 👇 MENSAGENS FLASH -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
-
-        <!-- 👇 ESTATÍSTICAS -->
-        <div class="estatisticas">
-            {% for stat in contagem_status %}
-            <div class="estatistica-card">
-                <h3>{{ stat['status']|title }}</h3>
-                <div class="estatistica-numero">{{ stat['count'] }}</div>
-                <small>Pedidos</small>
-            </div>
-            {% endfor %}
-            <div class="estatistica-card">
-                <h3>Total</h3>
-                <div class="estatistica-numero">{{ pedidos|length }}</div>
-                <small>Pedidos</small>
-            </div>
-        </div>
-
-        <!-- 👇 FILTROS -->
-        <div class="filtros-pedidos">
-            <div class="filtro-status">
-                <button class="btn-status todos {{ 'ativo' if status_filter == 'todos' }}"
-                    onclick="filtrarPorStatus('todos')">
-                    📦 Todos
-                </button>
-                <button class="btn-status pendente {{ 'ativo' if status_filter == 'pendente' }}"
-                    onclick="filtrarPorStatus('pendente')">
-                    ⏳ Pendentes
-                </button>
-                <button class="btn-status processando {{ 'ativo' if status_filter == 'processando' }}"
-                    onclick="filtrarPorStatus('processando')">
-                    🧑‍🍳 Processando
-                </button>
-                <button class="btn-status enviado {{ 'ativo' if status_filter == 'enviado' }}"
-                    onclick="filtrarPorStatus('enviado')">
-                    🚚 Enviados
-                </button>
-                <button class="btn-status entregue {{ 'ativo' if status_filter == 'entregue' }}"
-                    onclick="filtrarPorStatus('entregue')">
-                    ✅ Entregues
-                </button>
-                <button class="btn-status cancelado {{ 'ativo' if status_filter == 'cancelado' }}"
-                    onclick="filtrarPorStatus('cancelado')">
-                    ❌ Cancelados
-                </button>
-                <button class="btn-status reset-numeracao" onclick="abrirModalResetNumeracao()">
-                    🔄 Resetar Numeração
-                </button>
-                <button class="btn-status excluir-todos" onclick="abrirModalExcluirTodos()"
-                    style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-                    🗑️ Excluir Todos
-                </button>
-            </div>
-        </div>
-
-        <!-- 👇 LISTA DE PEDIDOS -->
-        <div class="pedidos-grid">
-            {% if pedidos %}
-            {% for pedido in pedidos %}
-            <div class="pedido-card {{ pedido['status'] }}">
-                <div class="pedido-header">
-                    <div class="pedido-info">
-                        <h3>Pedido #{{ pedido['id'] }}</h3>
-                        <p><strong>Cliente:</strong> {{ pedido['username'] }}</p>
-                        <p><strong>Data:</strong> {{ pedido['created_at'] }}</p>
-                        <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido['total_amount']) }}</p>
-                        <p><strong>Pagamento:</strong>
-                            {% if pedido['metodo_pagamento'] == 'dinheiro' %}💵 Dinheiro{% endif %}
-                            {% if pedido['metodo_pagamento'] == 'cartao' %}💳 Cartão{% endif %}
-                            {% if pedido['metodo_pagamento'] == 'pix' %}📱 PIX{% endif %}
-                            {% if not pedido['metodo_pagamento'] %}💳 Cartão (padrão){% endif %}
-                        </p>
-                    </div>
-                    <span class="pedido-status status-{{ pedido['status'] }}">
-                        {{ pedido['status']|title }}
-                    </span>
-                </div>
-
-                <div class="pedido-itens">
-                    <strong>Itens do Pedido:</strong>
-                    {% if pedido.itens is defined and pedido.itens %}
-                    {% for item in pedido.itens %}
-                    <div class="item-pedido">
-                        <span>
-                            {% if item is mapping and item.nome is defined and item.quantidade is defined %}
-                            {{ item.quantidade }}x {{ item.nome }}
-                            {% else %}
-                            1x Item inválido
-                            {% endif %}
-                        </span>
-                        <span>
-                            {% if item is mapping and item.preco is defined and item.quantidade is defined %}
-                            R$ {{ "%.2f"|format(item.preco * item.quantidade) }}
-                            {% else %}
-                            R$ 0.00
-                            {% endif %}
-                        </span>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <p>Nenhum item disponível</p>
-                    {% endif %}
-                </div>
-
-                <div class="pedido-acoes">
-                    <select class="select-status" id="status-{{ pedido['id'] }}">
-                        <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>⏳ Pendente
-                        </option>
-                        <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>🧑‍🍳
-                            Processando</option>
-                        <option value="enviado" {% if pedido['status']=='enviado' %}selected{% endif %}>🚚 Enviado
-                        </option>
-                        <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>✅ Entregue
-                        </option>
-                        <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>❌ Cancelado
-                        </option>
-                    </select>
-                    <button class="btn-atualizar" onclick="atualizarStatus({{ pedido['id'] }})">
-                        💾 Atualizar
-                    </button>
-                    <button class="btn-excluir-pedido"
-                        onclick="abrirModalExclusaoPedido({{ pedido['id'] }}, {{ pedido['total_amount'] }})">
-                        🗑️ Excluir
-                    </button>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="nenhum-pedido">
-                <h2>📦 Nenhum pedido encontrado</h2>
-                <p>Não há pedidos com o status selecionado.</p>
-                <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
-                    Ver Todos os Pedidos
-                </button>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO DE PEDIDOS -->
-    <div id="modalExclusaoPedido" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>📦 Confirmar Exclusão de Pedido</h3>
-                <span class="modal-close" onclick="fecharModalPedido()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir o pedido <strong id="id-pedido-excluir">#000</strong>?</p>
-                <p>Valor total: <strong id="valor-pedido-excluir">R$ 0,00</strong></p>
-                <p>⚠️ Esta ação não pode ser desfeita!</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancelar-modal" onclick="fecharModalPedido()">❌ Cancelar</button>
-                <button class="btn-confirmar-modal" onclick="confirmarExclusaoPedido()">f🗑️ Sim, Excluir</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO DE TODOS OS PEDIDOS -->
-    <div id="modalExcluirTodos" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🗑️ Confirmar Exclusão Total</h3>
-                <span class="modal-close" onclick="fecharModalExcluirTodos()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir <strong>TODOS</strong> os pedidos do sistema?</p>
-                <p>⚠️ Esta ação não pode ser desfeita e removerá todos os registros de pedidos!</p>
-                <p>📊 Total de pedidos: <strong id="total-pedidos-excluir">0</strong></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancelar-modal" onclick="fecharModalExcluirTodos()">❌ Cancelar</button>
-                <button class="btn-confirmar-modal" onclick="confirmarExclusaoTodos()">🗑️ Sim, Excluir Tudo</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA RESET DE NUMERAÇÃO -->
-    <div id="modalResetNumeracao" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🔄 Resetar Numeração de Pedidos</h3>
-                <span class="modal-close" onclick="fecharModalResetNumeracao()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja resetar a numeração dos pedidos?</p>
-                <p>📝 <strong>Próximo pedido começará do número sequencial correto.</strong></p>
-                <p>⚠️ Esta ação não afeta os pedidos existentes, apenas a numeração futura.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancelar-modal" onclick="fecharModalResetNumeracao()">❌ Cancelar</button>
-                <button class="btn-confirmar-modal" onclick="confirmarResetNumeracao()">🔄 Sim, Resetar</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 👇 VARIÁVEIS GLOBAIS PARA EXCLUSÃO DE PEDIDOS
-        let pedidoIdParaExcluir = null;
-        let pedidoValorParaExcluir = null;
-
-        // 👇 FILTRAR POR STATUS
-        function filtrarPorStatus(status) {
-            window.location.href = `/admin/pedidos?status=${status}`;
-        }
-
-        // 👇 FUNÇÃO PARA MOSTRAR NOTIFICAÇÕES FLASH (SUBSTITUI ALERTAS)
-        function mostrarNotificacaoFlash(mensagem, tipo = 'success') {
-            // Cria elemento de notificação
-            const notificacao = document.createElement('div');
-            notificacao.className = `notificacao ${tipo}`;
-            notificacao.style.position = 'fixed';
-            notificacao.style.top = '20px';
-            notificacao.style.right = '20px';
-            notificacao.style.zIndex = '10000';
-
-            const icons = {
-                success: '✅',
-                error: '❌',
-                info: 'ℹ️'
-            };
-
-            notificacao.innerHTML = `
-        <span class="notificacao-icon">${icons[tipo] || '✅'}</span>
-        <div class="notificacao-conteudo">
-            <div class="notificacao-mensagem">${mensagem}</div>
-        </div>
-        <button class="btn-fechar" onclick="this.parentElement.remove()">×</button>
-    `;
-
-            document.body.appendChild(notificacao);
-
-            // Remove automaticamente após 3 segundos
-            setTimeout(() => {
-                if (notificacao.parentElement) {
-                    notificacao.remove();
-                }
-            }, 3000);
-        }
-
-        // 👇 ATUALIZAR STATUS COM REDIRECT PARA MOSTRAR FLASH MESSAGES
-        function atualizarStatus(pedidoId) {
-            const select = document.getElementById(`status-${pedidoId}`);
-            const novoStatus = select.value;
-            const statusAnterior = select.getAttribute('data-status-anterior');
-
-            // Se não mudou, não faz nada
-            if (novoStatus === statusAnterior) {
-                return;
-            }
-
-            fetch(`/admin/pedido/${pedidoId}/status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: novoStatus })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.redirect) {
-                        // Redireciona para a mesma página para mostrar a flash message
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const statusFilter = urlParams.get('status') || 'todos';
-                        window.location.href = `/admin/pedidos?status=${statusFilter}`;
-                    } else if (!data.success && data.redirect) {
-                        // Também redireciona para mostrar mensagem de erro
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const statusFilter = urlParams.get('status') || 'todos';
-                        window.location.href = `/admin/pedidos?status=${statusFilter}`;
-                    } else if (!data.success) {
-                        alert('Erro ao atualizar status: ' + (data.message || 'Erro desconhecido'));
-                        // Reverte o select para o status anterior
-                        select.value = statusAnterior;
-                    }
-                })
-                .catch(error => {
-                    alert('Erro de conexão ao atualizar status');
-                    select.value = statusAnterior;
-                });
-        }
-
-        // 👇 ABRIR MODAL DE EXCLUSÃO DE PEDIDO
-        function abrirModalExclusaoPedido(id, valor) {
-            pedidoIdParaExcluir = id;
-            pedidoValorParaExcluir = valor;
-
-            document.getElementById('id-pedido-excluir').textContent = '#' + id;
-            document.getElementById('valor-pedido-excluir').textContent = 'R$ ' + valor.toFixed(2);
-            document.getElementById('modalExclusaoPedido').style.display = 'block';
-        }
-
-        // 👇 FECHAR MODAL DE PEDIDO
-        function fecharModalPedido() {
-            document.getElementById('modalExclusaoPedido').style.display = 'none';
-            pedidoIdParaExcluir = null;
-            pedidoValorParaExcluir = null;
-        }
-
-        // 👇 CONFIRMAR EXCLUSÃO DE PEDIDO (VERSÃO COM MENSAGENS FLASH)
-        function confirmarExclusaoPedido() {
-            if (pedidoIdParaExcluir) {
-                fetch(`/admin/pedido/${pedidoIdParaExcluir}/excluir`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // 🔥 REDIRECIONA PARA A MESMA PÁGINA PARA MOSTRAR A MENSAGEM FLASH
-                            window.location.href = '/admin/pedidos?status=' + (new URLSearchParams(window.location.search).get('status') || 'todos');
-                        } else {
-                            // Mostra alerta temporário se der erro
-                            alert('Erro: ' + data.message);
-                            location.reload();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro:', error);
-                        location.reload();
-                    });
-            }
-            fecharModalPedido();
-        }
-
-        // 👇 FUNÇÃO PARA REMOVER O PEDIDO VISUALMENTE DA TELA
-        function removerPedidoDaTela(pedidoId) {
-            // Encontra o card do pedido pelo ID
-            const pedidoCard = document.querySelector(`.pedido-card:has(.pedido-info h3:contains('Pedido #${pedidoId}'))`);
-
-            if (pedidoCard) {
-                // Adiciona animação de fade out
-                pedidoCard.style.transition = 'all 0.5s ease';
-                pedidoCard.style.opacity = '0';
-                pedidoCard.style.transform = 'translateX(-100px)';
-
-                // Remove o card após a animação
-                setTimeout(() => {
-                    pedidoCard.remove();
-
-                    // Atualiza o contador de pedidos
-                    atualizarContadorPedidos();
-
-                    // Se não houver mais pedidos, mostra mensagem
-                    if (document.querySelectorAll('.pedido-card').length === 0) {
-                        mostrarMensagemNenhumPedido();
-                    }
-
-                }, 500);
-            } else {
-                // Se não encontrar o card, recarrega a página
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            }
-        }
-
-        // 👇 ATUALIZA O CONTADOR DE PEDIDOS
-        function atualizarContadorPedidos() {
-            const pedidosRestantes = document.querySelectorAll('.pedido-card').length;
-            const estatisticaTotal = document.querySelector('.estatistica-card:last-child .estatistica-numero');
-
-            if (estatisticaTotal) {
-                estatisticaTotal.textContent = pedidosRestantes;
-            }
-        }
-
-        // 👇 MOSTRA MENSAGEM QUANDO NÃO HÁ PEDIDOS
-        function mostrarMensagemNenhumPedido() {
-            const pedidosGrid = document.querySelector('.pedidos-grid');
-            if (pedidosGrid) {
-                pedidosGrid.innerHTML = `
-            <div class="nenhum-pedido">
-                <h2>📦 Nenhum pedido encontrado</h2>
-                <p>Não há pedidos com o status selecionado.</p>
-                <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
-                    Ver Todos os Pedidos
-                </button>
-            </div>
-        `;
-            }
-        }
-
-        // 👇 FECHAR MODAL AO CLICAR FORA
-        document.getElementById('modalExclusaoPedido').addEventListener('click', function (e) {
-            if (e.target === this) {
-                fecharModalPedido();
-            }
-        });
-
-        // 👇 BUSCA EM TEMPO REAL (PARA IMPLEMENTAR DEPOIS)
-        function buscarPedidos() {
-            const termo = document.getElementById('searchPedidos').value.toLowerCase();
-            // Implementar busca futuramente
-        }
-
-        // 👇 FUNÇÕES PARA RESET DE NUMERAÇÃO
-        function abrirModalResetNumeracao() {
-            document.getElementById('modalResetNumeracao').style.display = 'block';
-        }
-
-        function fecharModalResetNumeracao() {
-            document.getElementById('modalResetNumeracao').style.display = 'none';
-        }
-
-        function confirmarResetNumeracao() {
-            fetch('/admin/pedidos/resetar-numeracao', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Fecha o modal e recarrega a página para ver a mensagem flash
-                        fecharModalResetNumeracao();
-                        window.location.href = '/admin/pedidos?status=' + (new URLSearchParams(window.location.search).get('status') || 'todos');
-                    } else {
-                        alert('Erro: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao resetar numeração');
-                });
-        }
-
-        // 👇 FECHAR MODAL AO CLICAR FORA
-        document.getElementById('modalResetNumeracao').addEventListener('click', function (e) {
-            if (e.target === this) {
-                fecharModalResetNumeracao();
-            }
-        });
-
-        // 👇 FUNÇÕES PARA EXCLUSÃO DE TODOS OS PEDIDOS
-        function abrirModalExcluirTodos() {
-            // Buscar estatísticas atuais
-            fetch('/admin/pedidos/excluir-todos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('total-pedidos-excluir').textContent = data.count || 'Todos';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar estatísticas:', error);
-                });
-
-            document.getElementById('modalExcluirTodos').style.display = 'block';
-        }
-
-        function fecharModalExcluirTodos() {
-            document.getElementById('modalExcluirTodos').style.display = 'none';
-        }
-
-        function confirmarExclusaoTodos() {
-            fetch('/admin/pedidos/excluir-todos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Recarrega a página para mostrar a mensagem de sucesso
-                        window.location.href = '/admin/pedidos?status=todos';
-                    } else {
-                        alert('Erro: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao excluir todos os pedidos');
-                });
-
-            fecharModalExcluirTodos();
-        }
-
-        // Fechar modal ao clicar fora
-        document.getElementById('modalExcluirTodos').addEventListener('click', function (e) {
-            if (e.target === this) {
-                fecharModalExcluirTodos();
-            }
-        });
-    </script>
-</body>
-
-</html>
+    }
+</style>
+{% endblock %}

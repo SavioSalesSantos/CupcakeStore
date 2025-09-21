@@ -1,477 +1,270 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+{% extends "Admin/base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Produtos - CupcakeStore</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .admin-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+{% block title %}Produtos - CupcakeStore{% endblock %}
 
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #ff6b8b;
-        }
+{% block content %}
+<!-- Cabeçalho com botão centralizado -->
+<div style="display: flex; justify-content: center; margin-bottom: 30px;">
+    <button class="btn-admin btn-primary" onclick="document.getElementById('addProductForm').style.display='block'">
+        <i class="fas fa-plus"></i> Adicionar Produto
+    </button>
+</div>
 
-        .admin-nav {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
+<!-- Formulário de Adicionar Produto (inicialmente oculto) -->
+<div id="addProductForm" style="display: none; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px;">
+    <h3 style="color: #ff6b8b; margin-bottom: 20px; text-align: center;">➕ Adicionar Novo Produto</h3>
+    <form action="{{ url_for('admin_adicionar_produto') }}" method="POST" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="nome">Nome do Produto:</label>
+                <input type="text" id="nome" name="nome" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px;">
+            </div>
 
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        }
-
-        .nav-links a.active {
-            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-        }
-
-        .produtos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .produto-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .produto-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-edit {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-        }
-
-        .btn-delete {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
-        }
-
-        .btn-edit:hover,
-        .btn-delete:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-edit:active,
-        .btn-delete:active {
-            transform: translateY(1px) scale(0.98);
-        }
-
-        .add-produto {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-        }
-
-        /* Estilos para mensagens flash */
-        .flash-messages {
-            margin-bottom: 20px;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        /* 👇 ESTILOS DA MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 0;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.3s ease;
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-            color: white;
-            padding: 20px;
-            border-radius: 15px 15px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.4em;
-        }
-
-        .modal-close {
-            font-size: 1.8em;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .modal-close:hover {
-            transform: scale(1.2);
-        }
-
-        .modal-body {
-            padding: 30px;
-            text-align: center;
-        }
-
-        .modal-body p {
-            margin: 10px 0;
-            font-size: 1.1em;
-            color: #333;
-        }
-
-        .modal-footer {
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .btn-cancelar-modal {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-confirmar-modal {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-cancelar-modal:hover {
-            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
-            transform: translateY(-2px);
-        }
-
-        .btn-confirmar-modal:hover {
-            background: linear-gradient(135deg, #c0392b, #a93226);
-            transform: translateY(-2px);
-        }
-
-        /* 👇 ANIMAÇÕES */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* 👇 RESPONSIVIDADE */
-        @media (max-width: 600px) {
-            .modal-content {
-                margin: 20% auto;
-                width: 95%;
-            }
-
-            .modal-footer {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none;">
-                <h1 style="margin: 0; color: #ff6b8b;">🍰 CupcakeStore</h1>
-            </a>
-            <h1 style="margin: 0; color: #ff6b8b;">Produtos</h1>
-            <div>
-                <a href="{{ url_for('home') }}" class="btn-voltar">← Voltar à Loja</a>
-                <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
+            <div class="form-group">
+                <label for="preco">Preço:</label>
+                <input type="number" id="preco" name="preco" step="0.01" min="0" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px;">
             </div>
         </div>
 
-        <div class="admin-nav">
-            <div class="nav-links">
-                <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
-                <a href="/admin/produtos" class="active">📦 Produtos</a>
-                <a href="/admin/pedidos">📋 Pedidos</a>
-                <a href="/admin/usuarios">👥 Usuários</a>
-            </div>
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" name="descricao" rows="3" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px;"></textarea>
         </div>
 
-        <!-- 👇 MENSAGENS FLASH -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-            {% endfor %}
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="imagem">Imagem do Produto:</label>
+            <input type="file" id="imagem" name="imagem" accept="image/*" style="width: 极速加速器; padding: 10px;">
+            <small>Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP (até 16MB)</small>
         </div>
-        {% endif %}
-        {% endwith %}
 
-        <div class="add-produto">
-            <h2>➕ Adicionar Novo Produto</h2>
-            <form action="{{ url_for('admin_adicionar_produto') }}" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="nome">Nome do Produto:</label>
-                    <input type="text" id="nome" name="nome" required>
-                </div>
+        <div style="display: flex; gap: 15px; margin-top: 20px; justify-content: center;">
+            <button type="submit" class="btn-admin btn-primary">Adicionar Produto</button>
+            <button type="button" class="btn-admin btn-cancelar" onclick="document.getElementById('addProductForm').style.display='none'">Cancelar</button>
+        </div>
+    </form>
+</div>
 
-                <div class="form-group">
-                    <label for="preco">Preço:</label>
-                    <input type="number" id="preco" name="preco" step="0.01" min="0" required>
-                </div>
+<!-- Lista de Produtos -->
+<h3 style="margin-bottom: 20px; text-align: center;">📋 Lista de Produtos ({{ produtos|length }})</h3>
 
-                <div class="form-group">
-                    <label for="descricao">Descrição:</label>
-                    <textarea id="descricao" name="descricao" rows="3" required></textarea>
-                </div>
+{% if produtos %}
+<div class="produtos-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+    {% for produto in produtos %}
+    <div class="produto-card" style="background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;">
+        <div style="height: 200px; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #f0f0f0;">
+            {% if produto['imagem'] is defined and produto['imagem'] %}
+            <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            {% else %}
+            <span style="font-size: 3em;">🧁</span>
+            {% endif %}
+        </div>
+        
+        <div style="padding: 20px;">
+            <h4 style="margin: 0 0 10px 0; color: #333;">{{ produto['nome'] }}</h4>
+            <p style="color: #666; margin: 0 0 10px 0; font-size: 0.9em;">{{ produto['descricao'] }}</p>
+            <p style="font-weight: bold; color: #ff6b8b; margin: 0 0 15px 0;">R$ {{ "%.2f"|format(produto['preco']) }}</p>
+            
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ url_for('admin_editar_produto', id=produto['id']) }}" class="btn-admin btn-primary" style="flex: 1; text-align: center; padding: 8px 12px;">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <button type="button" class="btn-admin btn-danger" style="flex: 1; padding: 8px 12px;" onclick="abrirModalExclusao({{ produto['id'] }}, '{{ produto['nome'] }}')">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <h3 style="color: #ff6b8b;">Nenhum produto cadastrado</h3>
+    <p>Comece adicionando seu primeiro produto!</p>
+</div>
+{% endif %}
 
-                <div class="form-group">
-                    <label for="imagem">Imagem do Produto:</label>
-                    <input type="file" id="imagem" name="imagem" accept="image/*">
-                    <small>Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP (até 16MB)</small>
-                </div>
-
-                <button type="submit" class="btn-finalizar">Adicionar Produto</button>
+<!-- Modal de confirmação padronizado -->
+<div id="modalConfirmacao" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3>🧁 Confirmar Exclusão</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModal()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p>Tem certeza que deseja excluir o produto <strong id="nome-produto-excluir">[Nome do Produto]</strong>?</p>
+            <p>Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModal()">❌ Cancelar</button>
+            <form id="formExcluirProduto" method="POST" style="display: inline;">
+                <button type="submit" class="btn-modal btn-modal-confirmar">🗑️ Sim, Excluir</button>
             </form>
         </div>
+    </div>
+</div>
 
-        <h2>📋 Lista de Produtos</h2>
+<style>
+    .produtos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .produto-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .produto-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    /* Estilos para modais de confirmação */
+    .modal-confirmacao {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+    
+    .modal-confirmacao-conteudo {
+        background: white;
+        margin: 10% auto;
+        padding: 0;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 极速加速器 10px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+    
+    .modal-confirmacao-cabecalho {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-confirmacao-cabecalho h3 {
+        margin: 0;
+        font-size: 1.4em;
+    }
+    
+    .modal-confirmacao-fechar {
+        font-size: 1.8em;
+        cursor: pointer;
+    }
+    
+    .modal-confirmacao-corpo {
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .modal-confirmacao-rodape {
+        padding: 20px;
+        text-align: center;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    .btn-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 12px 25px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-modal-cancelar {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+    }
+    
+    .btn-modal-cancelar:hover {
+        background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+    }
+    
+    .btn-modal-confirmar {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+    }
+    
+    .btn-modal-confirmar:hover {
+        background: linear-gradient(135deg, #ff4d73, #ff3366);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+    }
+    
+    .btn-cancelar {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancelar:hover {
+        background: linear-gradient(135deg, #ff4d73, #ff3366);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+    }
+</style>
 
-        <div class="produtos-grid">
-            {% for produto in produtos %}
-            <div class="produto-card">
-                <!-- 🔽 ADICIONAR IMAGEM AQUI -->
-                {% if produto['imagem'] is defined and produto['imagem'] %}
-                <img src="{{ url_for('static', filename=produto['imagem'].replace('static/', '')) }}"
-                    alt="{{ produto['nome'] }}"
-                    style="max-width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-                {% else %}
-                <div
-                    style="height: 150px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                    🧁 Sem imagem
-                </div>
-                {% endif %}
+<script>
+    let produtoIdParaExcluir = null;
+    let produtoNomeParaExcluir = null;
 
-                <h3>{{ produto['nome'] }}</h3>
-                <p><strong>Preço:</strong> R$ {{ "%.2f"|format(produto['preco']) }}</p>
-                <p><strong>Descrição:</strong> {{ produto['descricao'] }}</p>
+    function abrirModalExclusao(id, nome) {
+        produtoIdParaExcluir = id;
+        produtoNomeParaExcluir = nome;
+        document.getElementById('nome-produto-excluir').textContent = nome;
+        
+        // Configura o action do form
+        document.getElementById('formExcluirProduto').action = `/admin/produto/${id}/remover`;
+        
+        document.getElementById('modalConfirmacao').style.display = 'block';
+    }
 
-                <div class="produto-actions">
-                    <a href="{{ url_for('admin_editar_produto', id=produto['id']) }}" class="btn-edit">✏️ Editar</a>
-                    <form action="{{ url_for('admin_remover_produto', id=produto['id']) }}" method="POST"
-                        style="display: inline;">
-                        <button type="button" class="btn-delete"
-                            onclick="abrirModalExclusao({{ produto['id'] }}, '{{ produto['nome'] }}')">
-                            🗑️ Excluir
-                        </button>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- 👇 MODAL DE CONFIRMAÇÃO ELEGANTE -->
-        <div id="modalConfirmacao" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>🧁 Confirmar Exclusão</h3>
-                    <span class="modal-close">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <p>Tem certeza que deseja excluir o produto <strong id="nome-produto-excluir">[Nome do
-                            Produto]</strong>?</p>
-                    <p>Esta ação não pode ser desfeita.</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-cancelar-modal">❌ Cancelar</button>
-                    <button class="btn-confirmar-modal">🗑️ Sim, Excluir</button>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            // 👇 VARIÁVEIS GLOBAIS
-            let produtoIdParaExcluir = null;
-            let produtoNomeParaExcluir = null;
-
-            // 👇 ABRIR MODAL
-            function abrirModalExclusao(id, nome) {
-                produtoIdParaExcluir = id;
-                produtoNomeParaExcluir = nome;
-
-                document.getElementById('nome-produto-excluir').textContent = nome;
-                document.getElementById('modalConfirmacao').style.display = 'block';
-            }
-
-            // 👇 FECHAR MODAL
-            function fecharModal() {
-                document.getElementById('modalConfirmacao').style.display = 'none';
-                produtoIdParaExcluir = null;
-                produtoNomeParaExcluir = null;
-            }
-
-            // 👇 CONFIRMAR EXCLUSÃO
-            function confirmarExclusao() {
-                if (produtoIdParaExcluir) {
-                    // Envia o formulário de exclusão
-                    const form = document.querySelector(`form[action="/admin/produto/${produtoIdParaExcluir}/remover"]`);
-                    if (form) {
-                        form.submit();
-                    }
-                }
-                fecharModal();
-            }
-
-            // 👇 EVENT LISTENERS
-            document.addEventListener('DOMContentLoaded', function () {
-                // Fechar modal ao clicar no X ou no botão cancelar
-                document.querySelector('.modal-close').addEventListener('click', fecharModal);
-                document.querySelector('.btn-cancelar-modal').addEventListener('click', fecharModal);
-
-                // Confirmar exclusão
-                document.querySelector('.btn-confirmar-modal').addEventListener('click', confirmarExclusao);
-
-                // Fechar modal ao clicar fora do conteúdo
-                document.getElementById('modalConfirmacao').addEventListener('click', function (e) {
-                    if (e.target === this) {
-                        fecharModal();
-                    }
-                });
-            });
-        </script>
-</body>
-
-</html>
+    function fecharModal() {
+        document.getElementById('modalConfirmacao').style.display = 'none';
+        produtoIdParaExcluir = null;
+        produtoNomeParaExcluir = null;
+    }
+    
+    // Fechar modal ao clicar fora
+    document.getElementById('modalConfirmacao').addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModal();
+        }
+    });
+</script>
+{% endblock %}

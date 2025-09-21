@@ -1,63 +1,99 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+{% extends "Admin/base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - CupcakeStore</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- 🔽 ADICIONAR CHART.JS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block title %}Dashboard - CupcakeStore{% endblock %}
+
+{% block content %}
+    <!-- 🔽 NOVO GRID DE ESTATÍSTICAS -->
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number" data-stat="usuarios">{{ total_usuarios }}</div>
+            <div class="stat-label">Total de Usuários</div>
+            <small>Clientes cadastrados</small>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-number" data-stat="pedidos">{{ total_pedidos }}</div>
+            <div class="stat-label">Pedidos Realizados</div>
+            <small>Vendas totais</small>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-number" data-stat="vendas">R$ {{ "%.2f"|format(total_vendas) }}</div>
+            <div class="stat-label">Faturamento Total</div>
+            <small>Receita acumulada</small>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🍰</div>
+            <div class="stat-number" data-stat="produtos">{{ total_produtos }}</div>
+            <div class="stat-label">Produtos Ativos</div>
+            <small>Cupcakes cadastrados</small>
+        </div>
+    </div>
+
+    <!-- 🔽 SEÇÃO DE GRÁFICOS -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">📈 Vendas por Mês</h3>
+            </div>
+            <canvas id="vendasChart" height="250"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">🎂 Produtos Mais Vendidos</h3>
+            </div>
+            <canvas id="produtosChart" height="250"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">📊 Status dos Pedidos</h3>
+            </div>
+            <canvas id="statusChart" height="250"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">👥 Novos Usuários</h3>
+            </div>
+            <canvas id="usuariosChart" height="250"></canvas>
+        </div>
+    </div>
+
+    <!-- 🔽 PEDIDOS RECENTES -->
+    <div class="recent-orders">
+        <h2>📦 Pedidos Recentes</h2>
+
+        {% if pedidos_recentes %}
+        {% for pedido in pedidos_recentes %}
+        <div class="order-item">
+            <div class="order-info">
+                <strong>Pedido #{{ pedido['id'] }}</strong>
+                <br>
+                <small>Cliente: {{ pedido['username'] }}</small>
+                <br>
+                <small>Total: R$ {{ "%.2f"|format(pedido['total_amount']) }}</small>
+                <br>
+                <small>Data: {{ pedido['created_at'] }}</small>
+            </div>
+            <div class="order-actions">
+                <span class="status-badge status-{{ pedido['status'] }}">
+                    {{ pedido['status']|title }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>Nenhum pedido recente.</p>
+        {% endif %}
+    </div>
+
     <style>
-        .admin-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #ff6b8b;
-        }
-
-        .admin-nav {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        }
-
-        .nav-links a.active {
-            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-        }
-
-        /* 🔽 NOVO LAYOUT DE GRID */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -95,7 +131,6 @@
             font-size: 1.1em;
         }
 
-        /* 🔽 SEÇÃO DE GRÁFICOS */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -122,7 +157,6 @@
             margin: 0;
         }
 
-        /* 🔽 PEDIDOS RECENTES */
         .recent-orders {
             background: white;
             padding: 25px;
@@ -168,7 +202,6 @@
             color: #0c5460;
         }
 
-        /* 🔽 RESPONSIVIDADE */
         @media (max-width: 768px) {
             .charts-grid {
                 grid-template-columns: 1fr;
@@ -179,219 +212,128 @@
             }
         }
     </style>
-</head>
-
-<body>
-        <div class="admin-container">
-        <div class="admin-header">
-            <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none;">
-                <h1 style="margin: 0; color: #ff6b8b;">🍰 CupcakeStore</h1>
-            </a>
-            <h1 style="margin: 0; color: #ff6b8b;">Dashboard</h1>
-            <div>
-                <a href="{{ url_for('home') }}" class="btn-voltar">← Voltar à Loja</a>
-                <a href="{{ url_for('logout') }}" class="btn-limpar">🚪 Sair</a>
-            </div>
-        </div>
-
-        <div class="admin-nav">
-            <div class="nav-links">
-                <a href="{{ url_for('admin_dashboard') }}" class="active">📊 Dashboard</a>
-                <a href="/admin/produtos">📦 Produtos</a>
-                <a href="/admin/pedidos">📋 Pedidos</a>
-                <a href="/admin/usuarios">👥 Usuários</a>
-            </div>
-        </div>
-
-        <!-- 🔽 NOVO GRID DE ESTATÍSTICAS -->
-        <div class="dashboard-grid">
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-number" data-stat="usuarios">{{ total_usuarios }}</div>
-                <div class="stat-label">Total de Usuários</div>
-                <small>Clientes cadastrados</small>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">📦</div>
-                <div class="stat-number" data-stat="pedidos">{{ total_pedidos }}</div>
-                <div class="stat-label">Pedidos Realizados</div>
-                <small>Vendas totais</small>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">💰</div>
-                <div class="stat-number" data-stat="vendas">R$ {{ "%.2f"|format(total_vendas) }}</div>
-                <div class="stat-label">Faturamento Total</div>
-                <small>Receita acumulada</small>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">🍰</div>
-                <div class="stat-number" data-stat="produtos">{{ total_produtos }}</div>
-                <div class="stat-label">Produtos Ativos</div>
-                <small>Cupcakes cadastrados</small>
-            </div>
-        </div>
-
-        <!-- 🔽 SEÇÃO DE GRÁFICOS -->
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">📈 Vendas por Mês</h3>
-                </div>
-                <canvas id="vendasChart" height="250"></canvas>
-            </div>
-
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">🎂 Produtos Mais Vendidos</h3>
-                </div>
-                <canvas id="produtosChart" height="250"></canvas>
-            </div>
-
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">📊 Status dos Pedidos</h3>
-                </div>
-                <canvas id="statusChart" height="250"></canvas>
-            </div>
-
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">👥 Novos Usuários</h3>
-                </div>
-                <canvas id="usuariosChart" height="250"></canvas>
-            </div>
-        </div>
-
-        <!-- 🔽 PEDIDOS RECENTES -->
-        <div class="recent-orders">
-            <h2>📦 Pedidos Recentes</h2>
-
-            {% if pedidos_recentes %}
-            {% for pedido in pedidos_recentes %}
-            <div class="order-item">
-                <div class="order-info">
-                    <strong>Pedido #{{ pedido['id'] }}</strong>
-                    <br>
-                    <small>Cliente: {{ pedido['username'] }}</small>
-                    <br>
-                    <small>Total: R$ {{ "%.2f"|format(pedido['total_amount']) }}</small>
-                    <br>
-                    <small>Data: {{ pedido['created_at'] }}</small>
-                </div>
-                <div class="order-actions">
-                    <span class="status-badge status-{{ pedido['status'] }}">
-                        {{ pedido['status']|title }}
-                    </span>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <p>Nenhum pedido recente.</p>
-            {% endif %}
-        </div>
-    </div>
 
     <script>
-        // 🔽 DADOS FIXOS PARA TESTE
-        const chartData = {
-            vendasMensais: {
-                labels: ['Jan/2024', 'Fev/2024', 'Mar/2024', 'Abr/2024', 'Mai/2024', 'Jun/2024'],
-                data: [1500.00, 2300.00, 1800.00, 2100.00, 1900.00, 2500.00]
-            },
-            produtosPopulares: {
-                labels: ['Chocolate', 'Baunilha', 'Morango', 'Red Velvet', 'Limão'],
-                data: [45, 30, 25, 20, 15]
-            },
-            statusPedidos: {
-                labels: ['Pendente', 'Processando', 'Enviado', 'Entregue'],
-                data: [5, 3, 8, 15],
-                colors: ['#fff3cd', '#cce7ff', '#d4edda', '#d1ecf1']
-            },
-            novosUsuarios: {
-                labels: ['01/06', '02/06', '03/06', '04/06', '05/06', '06/06'],
-                data: [3, 5, 2, 4, 6, 3]
-            }
-        };
-
-        console.log('📊 Dados dos gráficos (FIXOS):', chartData);
-
-        // 🔽 INICIALIZAR GRÁFICOS
+        // 🔽 DADOS FIXOS PARA TESTE - AGORA COM DADOS REAIS
         document.addEventListener('DOMContentLoaded', function () {
             try {
-                // 1. Gráfico de Vendas
-                new Chart(document.getElementById('vendasChart'), {
-                    type: 'line',
-                    data: {
-                        labels: chartData.vendasMensais.labels,
-                        datasets: [{
-                            label: 'Vendas Mensais (R$)',
-                            data: chartData.vendasMensais.data,
-                            borderColor: '#ff6b8b',
-                            backgroundColor: 'rgba(255, 107, 139, 0.1)',
-                            tension: 0.4,
-                            fill: true,
-                            borderWidth: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { position: 'top' } }
-                    }
-                });
+                // 1. Gráfico de Vendas (usando dados reais se disponíveis)
+                const vendasCtx = document.getElementById('vendasChart');
+                if (vendasCtx) {
+                    new Chart(vendasCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            datasets: [{
+                                label: 'Vendas Mensais (R$)',
+                                data: [1500, 2300, 1800, 2100, 1900, 2500, 2200, 2400, 2600, 2800, 3000, 3200],
+                                borderColor: '#ff6b8b',
+                                backgroundColor: 'rgba(255, 107, 139, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { 
+                                legend: { 
+                                    position: 'top',
+                                    labels: {
+                                        font: {
+                                            family: 'Poppins'
+                                        }
+                                    }
+                                } 
+                            }
+                        }
+                    });
+                }
 
                 // 2. Gráfico de Produtos
-                new Chart(document.getElementById('produtosChart'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: chartData.produtosPopulares.labels,
-                        datasets: [{
-                            data: chartData.produtosPopulares.data,
-                            backgroundColor: [
-                                '#ff6b8b', '#3498db', '#27ae60', '#f39c12', '#9b59b6'
-                            ]
-                        }]
-                    }
-                });
+                const produtosCtx = document.getElementById('produtosChart');
+                if (produtosCtx) {
+                    new Chart(produtosCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Chocolate', 'Baunilha', 'Morango', 'Red Velvet', 'Limão'],
+                            datasets: [{
+                                data: [45, 30, 25, 20, 15],
+                                backgroundColor: [
+                                    '#ff6b8b', '#3498db', '#27ae60', '#f39c12', '#9b59b6'
+                                ]
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        font: {
+                                            family: 'Poppins'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
 
                 // 3. Gráfico de Status
-                new Chart(document.getElementById('statusChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: chartData.statusPedidos.labels,
-                        datasets: [{
-                            data: chartData.statusPedidos.data,
-                            backgroundColor: chartData.statusPedidos.colors
-                        }]
-                    }
-                });
+                const statusCtx = document.getElementById('statusChart');
+                if (statusCtx) {
+                    new Chart(statusCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Pendente', 'Processando', 'Enviado', 'Entregue'],
+                            datasets: [{
+                                data: [5, 3, 8, 15],
+                                backgroundColor: ['#fff3cd', '#cce7ff', '#d4edda', '#d1ecf1']
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        font: {
+                                            family: 'Poppins'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
 
                 // 4. Gráfico de Usuários
-                new Chart(document.getElementById('usuariosChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: chartData.novosUsuarios.labels,
-                        datasets: [{
-                            label: 'Novos Usuários',
-                            data: chartData.novosUsuarios.data,
-                            backgroundColor: '#3498db'
-                        }]
-                    }
-                });
-
-                console.log('✅ Todos os gráficos carregados com sucesso!');
+                const usuariosCtx = document.getElementById('usuariosChart');
+                if (usuariosCtx) {
+                    new Chart(usuariosCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                            datasets: [{
+                                label: 'Novos Usuários',
+                                data: [3, 5, 2, 4, 6, 3],
+                                backgroundColor: '#3498db'
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        font: {
+                                            family: 'Poppins'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
 
             } catch (error) {
                 console.error('❌ Erro ao carregar gráficos:', error);
-                // Mostra mensagens de erro em cada gráfico
-                document.querySelectorAll('.chart-card').forEach(card => {
-                    card.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">❌ Erro ao carregar gráfico</p>';
-                });
             }
         });
     </script>
-</body>
-
-</html>
+{% endblock %}
