@@ -623,6 +623,10 @@
                 <button class="btn-status reset-numeracao" onclick="abrirModalResetNumeracao()">
                     🔄 Resetar Numeração
                 </button>
+                <button class="btn-status excluir-todos" onclick="abrirModalExcluirTodos()"
+                    style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    🗑️ Excluir Todos
+                </button>
             </div>
         </div>
 
@@ -725,6 +729,25 @@
             <div class="modal-footer">
                 <button class="btn-cancelar-modal" onclick="fecharModalPedido()">❌ Cancelar</button>
                 <button class="btn-confirmar-modal" onclick="confirmarExclusaoPedido()">f🗑️ Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO DE TODOS OS PEDIDOS -->
+    <div id="modalExcluirTodos" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🗑️ Confirmar Exclusão Total</h3>
+                <span class="modal-close" onclick="fecharModalExcluirTodos()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir <strong>TODOS</strong> os pedidos do sistema?</p>
+                <p>⚠️ Esta ação não pode ser desfeita e removerá todos os registros de pedidos!</p>
+                <p>📊 Total de pedidos: <strong id="total-pedidos-excluir">0</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancelar-modal" onclick="fecharModalExcluirTodos()">❌ Cancelar</button>
+                <button class="btn-confirmar-modal" onclick="confirmarExclusaoTodos()">🗑️ Sim, Excluir Tudo</button>
             </div>
         </div>
     </div>
@@ -986,6 +1009,63 @@
         document.getElementById('modalResetNumeracao').addEventListener('click', function (e) {
             if (e.target === this) {
                 fecharModalResetNumeracao();
+            }
+        });
+
+        // 👇 FUNÇÕES PARA EXCLUSÃO DE TODOS OS PEDIDOS
+        function abrirModalExcluirTodos() {
+            // Buscar estatísticas atuais
+            fetch('/admin/pedidos/excluir-todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('total-pedidos-excluir').textContent = data.count || 'Todos';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar estatísticas:', error);
+                });
+
+            document.getElementById('modalExcluirTodos').style.display = 'block';
+        }
+
+        function fecharModalExcluirTodos() {
+            document.getElementById('modalExcluirTodos').style.display = 'none';
+        }
+
+        function confirmarExclusaoTodos() {
+            fetch('/admin/pedidos/excluir-todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Recarrega a página para mostrar a mensagem de sucesso
+                        window.location.href = '/admin/pedidos?status=todos';
+                    } else {
+                        alert('Erro: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao excluir todos os pedidos');
+                });
+
+            fecharModalExcluirTodos();
+        }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('modalExcluirTodos').addEventListener('click', function (e) {
+            if (e.target === this) {
+                fecharModalExcluirTodos();
             }
         });
     </script>

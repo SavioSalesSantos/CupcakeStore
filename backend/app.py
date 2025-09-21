@@ -333,6 +333,62 @@ def logout():
     flash('Você fez logout com sucesso!', 'success')
     return redirect(url_for('home'))
 
+@app.route('/meu-usuario', methods=['GET', 'POST'])
+def meu_usuario():
+    """Página para o usuário editar seus próprios dados"""
+    if 'user_id' not in session:
+        flash('Você precisa fazer login para acessar esta página!', 'error')
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    try:
+        conn = get_db_connection()
+        
+        if request.method == 'POST':
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            
+            # Atualiza os dados básicos
+            conn.execute(
+                'UPDATE users SET username = ?, email = ? WHERE id = ?',
+                (username, email, user_id)
+            )
+            
+            # Atualiza a senha se fornecida
+            if password:
+                password_hash = generate_password_hash(password)
+                conn.execute(
+                    'UPDATE users SET password = ? WHERE id = ?',
+                    (password_hash, user_id)
+                )
+            
+            conn.commit()
+            conn.close()
+            
+            session['username'] = username
+            flash('Dados atualizados com sucesso!', 'success')
+            return redirect(url_for('meu_usuario'))
+        
+        else:
+            usuario = conn.execute(
+                'SELECT * FROM users WHERE id = ?', 
+                (user_id,)
+            ).fetchone()
+            conn.close()
+            
+            if usuario:
+                return render_template('meu_usuario.html', usuario=usuario)
+            else:
+                flash('Usuário não encontrado!', 'error')
+                return redirect(url_for('home'))
+                
+    except Exception as e:
+        print(f"❌ Erro ao editar usuário: {e}")
+        flash('Erro ao editar usuário.', 'error')
+        return redirect(url_for('home'))
+
 # =============================================
 # 👇 ROTAS DE PEDIDOS
 # =============================================
@@ -519,6 +575,35 @@ def admin_resetar_numeracao_pedidos():
         
         flash('Erro ao resetar numeração de pedidos', 'error')
         return jsonify({'success': False, 'message': str(e)})
+    
+@app.route('/admin/pedidos/excluir-todos', methods=['POST'])
+@admin_required
+def admin_excluir_todos_pedidos():
+    """Exclui todos os pedidos do sistema"""
+    try:
+        conn = get_db_connection()
+        
+        # Busca o valor total de todos os pedidos para mostrar na mensagem
+        total_pedidos = conn.execute("SELECT COUNT(*) as count, SUM(total_amount) as total FROM orders").fetchone()
+        count_pedidos = total_pedidos['count'] if total_pedidos else 0
+        valor_total = total_pedidos['total'] if total_pedidos and total_pedidos['total'] else 0
+        
+        # Exclui todos os pedidos
+        conn.execute('DELETE FROM orders')
+        conn.commit()
+        conn.close()
+        
+        flash(f'Todos os pedidos foram excluídos! ({count_pedidos} pedidos, R$ {valor_total:.2f})', 'success')
+        return jsonify({
+            'success': True, 
+            'message': f'{count_pedidos} pedidos excluídos',
+            'valor_total': valor_total
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao excluir todos os pedidos: {e}")
+        flash('Erro ao excluir todos os pedidos', 'error')
+        return jsonify({'success': False, 'message': 'Erro ao excluir pedidos'})
 
 # =============================================
 # 👇 ROTAS DO PAINEL ADMIN

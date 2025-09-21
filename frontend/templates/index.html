@@ -576,7 +576,7 @@
 <body>
     <header>
         <div class="header-content">
-            <div class="logo-container"> 
+            <div class="logo-container">
                 <a href="{{ url_for('home') }}" class="logo">
                     <h1>🧁 CupcakeStore</h1>
                 </a>
@@ -594,6 +594,10 @@
                             <a href="{{ url_for('meus_pedidos') }}" class="dropdown-item">
                                 <i class="fas fa-clipboard-list"></i>
                                 Meus Pedidos
+                            </a>
+                            <a href="{{ url_for('meu_usuario') }}" class="dropdown-item"> <!-- LINHA NOVA -->
+                                <i class="fas fa-user-edit"></i>
+                                Meus Dados
                             </a>
                             {% if is_admin() %}
                             <a href="{{ url_for('admin_dashboard') }}" class="dropdown-item">
@@ -731,7 +735,7 @@
         function comprar(idProduto, nomeProduto, element) {
             const botao = element;
             const retangulo = botao.getBoundingClientRect();
-            const iconHtml = '<i class="fas fa-cart-plus"></i> '; 
+            const iconHtml = '<i class="fas fa-cart-plus"></i> ';
 
             // Animação no botão
             botao.classList.add('carregando');
@@ -746,7 +750,7 @@
                         // Animações de sucesso
                         botao.classList.remove('carregando');
                         botao.classList.add('adicionado');
-                        botao.innerHTML = iconHtml + 'Adicionado!'; 
+                        botao.innerHTML = iconHtml + 'Adicionado!';
                         botao.style.backgroundColor = '#27ae60';
 
                         atualizarContadorCarrinho();
@@ -767,7 +771,7 @@
                 .catch(error => {
                     console.error('Erro:', error);
                     botao.classList.remove('carregando');
-                    botao.innerHTML = iconHtml + 'Tentar Novamente'; 
+                    botao.innerHTML = iconHtml + 'Tentar Novamente';
                     setTimeout(() => {
                         botao.innerHTML = iconHtml + 'Comprar';
                     }, 2000);
