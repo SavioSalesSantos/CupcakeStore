@@ -5,16 +5,16 @@
 **Um protótipo de e-commerce para uma loja de cupcakes, desenvolvido como trabalho acadêmico para a disciplina de Projeto Integrador Transdisciplinar II do curso de Engenharia de Software da UNICID - Cruzeiro Sul Virtual**
 
 
-**⚠️ Esse é um projeto que funcionará como uma loja online de cupcakes para uma pequena empresa. Ele faz parte de um trabalho acadêmico e utiliza conceitos aprendidos durante o curso. Tenha em mente que este é um projeto acadêmico e não atende aos requisitos para ser utilizado em produção
+**⚠️ Esse é um projeto que funcionará como uma loja online de cupcakes para uma pequena empresa. Ele faz parte de um trabalho acadêmico e utiliza conceitos aprendidos durante o curso. Tenha em mente que este é um projeto acadêmico e não atende aos requisitos para ser utilizado em produção** 
 
-Funcionalidades Principais
-Catálogo de Produtos: Visualização de cupcakes com imagens, descrições e preços
+#Funcionalidades Principais
+#Catálogo de Produtos: Visualização de cupcakes com imagens, descrições e preços
 
-Sistema de Carrinho: Adição, remoção e gestão de itens no carrinho de compras
+#Sistema de Carrinho: Adição, remoção e gestão de itens no carrinho de compras
 
-Autenticação de Usuários: Registro, login e gestão de perfis
+#Autenticação de Usuários: Registro, login e gestão de perfis
 
-Painel Administrativo: CRUD completo de produtos, usuários e pedidos
+#Painel Administrativo: CRUD completo de produtos, usuários e pedidos
 
 Sistema de Pedidos: Histórico de compras e status de pedidos
 
