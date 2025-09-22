@@ -87,11 +87,11 @@ Página Principal
 
 Painel Administrativo
 
-![alt text](image-1.png)
+![alt text](image-2.png)
 
 Carrinho de Compras
 
-![alt text](image-2.png)
+![alt text](image-1.png)
 
 Como Executar o Projeto Localmente
 Pré-requisitos
