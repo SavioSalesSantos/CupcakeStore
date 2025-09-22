@@ -46,45 +46,38 @@ Google Fonts (Poppins): Tipografia
 
 Estrutura do Projeto
 cupcakestore/
-├── backend/
-│   ├── app.py                 # Aplicação principal Flask
-│   ├── controller.py          # Controladores adicionais
-│  
-├── database/
-│   ├── database.py            # Configuração e modelos do banco
-│   ├── cupcakes.db            # Banco de dados SQLite (gerado)
-│ 
-├── frontend/
-│   ├── static/
-│   │   ├── css/
-│   │   │   └── style.css      # Estilos principais
-│   │   │
-│   │   ├── js/
-│   │   │   ├── script.js      # JavaScript geral
-│   │   │   └── carrinho.js    # Funcionalidades do carrinho
-│   │   │ 
-│   │   ├── sounds/            # Efeitos sonoros
-│   │   └── uploads/           # Imagens enviadas
-│   │
-│   └── templates/
-│       ├── admin/             # Painel administrativo
-│       │   ├── dashboard.html # Visão geral  
-│       │   ├── produtos.html # Gerenciamento de produtos 
-│       │   ├── pedidos.html # Gerenciamento de pedidos
-│       │   ├── usuarios.html # Gerenciamento de usuários
-│       │   ├── editar_produto.html # Edição de produtos 
-│       │   └── editar_usuario.html # Edição de usuários
-│       │ 
-│       ├── index.html         # Página inicial
-│       ├── login.html         # Autenticação
-│       ├── register.html      # Registro
-│       ├── carrinho.html      # Carrinho de compras
-│       ├── compra_finalizada.html # Confirmação de compras
-│       ├── meu_usuario.html   # Perfil do usuário
-│       └── meus_pedidos.html  # Histórico de pedidos
-│ 
-├── docs/                      # Documentação
-└── README.md                  # Este arquivo
+backend/
+app.py                 # Aplicação principal Flask
+controller.py          # Controladores adicionais  
+database
+database.py            # Configuração e modelos do banco
+cupcakes.db            # Banco de dados SQLite (gerado)
+frontend/
+static/
+css/
+style.css      # Estilos principais
+js/
+script.js      # JavaScript geral
+carrinho.js    # Funcionalidades do carrinho
+sounds/            # Efeitos sonoros
+uploads/           # Imagens enviadas
+templates/
+admin/             # Painel administrativo
+dashboard.html # Visão geral  
+produtos.html # Gerenciamento de produtos 
+pedidos.html # Gerenciamento de pedidos
+usuarios.html # Gerenciamento de usuários
+editar_produto.html # Edição de produtos 
+editar_usuario.html # Edição de usuários
+index.html         # Página inicial
+login.html         # Autenticação
+register.html      # Registro
+carrinho.html      # Carrinho de compras
+compra_finalizada.html # Confirmação de compras
+meu_usuario.html   # Perfil do usuário
+meus_pedidos.html  # Histórico de pedidos
+docs/                      # Documentação
+README.md                  # Este arquivo
 
 
 Capturas de Tela
