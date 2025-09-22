@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Usuário - CupcakeStore</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -219,15 +220,15 @@
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
 
         <div class="form-editar">
@@ -245,12 +246,14 @@
             <form action="{{ url_for('admin_editar_usuario', user_id=usuario.id) }}" method="POST">
                 <div class="form-group">
                     <label for="username">Nome de usuário:</label>
-                    <input type="text" id="username" name="username" value="{{ usuario.username }}" required {% if usuario.email=='saviosales@cupcakestore.com' %}disabled{% endif %}>
+                    <input type="text" id="username" name="username" value="{{ usuario.username }}" required {% if
+                        usuario.email=='saviosales@cupcakestore.com' %}disabled{% endif %}>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="{{ usuario.email }}" required {% if usuario.email=='saviosales@cupcakestore.com' %}disabled{% endif %}>
+                    <input type="email" id="email" name="email" value="{{ usuario.email }}" required {% if
+                        usuario.email=='saviosales@cupcakestore.com' %}disabled{% endif %}>
                 </div>
 
                 <div class="form-group">
@@ -259,24 +262,114 @@
                     <input type="password" id="password" name="password" placeholder="••••••••">
                 </div>
 
-                {% if usuario.email != 'saviosales@cupcakestore.com' %}
-                <div class="checkbox-group">
-                    <input type="checkbox" id="is_admin" name="is_admin" value="1" {% if usuario.is_admin==1 %}checked{% endif %}>
-                    <label for="is_admin">É administrador</label>
-                </div>
-                {% endif %}
+                <!-- 👇 NOVA SEÇÃO: DADOS DE ENDEREÇO -->
+                <div style="margin: 2rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: var(--radius);">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem; text-align: center;">📮 Endereço</h3>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Salvar Alterações
-                    </button>
-                    <a href="{{ url_for('admin_usuarios') }}" class="btn-cancelar">
-                        <i class="fas fa-times"></i> Cancelar
-                    </a>
-                </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" name="cep" value="{{ usuario['cep'] or '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado:</label>
+                            <input type="text" id="estado" name="estado" value="{{ usuario['estado'] or '' }}"
+                                placeholder="SP">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cidade">Cidade:</label>
+                        <input type="text" id="cidade" name="cidade" value="{{ usuario['cidade'] or '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bairro">Bairro:</label>
+                        <input type="text" id="bairro" name="bairro" value="{{ usuario['bairro'] or '' }}">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="rua">Rua:</label>
+                            <input type="text" id="rua" name="rua" value="{{ usuario['rua'] or '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="numero">Número:</label>
+                            <input type="text" id="numero" name="numero" value="{{ usuario['numero'] or '' }}">
+                        </div>
+
+                        {% if usuario.email != 'saviosales@cupcakestore.com' %}
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="is_admin" name="is_admin" value="1" {% if usuario.is_admin==1
+                                %}checked{% endif %}>
+                            <label for="is_admin">É administrador</label>
+                        </div>
+                        {% endif %}
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                            <a href="{{ url_for('admin_usuarios') }}" class="btn-cancelar">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
             </form>
         </div>
     </div>
+    <!-- 👇 SCRIPT DE CEP PARA ADMIN -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cepInput = document.getElementById('cep');
+
+            if (cepInput) {
+                // Adiciona máscara ao CEP (XXXXX-XXX)
+                cepInput.addEventListener('input', function (e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 5) {
+                        value = value.substring(0, 5) + '-' + value.substring(5, 8);
+                    }
+                    e.target.value = value;
+                });
+
+                cepInput.addEventListener('blur', function () {
+                    const cep = this.value.replace(/\D/g, '');
+
+                    if (cep.length === 8) {
+                        console.log('Buscando CEP:', cep);
+
+                        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.erro) {
+                                    // Preenche os campos
+                                    setValue('estado', data.uf);
+                                    setValue('cidade', data.localidade);
+                                    setValue('bairro', data.bairro);
+                                    setValue('rua', data.logradouro);
+
+                                    if (document.getElementById('numero')) {
+                                        document.getElementById('numero').focus();
+                                    }
+                                } else {
+                                    console.log('CEP não encontrado');
+                                }
+                            })
+                            .catch(error => console.error('Erro ao buscar CEP:', error));
+                    }
+                });
+            }
+
+            function setValue(elementId, value) {
+                const element = document.getElementById(elementId);
+                if (element && value) {
+                    element.value = value;
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

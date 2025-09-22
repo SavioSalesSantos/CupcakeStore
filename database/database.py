@@ -39,7 +39,7 @@ def init_db():
     # 👇 CHAMA AS ATUALIZAÇÕES - ADICIONE A LINHA corrigir_sequencia_usuarios()
     atualizar_banco()
     atualizar_banco_pedidos()
-    corrigir_sequencia_usuarios()  # 👈 ESTA LINHA DEVE SER ADICIONADA
+    corrigir_sequencia_usuarios()  
     
     print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 
@@ -62,6 +62,30 @@ def atualizar_banco_pedidos():
     except Exception as e:
         print(f"❌ Erro ao atualizar banco de pedidos: {e}")
 
+def atualizar_banco_enderecos():
+    """Adiciona campos de endereço aos usuários existentes"""
+    try:
+        conn = get_db_connection()
+        
+        # Lista de campos de endereço a serem adicionados
+        campos_endereco = [
+            'estado', 'cidade', 'bairro', 'rua', 'numero', 'cep'
+        ]
+        
+        for campo in campos_endereco:
+            # Verifica se a coluna já existe
+            colunas = conn.execute("PRAGMA table_info(users)").fetchall()
+            coluna_existe = any(coluna[1] == campo for coluna in colunas)
+            
+            if not coluna_existe:
+                print(f"🔄 Adicionando coluna '{campo}' à tabela users...")
+                conn.execute(f"ALTER TABLE users ADD COLUMN {campo} TEXT")
+                print(f"✅ Coluna '{campo}' adicionada com sucesso!")
+        
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"❌ Erro ao atualizar banco com endereços: {e}")
 
 def init_db():
     """Inicializa o banco de dados com todas as tabelas necessárias."""
@@ -132,7 +156,8 @@ def init_db():
     # 👇 CHAMA AS ATUALIZAÇÕES - AGORA COM CORREÇÃO AUTOMÁTICA
     atualizar_banco()
     atualizar_banco_pedidos()
-    corrigir_sequencia_usuarios_automatico()  # 👈 TROQUEI PARA A NOVA FUNÇÃO
+    atualizar_banco_enderecos()
+    corrigir_sequencia_usuarios_automatico()  
     
     print(f"✅ Banco de dados criado/atualizado em: {os.path.join(base_dir, 'cupcakes.db')}")
 

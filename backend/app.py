@@ -278,6 +278,14 @@ def register():
         email = request.form['email']
         password = request.form['password']
         
+        # 👇 NOVOS CAMPOS DE ENDEREÇO
+        estado = request.form['estado']
+        cidade = request.form['cidade']
+        bairro = request.form['bairro']
+        rua = request.form['rua']
+        numero = request.form['numero']
+        cep = request.form['cep']
+        
         try:
             conn = get_db_connection()
             user_exists = conn.execute(
@@ -290,9 +298,12 @@ def register():
                 return render_template('register.html')
             
             password_hash = generate_password_hash(password)
+            
+            # 👇 INSERT ATUALIZADO COM ENDEREÇO
             conn.execute(
-                'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-                (username, email, password_hash)
+                '''INSERT INTO users (username, email, password, estado, cidade, bairro, rua, numero, cep) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                (username, email, password_hash, estado, cidade, bairro, rua, numero, cep)
             )
             conn.commit()
             conn.close()
@@ -363,10 +374,19 @@ def meu_usuario():
             email = request.form['email']
             password = request.form['password']
             
-            # Atualiza os dados básicos
+            # 👇 NOVOS CAMPOS DE ENDEREÇO
+            estado = request.form['estado']
+            cidade = request.form['cidade']
+            bairro = request.form['bairro']
+            rua = request.form['rua']
+            numero = request.form['numero']
+            cep = request.form['cep']
+            
+            # Atualiza os dados básicos e endereço
             conn.execute(
-                'UPDATE users SET username = ?, email = ? WHERE id = ?',
-                (username, email, user_id)
+                '''UPDATE users SET username = ?, email = ?, estado = ?, cidade = ?, bairro = ?, rua = ?, numero = ?, cep = ? 
+                WHERE id = ?''',
+                (username, email, estado, cidade, bairro, rua, numero, cep, user_id)
             )
             
             # Atualiza a senha se fornecida
@@ -406,17 +426,41 @@ def meu_usuario():
 # 👇 ROTAS DE PEDIDOS
 # =============================================
 
+def usuario_tem_endereco(user_id):
+    """Verifica se o usuário tem endereço cadastrado"""
+    try:
+        conn = get_db_connection()
+        usuario = conn.execute(
+            'SELECT estado, cidade, bairro, rua, numero, cep FROM users WHERE id = ?', 
+            (user_id,)
+        ).fetchone()
+        conn.close()
+        
+        if usuario:
+            # Verifica se todos os campos obrigatórios estão preenchidos
+            return (usuario['estado'] and usuario['cidade'] and usuario['bairro'] 
+                    and usuario['rua'] and usuario['numero'] and usuario['cep'])
+        return False
+    except Exception as e:
+        print(f"❌ Erro ao verificar endereço: {e}")
+        return False
+
 @app.route('/finalizar-compra')
 def finalizar_compra():
     """Página de confirmação de compra finalizada"""
     metodo_pagamento = request.args.get('metodo', 'cartao')
-    print(f"DEBUG - Método de pagamento recebido: {metodo_pagamento}")
     
     if 'user_id' not in session:
         flash('Você precisa fazer login para finalizar a compra!', 'error')
         return redirect(url_for('login'))
     
     user_id = session['user_id']
+    
+    # 👇 VERIFICA SE O USUÁRIO TEM ENDEREÇO CADASTRADO
+    if not usuario_tem_endereco(user_id):
+        flash('Para finalizar a compra, cadastre um endereço para entrega!', 'error')
+        return redirect(url_for('meu_usuario'))
+    
     carrinho_ids = session.get('carrinho', [])
     
     if not carrinho_ids:
@@ -520,74 +564,82 @@ def meus_pedidos():
         flash('Erro ao carregar seus pedidos.', 'error')
         return redirect(url_for('home'))
     
-@app.route('/admin/pedidos/resetar-numeracao', methods=['POST'])
+@app.route('/admin/usuario/<int:user_id>/editar', methods=['GET', 'POST'])
 @admin_required
-def admin_resetar_numeracao_pedidos():
-    """Reinicia a numeração automática dos pedidos - VERSÃO CORRIGIDA"""
+def admin_editar_usuario(user_id):
+    """Edita um usuário"""
     try:
+        # Impede edição da conta master por outros usuários
+        if is_master_account(user_id) and not is_master_account(session['user_id']):
+            flash('Não pode editar a conta master!', 'error')
+            return redirect(url_for('admin_usuarios'))
+        
         conn = get_db_connection()
         
-        # 1. Primeiro verifica se há pedidos na tabela
-        pedidos_count = conn.execute("SELECT COUNT(*) as count FROM orders").fetchone()
-        has_orders = pedidos_count['count'] > 0
-        
-        if not has_orders:
-            # 🔽 CASO 1: NÃO HÁ PEDIDOS - ZERA COMPLETAMENTE
-            conn.execute("DELETE FROM sqlite_sequence WHERE name='orders'")
-            next_val = 1
-            message = 'Numeração resetada! Próximo pedido será #1'
+        if request.method == 'POST':
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            is_admin = request.form.get('is_admin', 0)
             
-        else:
-            # 🔽 CASO 2: HÁ PEDIDOS - SOLUÇÃO QUE MANTÉM OS DADOS
-            # Primeiro backup dos dados COMPLETOS incluindo metodo_pagamento
-            pedidos_backup = conn.execute("SELECT * FROM orders").fetchall()
+            # 👇 NOVOS CAMPOS DE ENDEREÇO
+            estado = request.form['estado']
+            cidade = request.form['cidade']
+            bairro = request.form['bairro']
+            rua = request.form['rua']
+            numero = request.form['numero']
+            cep = request.form['cep']
             
-            # Drop da tabela existente
-            conn.execute("DROP TABLE orders")
+            # Se for a conta master, força is_admin = 1
+            if is_master_account(user_id):
+                is_admin = 1
             
-            # Recria a tabela com AUTOINCREMENT e metodo_pagamento
-            conn.execute('''
-                CREATE TABLE orders (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    order_data TEXT NOT NULL,
-                    total_amount REAL NOT NULL,
-                    metodo_pagamento TEXT DEFAULT 'cartao',
-                    status TEXT DEFAULT 'pendente',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users (id)
-                )
-            ''')
-            
-            # Restaura os dados mantendo metodo_pagamento
-            for pedido in pedidos_backup:
+            # Atualiza os dados básicos
+            if is_master_account(user_id):
+                # Conta master - não atualiza email
                 conn.execute(
-                    'INSERT INTO orders (user_id, order_data, total_amount, metodo_pagamento, status, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-                    (pedido['user_id'], pedido['order_data'], pedido['total_amount'], 
-                     pedido['metodo_pagamento'], pedido['status'], pedido['created_at'])
+                    'UPDATE users SET username = ? WHERE id = ?',
+                    (username, user_id)
+                )
+            else:
+                conn.execute(
+                    '''UPDATE users SET username = ?, email = ?, is_admin = ?, estado = ?, cidade = ?, bairro = ?, rua = ?, numero = ?, cep = ? 
+                    WHERE id = ?''',
+                    (username, email, is_admin, estado, cidade, bairro, rua, numero, cep, user_id)
                 )
             
-            # Agora o próximo ID será automaticamente 1 + quantidade de pedidos
-            next_val = len(pedidos_backup) + 1
-            message = f'Numeração completamente resetada! Próximo pedido será #{next_val}'
+            # Atualiza a senha se fornecida
+            if password:
+                password_hash = generate_password_hash(password)
+                conn.execute(
+                    'UPDATE users SET password = ? WHERE id = ?',
+                    (password_hash, user_id)
+                )
+            
+            conn.commit()
+            conn.close()
+            
+            flash('Usuário atualizado com sucesso!', 'success')
+            return redirect(url_for('admin_usuarios'))
         
-        conn.commit()
-        conn.close()
-        
-        flash(message, 'success')
-        return jsonify({
-            'success': True, 
-            'proximo_id': next_val,
-            'message': message
-        })
-        
+        else:
+            # Modo visualização - busca os dados do usuário
+            usuario = conn.execute(
+                'SELECT * FROM users WHERE id = ?', 
+                (user_id,)
+            ).fetchone()
+            conn.close()
+            
+            if usuario:
+                return render_template('admin/editar_usuario.html', usuario=usuario)
+            else:
+                flash('Usuário não encontrado!', 'error')
+                return redirect(url_for('admin_usuarios'))
+                
     except Exception as e:
-        print(f"❌ Erro ao resetar numeração: {e}")
-        import traceback
-        traceback.print_exc()
-        
-        flash('Erro ao resetar numeração de pedidos', 'error')
-        return jsonify({'success': False, 'message': str(e)})
+        print(f"❌ Erro ao editar usuário: {e}")
+        flash('Erro ao editar usuário.', 'error')
+        return redirect(url_for('admin_usuarios'))
     
 @app.route('/admin/pedidos/excluir-todos', methods=['POST'])
 @admin_required
@@ -1084,81 +1136,20 @@ def admin_excluir_usuario(user_id):
         flash('Erro ao excluir usuário.', 'error')
         return redirect(url_for('admin_usuarios'))
 
-@app.route('/admin/usuario/<int:user_id>/editar', methods=['GET', 'POST'])
-@admin_required
-def admin_editar_usuario(user_id):
-    """Edita um usuário"""
-    try:
-        # Impede edição da conta master por outros usuários
-        if is_master_account(user_id) and not is_master_account(session['user_id']):
-            flash('Não pode editar a conta master!', 'error')
-            return redirect(url_for('admin_usuarios'))
-        
-        conn = get_db_connection()
-        
-        if request.method == 'POST':
-            username = request.form['username']
-            email = request.form['email']
-            password = request.form['password']
-            is_admin = request.form.get('is_admin', 0)
-            
-            # Se for a conta master, força is_admin = 1
-            if is_master_account(user_id):
-                is_admin = 1
-            
-            # Atualiza os dados básicos
-            if is_master_account(user_id):
-                # Conta master - não atualiza email
-                conn.execute(
-                    'UPDATE users SET username = ? WHERE id = ?',
-                    (username, user_id)
-                )
-            else:
-                conn.execute(
-                    'UPDATE users SET username = ?, email = ?, is_admin = ? WHERE id = ?',
-                    (username, email, is_admin, user_id)
-                )
-            
-            # Atualiza a senha se fornecida
-            if password:
-                password_hash = generate_password_hash(password)
-                conn.execute(
-                    'UPDATE users SET password = ? WHERE id = ?',
-                    (password_hash, user_id)
-                )
-            
-            conn.commit()
-            conn.close()
-            
-            flash('Usuário atualizado com sucesso!', 'success')
-            return redirect(url_for('admin_usuarios'))
-        
-        else:
-            # Modo visualização - busca os dados do usuário
-            usuario = conn.execute(
-                'SELECT * FROM users WHERE id = ?', 
-                (user_id,)
-            ).fetchone()
-            conn.close()
-            
-            if usuario:
-                return render_template('admin/editar_usuario.html', usuario=usuario)
-            else:
-                flash('Usuário não encontrado!', 'error')
-                return redirect(url_for('admin_usuarios'))
-                
-    except Exception as e:
-        print(f"❌ Erro ao editar usuário: {e}")
-        flash('Erro ao editar usuário.', 'error')
-        return redirect(url_for('admin_usuarios'))
-    
-
 # =============================================
 # 👇 EXECUÇÃO DO APP
 # =============================================
 
+# Adicione este código temporário no final do backend/app.py para testar
 if __name__ == '__main__':
-    print("🔄 Inicializando banco de dados...")
-    init_db()
-    print("✅ Banco de dados inicializado")
+    print("🔄 Forçando atualização do banco...")
+    
+    # Importe e execute a função de atualização
+    try:
+        from database.database import atualizar_banco_enderecos
+        atualizar_banco_enderecos()
+        print("✅ Banco atualizado com sucesso!")
+    except Exception as e:
+        print(f"❌ Erro ao atualizar banco: {e}")
+    
     app.run(debug=True)

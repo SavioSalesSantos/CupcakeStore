@@ -10,42 +10,53 @@
 
 <div class="usuarios-list">
     <h2>📋 Todos os Usuários ({{ usuarios|length }})</h2>
-    
+
     {% if usuarios|length == 0 %}
-    <div class="nenhum-resultado" style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div class="nenhum-resultado"
+        style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
         <h3 style="color: #ff6b8b;">👥 Nenhum usuário encontrado</h3>
         <p>Não há usuários cadastrados no sistema.</p>
     </div>
     {% else %}
-    <table class="usuarios-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Tipo</th>
-                <th>Data Cadastro</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for usuario in usuarios %}
-            <tr class="usuario-row">
-                <td>{{ usuario['id'] }}</td>
-                <td>{{ usuario['username'] }}</td>
-                <td>{{ usuario['email'] }}</td>
-                <td>
-                    {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
-                    <span class="admin-badge badge-master">👑 Master</span>
-                    {% elif usuario['is_admin'] == 1 %}
-                    <span class="admin-badge badge-admin">Administrador</span>
-                    {% else %}
-                    <span class="admin-badge badge-user">Usuário</span>
-                    {% endif %}
-                </td>
-                <td>{{ usuario['created_at'] }}</td>
-                <td>
-                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+<table class="usuarios-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Endereço</th>
+            <th>Data Cadastro</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr class="usuario-row">
+            <td>{{ usuario['id'] }}</td>
+            <td>{{ usuario['username'] }}</td>
+            <td>{{ usuario['email'] }}</td>
+            <td>
+                {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
+                <span class="admin-badge badge-master">👑 Master</span>
+                {% elif usuario['is_admin'] == 1 %}
+                <span class="admin-badge badge-admin">Administrador</span>
+                {% else %}
+                <span class="admin-badge badge-user">Usuário</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if usuario['cep'] and usuario['rua'] and usuario['numero'] %}
+                <span class="badge-completo" title="Endereço completo">
+                    ✅ Completo
+                </span>
+                {% else %}
+                <span class="badge-incompleto">❌ Incompleto</span>
+                {% endif %}
+            </td>
+            <td>{{ usuario['created_at'] }}</td>
+            <td>
+                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                         {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
                         <!-- CONTA MASTER - AÇÕES BLOQUEADAS -->
                         <button class="btn-admin btn-secondary" disabled title="Conta master protegida">
@@ -64,12 +75,14 @@
                         </button>
                         {% endif %}
 
-                        <a href="{{ url_for('admin_editar_usuario', user_id=usuario['id']) }}" class="btn-admin btn-primary">
+                        <a href="{{ url_for('admin_editar_usuario', user_id=usuario['id']) }}"
+                            class="btn-admin btn-primary">
                             ✏️ Editar
                         </a>
 
                         {% if usuario['id'] != session['user_id'] %}
-                        <button class="btn-admin btn-danger" onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
+                        <button class="btn-admin btn-danger"
+                            onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
                             🗑️ Excluir
                         </button>
                         {% else %}
@@ -182,13 +195,13 @@
     }
 
     // 👇 BUSCA EM TEMPO REAL
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('searchInput');
 
         if (searchInput) {
             let searchTimeout;
 
-            searchInput.addEventListener('input', function() {
+            searchInput.addEventListener('input', function () {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     filtrarUsuarios();
@@ -197,7 +210,7 @@
         }
 
         // Fechar modal ao clicar fora
-        document.getElementById('modalExclusaoUsuario').addEventListener('click', function(e) {
+        document.getElementById('modalExclusaoUsuario').addEventListener('click', function (e) {
             if (e.target === this) {
                 fecharModalUsuario();
             }
@@ -343,6 +356,22 @@
             padding: 4px 8px;
             font-size: 12px;
         }
+    }
+
+    .badge-completo {
+        background: #d4edda;
+        color: #155724;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+    }
+
+    .badge-incompleto {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
     }
 </style>
 {% endblock %}
