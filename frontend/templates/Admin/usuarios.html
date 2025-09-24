@@ -66,11 +66,13 @@
                         {% else %}
                         <!-- USUÁRIOS NORMAIS -->
                         {% if usuario['is_admin'] == 1 %}
-                        <button class="btn-admin btn-warning" onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 1)">
+                        <button class="btn-admin btn-warning"
+                            onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 1)">
                             Remover Admin
                         </button>
                         {% else %}
-                        <button class="btn-admin btn-success" onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 0)">
+                        <button class="btn-admin btn-success"
+                            onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 0)">
                             Tornar Admin
                         </button>
                         {% endif %}
@@ -100,20 +102,25 @@
     {% endif %}
 </div>
 
-<!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO -->
-<div id="modalExclusaoUsuario" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>👤 Confirmar Exclusão</h3>
-            <span class="modal-close" onclick="fecharModalUsuario()">&times;</span>
+<!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO DE USUÁRIO (PADRONIZADO) -->
+<div id="modalExclusaoUsuario" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3>👤 Confirmar Exclusão de Usuário</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalUsuario()">&times;</span>
         </div>
-        <div class="modal-body">
+        <div class="modal-confirmacao-corpo">
             <p>Tem certeza que deseja excluir o usuário <strong id="nome-usuario-excluir">[Username]</strong>?</p>
             <p>⚠️ Todos os pedidos deste usuário também serão removidos!</p>
+            <p>🚫 Esta ação não pode ser desfeita!</p>
         </div>
-        <div class="modal-footer">
-            <button class="btn-admin btn-primary" onclick="fecharModalUsuario()">❌ Cancelar</button>
-            <button class="btn-admin btn-danger" onclick="confirmarExclusaoUsuario()">🗑️ Sim, Excluir</button>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal" onclick="fecharModalUsuario()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button class="btn-modal" onclick="confirmarExclusaoUsuario()">
+                <i class="fas fa-user-slash"></i> Sim, Excluir
+            </button>
         </div>
     </div>
 </div>
@@ -205,7 +212,7 @@
         isAdminParaToggle = isAdmin;
 
         const titulo = isAdmin ? 'Remover Administrador' : 'Tornar Administrador';
-        const mensagem = isAdmin ? 
+        const mensagem = isAdmin ?
             `Tem certeza que deseja remover <strong>${username}</strong> dos administradores?` :
             `Tem certeza que deseja tornar <strong>${username}</strong> um administrador?`;
 
@@ -232,20 +239,20 @@
                 },
                 body: JSON.stringify({ is_admin: isAdminParaToggle ? 0 : 1 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // 🔽 AGORA USA FLASH MESSAGE EM VEZ DE NOTIFICAÇÃO TEMPORÁRIA
-                    // A mensagem será exibida através do Flask após o reload
-                    window.location.href = '/admin/usuarios';
-                } else {
-                    alert('Erro ao atualizar permissões: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Erro ao atualizar permissões');
-                console.error('Error:', error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 🔽 AGORA USA FLASH MESSAGE EM VEZ DE NOTIFICAÇÃO TEMPORÁRIA
+                        // A mensagem será exibida através do Flask após o reload
+                        window.location.href = '/admin/usuarios';
+                    } else {
+                        alert('Erro ao atualizar permissões: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao atualizar permissões');
+                    console.error('Error:', error);
+                });
         }
         fecharModalToggleAdmin();
     }
@@ -437,7 +444,7 @@
         font-size: 0.8em;
     }
 
-    /* Estilos para modais de confirmação (padrão) */
+    /* Estilos para modais de confirmação - PADRONIZADO */
     .modal-confirmacao {
         display: none;
         position: fixed;
