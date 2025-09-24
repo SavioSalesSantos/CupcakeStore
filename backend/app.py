@@ -658,6 +658,7 @@ def admin_excluir_todos_pedidos():
     try:
         conn = get_db_connection()
         
+        
         # Busca o valor total de todos os pedidos para mostrar na mensagem
         total_pedidos = conn.execute("SELECT COUNT(*) as count, SUM(total_amount) as total FROM orders").fetchone()
         count_pedidos = total_pedidos['count'] if total_pedidos else 0
@@ -1034,7 +1035,12 @@ def admin_editar_produto(id):
     """Edita um produto existente com suporte a imagem"""
     try:
         conn = get_db_connection()
-        
+
+        # 👇 VERIFICA SE É UM CANCELAMENTO
+        if request.method == 'POST' and 'cancelar' in request.form:
+            flash('Alterações canceladas com sucesso!', 'success')
+            return redirect(url_for('admin_editar_produto', id=id))
+
         if request.method == 'POST':
             nome = request.form['nome']
             preco = float(request.form['preco'])
