@@ -317,6 +317,85 @@
                 max-width: 250px;
             }
         }
+
+        /* Estilos para modais de confirmação */
+        .modal-confirmacao {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-confirmacao-conteudo {
+            background: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .modal-confirmacao-cabecalho {
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-confirmacao-cabecalho h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .modal-confirmacao-fechar {
+            font-size: 1.8em;
+            cursor: pointer;
+        }
+
+        .modal-confirmacao-corpo {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-confirmacao-rodape {
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-modal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+            color: white;
+        }
+
+        .btn-modal:hover {
+            background: linear-gradient(135deg, #ff4d73, #9b59b6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
     </style>
 </head>
 
@@ -390,12 +469,12 @@
 
                 <div class="acoes-carrinho">
                     <a href="{{ url_for('home') }}" class="btn-padrao">
-                        <i class="fas fa-store"></i> Continuar Comprando  <!-- 👈 Ícone CORRIGIDO -->
+                        <i class="fas fa-store"></i> Continuar Comprando
                     </a>
-                    <a href="{{ url_for('limpar_carrinho') }}" class="btn-padrao">
+                    <button class="btn-padrao" onclick="abrirModalLimparCarrinho()">
                         <i class="fas fa-trash"></i> Limpar Carrinho
-                    </a>
-                    <button class="btn-padrao" onclick="finalizarCompra()">
+                    </button>
+                    <button class="btn-padrao" onclick="abrirModalFinalizarCompra()">
                         <i class="fas fa-check"></i> Finalizar Compra
                     </button>
                 </div>
@@ -411,6 +490,52 @@
             {% endif %}
         </div>
     </main>
+
+    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA LIMPAR CARRINHO -->
+    <div id="modalLimparCarrinho" class="modal-confirmacao">
+        <div class="modal-confirmacao-conteudo">
+            <div class="modal-confirmacao-cabecalho">
+                <h3>🛒 Limpar Carrinho</h3>
+                <span class="modal-confirmacao-fechar" onclick="fecharModalLimparCarrinho()">&times;</span>
+            </div>
+            <div class="modal-confirmacao-corpo">
+                <p>Tem certeza que deseja limpar todo o carrinho?</p>
+                <p><strong>Esta ação removerá todos os itens e não pode ser desfeita.</strong></p>
+            </div>
+            <div class="modal-confirmacao-rodape">
+                <button class="btn-modal" onclick="fecharModalLimparCarrinho()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-modal" onclick="confirmarLimparCarrinho()">
+                    <i class="fas fa-trash"></i> Sim, Limpar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA FINALIZAR COMPRA -->
+    <div id="modalFinalizarCompra" class="modal-confirmacao">
+        <div class="modal-confirmacao-conteudo">
+            <div class="modal-confirmacao-cabecalho">
+                <h3>✅ Finalizar Compra</h3>
+                <span class="modal-confirmacao-fechar" onclick="fecharModalFinalizarCompra()">&times;</span>
+            </div>
+            <div class="modal-confirmacao-corpo">
+                <p>Tem certeza que deseja finalizar a compra?</p>
+                <p><strong>Verifique se todos os itens e o método de pagamento estão corretos.</strong></p>
+                <p>Total: <strong>R$ {{ "%.2f"|format(total) }}</strong></p>
+            </div>
+            <div class="modal-confirmacao-rodape">
+                <button class="btn-modal" onclick="fecharModalFinalizarCompra()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-modal" onclick="confirmarFinalizarCompra()">
+                    <i class="fas fa-check"></i> Sim, Finalizar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let metodoPagamentoSelecionado = null;
 
@@ -426,29 +551,80 @@
             }
         }
 
-        function finalizarCompra() {
+        // 👇 FUNÇÕES PARA LIMPAR CARRINHO
+        function abrirModalLimparCarrinho() {
+            document.getElementById('modalLimparCarrinho').style.display = 'block';
+        }
+
+        function fecharModalLimparCarrinho() {
+            document.getElementById('modalLimparCarrinho').style.display = 'none';
+        }
+
+        function confirmarLimparCarrinho() {
+            window.location.href = "{{ url_for('limpar_carrinho') }}";
+        }
+
+        // 👇 FUNÇÕES PARA FINALIZAR COMPRA
+        function abrirModalFinalizarCompra() {
             if (!metodoPagamentoSelecionado) {
-                const notification = document.createElement('div');
-                notification.style.position = 'fixed';
-                notification.style.top = '20px';
-                notification.style.right = '20px';
-                notification.style.background = '#e74c3c';
-                notification.style.color = 'white';
-                notification.style.padding = '15px';
-                notification.style.borderRadius = '5px';
-                notification.style.zIndex = '10000';
-                notification.textContent = 'Por favor, selecione um método de pagamento.';
-
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
+                mostrarNotificacao('Por favor, selecione um método de pagamento!', 'erro', 'Atenção!');
                 return;
             }
+            
+            document.getElementById('modalFinalizarCompra').style.display = 'block';
+        }
 
+        function fecharModalFinalizarCompra() {
+            document.getElementById('modalFinalizarCompra').style.display = 'none';
+        }
+
+        function confirmarFinalizarCompra() {
             window.location.href = "/finalizar-compra?metodo=" + metodoPagamentoSelecionado;
         }
+
+        // 👇 FUNÇÃO DE NOTIFICAÇÃO
+        function mostrarNotificacao(mensagem, tipo = 'sucesso', titulo = 'Sucesso!') {
+            const notificacao = document.createElement('div');
+            notificacao.className = `notificacao ${tipo}`;
+            
+            const icons = {
+                sucesso: '✅',
+                erro: '❌',
+                info: 'ℹ️'
+            };
+
+            notificacao.innerHTML = `
+                <span class="notificacao-icon">${icons[tipo] || '✅'}</span>
+                <div class="notificacao-conteudo">
+                    <div class="notificacao-titulo">${titulo}</div>
+                    <div class="notificacao-mensagem">${mensagem}</div>
+                </div>
+                <button class="btn-fechar" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            document.body.appendChild(notificacao);
+            setTimeout(() => notificacao.classList.add('mostrar'), 100);
+            
+            setTimeout(() => {
+                if (notificacao.parentElement) {
+                    notificacao.classList.remove('mostrar');
+                    setTimeout(() => notificacao.remove(), 400);
+                }
+            }, 4000);
+        }
+
+        // 👇 FECHAR MODAIS AO CLICAR FORA
+        document.getElementById('modalLimparCarrinho').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModalLimparCarrinho();
+            }
+        });
+
+        document.getElementById('modalFinalizarCompra').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModalFinalizarCompra();
+            }
+        });
     </script>
 </body>
 

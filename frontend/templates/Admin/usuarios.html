@@ -18,45 +18,45 @@
         <p>Não há usuários cadastrados no sistema.</p>
     </div>
     {% else %}
-<table class="usuarios-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Tipo</th>
-            <th>Endereço</th>
-            <th>Data Cadastro</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for usuario in usuarios %}
-        <tr class="usuario-row">
-            <td>{{ usuario['id'] }}</td>
-            <td>{{ usuario['username'] }}</td>
-            <td>{{ usuario['email'] }}</td>
-            <td>
-                {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
-                <span class="admin-badge badge-master">👑 Master</span>
-                {% elif usuario['is_admin'] == 1 %}
-                <span class="admin-badge badge-admin">Administrador</span>
-                {% else %}
-                <span class="admin-badge badge-user">Usuário</span>
-                {% endif %}
-            </td>
-            <td>
-                {% if usuario['cep'] and usuario['rua'] and usuario['numero'] %}
-                <span class="badge-completo" title="Endereço completo">
-                    ✅ Completo
-                </span>
-                {% else %}
-                <span class="badge-incompleto">❌ Incompleto</span>
-                {% endif %}
-            </td>
-            <td>{{ usuario['created_at'] }}</td>
-            <td>
-                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+    <table class="usuarios-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Tipo</th>
+                <th>Endereço</th>
+                <th>Data Cadastro</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr class="usuario-row">
+                <td>{{ usuario['id'] }}</td>
+                <td>{{ usuario['username'] }}</td>
+                <td>{{ usuario['email'] }}</td>
+                <td>
+                    {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
+                    <span class="admin-badge badge-master">👑 Master</span>
+                    {% elif usuario['is_admin'] == 1 %}
+                    <span class="admin-badge badge-admin">Administrador</span>
+                    {% else %}
+                    <span class="admin-badge badge-user">Usuário</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if usuario['cep'] and usuario['rua'] and usuario['numero'] %}
+                    <span class="badge-completo" title="Endereço completo">
+                        ✅ Completo
+                    </span>
+                    {% else %}
+                    <span class="badge-incompleto">❌ Incompleto</span>
+                    {% endif %}
+                </td>
+                <td>{{ usuario['created_at'] }}</td>
+                <td>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                         {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
                         <!-- CONTA MASTER - AÇÕES BLOQUEADAS -->
                         <button class="btn-admin btn-secondary" disabled title="Conta master protegida">
@@ -66,11 +66,11 @@
                         {% else %}
                         <!-- USUÁRIOS NORMAIS -->
                         {% if usuario['is_admin'] == 1 %}
-                        <button class="btn-admin btn-warning" onclick="toggleAdmin({{ usuario['id'] }}, 0)">
+                        <button class="btn-admin btn-warning" onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 1)">
                             Remover Admin
                         </button>
                         {% else %}
-                        <button class="btn-admin btn-success" onclick="toggleAdmin({{ usuario['id'] }}, 1)">
+                        <button class="btn-admin btn-success" onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 0)">
                             Tornar Admin
                         </button>
                         {% endif %}
@@ -112,8 +112,30 @@
             <p>⚠️ Todos os pedidos deste usuário também serão removidos!</p>
         </div>
         <div class="modal-footer">
-            <button class="btn-admin btn-secondary" onclick="fecharModalUsuario()">❌ Cancelar</button>
+            <button class="btn-admin btn-primary" onclick="fecharModalUsuario()">❌ Cancelar</button>
             <button class="btn-admin btn-danger" onclick="confirmarExclusaoUsuario()">🗑️ Sim, Excluir</button>
+        </div>
+    </div>
+</div>
+
+<!-- 👇 MODAL DE CONFIRMAÇÃO PARA TORNAR/REMOVER ADMIN -->
+<div id="modalToggleAdmin" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3 id="modalToggleAdminTitulo">👑 Alterar Permissões</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalToggleAdmin()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p id="modalToggleAdminMensagem">Tem certeza que deseja alterar as permissões deste usuário?</p>
+            <p><strong>Esta ação afetará o acesso ao painel administrativo.</strong></p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal" onclick="fecharModalToggleAdmin()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button class="btn-modal" onclick="confirmarToggleAdmin()">
+                <i class="fas fa-check"></i> Sim, Confirmar
+            </button>
         </div>
     </div>
 </div>
@@ -122,6 +144,11 @@
     // 👇 VARIÁVEIS GLOBAIS
     let usuarioIdParaExcluir = null;
     let usuarioNomeParaExcluir = null;
+
+    // 👇 VARIÁVEIS GLOBAIS PARA TOGGLE ADMIN
+    let usuarioIdParaToggleAdmin = null;
+    let isAdminParaToggle = null;
+    let usuarioNomeParaToggle = null;
 
     // 👇 FUNÇÃO PARA FILTRAR USUÁRIOS
     function filtrarUsuarios() {
@@ -171,19 +198,46 @@
         fecharModalUsuario();
     }
 
-    // 👇 TOGGLE ADMIN
-    function toggleAdmin(userId, isAdmin) {
-        fetch('/admin/usuario/' + userId + '/admin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ is_admin: isAdmin })
-        })
+    // 👇 ABRIR MODAL PARA TOGGLE ADMIN
+    function abrirModalToggleAdmin(userId, username, isAdmin) {
+        usuarioIdParaToggleAdmin = userId;
+        usuarioNomeParaToggle = username;
+        isAdminParaToggle = isAdmin;
+
+        const titulo = isAdmin ? 'Remover Administrador' : 'Tornar Administrador';
+        const mensagem = isAdmin ? 
+            `Tem certeza que deseja remover <strong>${username}</strong> dos administradores?` :
+            `Tem certeza que deseja tornar <strong>${username}</strong> um administrador?`;
+
+        document.getElementById('modalToggleAdminTitulo').textContent = titulo;
+        document.getElementById('modalToggleAdminMensagem').innerHTML = mensagem;
+        document.getElementById('modalToggleAdmin').style.display = 'block';
+    }
+
+    // 👇 FECHAR MODAL TOGGLE ADMIN
+    function fecharModalToggleAdmin() {
+        document.getElementById('modalToggleAdmin').style.display = 'none';
+        usuarioIdParaToggleAdmin = null;
+        usuarioNomeParaToggle = null;
+        isAdminParaToggle = null;
+    }
+
+    // 👇 CONFIRMAR TOGGLE ADMIN - AGORA COM FLASH MESSAGE
+    function confirmarToggleAdmin() {
+        if (usuarioIdParaToggleAdmin !== null) {
+            fetch('/admin/usuario/' + usuarioIdParaToggleAdmin + '/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ is_admin: isAdminParaToggle ? 0 : 1 })
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    // 🔽 AGORA USA FLASH MESSAGE EM VEZ DE NOTIFICAÇÃO TEMPORÁRIA
+                    // A mensagem será exibida através do Flask após o reload
+                    window.location.href = '/admin/usuarios';
                 } else {
                     alert('Erro ao atualizar permissões: ' + data.message);
                 }
@@ -192,6 +246,8 @@
                 alert('Erro ao atualizar permissões');
                 console.error('Error:', error);
             });
+        }
+        fecharModalToggleAdmin();
     }
 
     // 👇 BUSCA EM TEMPO REAL
@@ -213,6 +269,13 @@
         document.getElementById('modalExclusaoUsuario').addEventListener('click', function (e) {
             if (e.target === this) {
                 fecharModalUsuario();
+            }
+        });
+
+        // Fechar modal toggle admin ao clicar fora
+        document.getElementById('modalToggleAdmin').addEventListener('click', function (e) {
+            if (e.target === this) {
+                fecharModalToggleAdmin();
             }
         });
     });
@@ -372,6 +435,102 @@
         padding: 4px 8px;
         border-radius: 12px;
         font-size: 0.8em;
+    }
+
+    /* Estilos para modais de confirmação (padrão) */
+    .modal-confirmacao {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-confirmacao-conteudo {
+        background: white;
+        margin: 10% auto;
+        padding: 0;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .modal-confirmacao-cabecalho {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-confirmacao-cabecalho h3 {
+        margin: 0;
+        font-size: 1.4em;
+    }
+
+    .modal-confirmacao-fechar {
+        font-size: 1.8em;
+        cursor: pointer;
+    }
+
+    .modal-confirmacao-corpo {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .modal-confirmacao-rodape {
+        padding: 20px;
+        text-align: center;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .btn-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 12px 25px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+    }
+
+    .btn-modal:hover {
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+    }
+
+    /* 🔽 CORREÇÃO: BOTÃO CANCELAR ROSA NO MODAL DE EXCLUSÃO */
+    .modal-footer .btn-primary {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .modal-footer .btn-primary:hover {
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
+        transform: translateY(-2px);
     }
 </style>
 {% endblock %}

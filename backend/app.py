@@ -930,8 +930,10 @@ def toggle_admin_usuario(user_id):
         )
         conn.commit()
         conn.close()
-        
-        return jsonify({'success': True, 'message': 'Permissões atualizadas com sucesso!'})
+
+         # 🔽 MENSAGEM FLASH PARA CONFIRMAÇÃO
+        flash('As permissões do usuário foram atualizadas com sucesso!', 'success')
+        return jsonify({'success': True})
     except Exception as e:
         print(f"❌ Erro ao atualizar permissões: {e}")
         return jsonify({'success': False, 'message': 'Erro ao atualizar permissões'})
