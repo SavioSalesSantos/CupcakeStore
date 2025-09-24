@@ -53,6 +53,7 @@
 
         .logo a {
             text-decoration: none;
+            transition: all 0.3s ease;
         }
 
         .logo h1 {
@@ -65,7 +66,7 @@
             transition: all 0.3s ease;
         }
 
-        .logo h1:hover {
+        .logo a:hover h1 {
             transform: scale(1.05);
             text-shadow: 0 2px 10px rgba(255, 107, 139, 0.3);
         }
@@ -113,7 +114,7 @@
             box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.2);
         }
 
-        .btn-padrao {
+        .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -122,38 +123,16 @@
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
             border: none;
             cursor: pointer;
             justify-content: center;
             box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
-        }
-
-        .btn-padrao:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-        }
-
-        .btn-cancelar {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 12px 24px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-size: 1rem;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            border: none;
-            cursor: pointer;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
         }
 
-        .btn-cancelar:hover {
+        .btn:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
@@ -164,12 +143,14 @@
             gap: 1rem;
             justify-content: center;
             margin-top: 2rem;
+            flex-wrap: wrap;
         }
 
         .alert {
             padding: 0.8rem 1.2rem;
             border-radius: var(--radius);
             margin-bottom: 1.5rem;
+            font-weight: 500;
         }
 
         .alert-success {
@@ -189,9 +170,122 @@
                 flex-direction: column;
             }
 
-            .btn-padrao,
-            .btn-cancelar {
+            .btn {
                 width: 100%;
+            }
+        }
+
+        /* Estilos para modais de confirmação */
+        .modal-confirmacao {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-confirmacao-conteudo {
+            background: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .modal-confirmacao-cabecalho {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-confirmacao-cabecalho h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .modal-confirmacao-fechar {
+            font-size: 1.8em;
+            cursor: pointer;
+        }
+
+        .modal-confirmacao-corpo {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-confirmacao-rodape {
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-modal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-modal:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        .mensagem-sucesso-temporaria {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
             }
         }
     </style>
@@ -217,7 +311,7 @@
         {% endif %}
         {% endwith %}
 
-        <form action="{{ url_for('meu_usuario') }}" method="POST">
+        <form action="{{ url_for('meu_usuario') }}" method="POST" id="formEditarUsuario">
             <!-- DADOS PESSOAIS -->
             <div style="margin-bottom: 2rem;">
                 <h3 style="color: var(--primary); margin-bottom: 1rem;">👤 Dados Pessoais</h3>
@@ -280,17 +374,137 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-padrao">
+                <button type="button" class="btn" onclick="abrirModalSalvar()">
                     <i class="fas fa-save"></i> Salvar Alterações
                 </button>
-                <a href="{{ url_for('home') }}" class="btn-cancelar">
+                <button type="button" class="btn" onclick="abrirModalCancelar()">
                     <i class="fas fa-times"></i> Cancelar
+                </button>
+                <a href="{{ url_for('home') }}" class="btn">
+                    <i class="fas fa-store"></i> Voltar à Loja
                 </a>
             </div>
         </form>
     </div>
-    <!-- 👇 SCRIPT DE CEP AUTOMÁTICO PARA USUÁRIO -->
+
+    <!-- Modal de Confirmação para Salvar -->
+    <div id="modalSalvar" class="modal-confirmacao">
+        <div class="modal-confirmacao-conteudo">
+            <div class="modal-confirmacao-cabecalho">
+                <h3>💾 Confirmar Alterações</h3>
+                <span class="modal-confirmacao-fechar" onclick="fecharModalSalvar()">&times;</span>
+            </div>
+            <div class="modal-confirmacao-corpo">
+                <p>Tem certeza que deseja salvar as alterações nos seus dados?</p>
+                <p><strong>Esta ação atualizará suas informações permanentemente.</strong></p>
+            </div>
+            <div class="modal-confirmacao-rodape">
+                <button class="btn-modal" onclick="fecharModalSalvar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-modal" onclick="confirmarSalvar()">
+                    <i class="fas fa-save"></i> Sim, Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação para Cancelar -->
+    <div id="modalCancelar" class="modal-confirmacao">
+        <div class="modal-confirmacao-conteudo">
+            <div class="modal-confirmacao-cabecalho">
+                <h3>⚠️ Confirmar Cancelamento</h3>
+                <span class="modal-confirmacao-fechar" onclick="fecharModalCancelar()">&times;</span>
+            </div>
+            <div class="modal-confirmacao-corpo">
+                <p>Tem certeza que deseja cancelar as alterações?</p>
+                <p><strong>Todas as modificações não salvas serão perdidas.</strong></p>
+            </div>
+            <div class="modal-confirmacao-rodape">
+                <button class="btn-modal" onclick="fecharModalCancelar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-modal" onclick="confirmarCancelamento()">
+                    <i class="fas fa-check"></i> Sim, Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Função para mostrar mensagem de sucesso temporária
+        function mostrarMensagemSucesso(mensagem) {
+            const mensagemDiv = document.createElement('div');
+            mensagemDiv.className = 'mensagem-sucesso-temporaria';
+            mensagemDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${mensagem}</span>
+            `;
+
+            document.body.appendChild(mensagemDiv);
+
+            // Remove a mensagem após a animação
+            setTimeout(() => {
+                if (mensagemDiv.parentNode) {
+                    mensagemDiv.parentNode.removeChild(mensagemDiv);
+                }
+            }, 3000);
+        }
+
+        // Funções para o Modal de Salvar
+        function abrirModalSalvar() {
+            document.getElementById('modalSalvar').style.display = 'block';
+        }
+
+        function fecharModalSalvar() {
+            document.getElementById('modalSalvar').style.display = 'none';
+        }
+
+        function confirmarSalvar() {
+            document.getElementById('formEditarUsuario').submit();
+        }
+
+        // Funções para o Modal de Cancelar
+        function abrirModalCancelar() {
+            document.getElementById('modalCancelar').style.display = 'block';
+        }
+
+        function fecharModalCancelar() {
+            document.getElementById('modalCancelar').style.display = 'none';
+        }
+
+        function confirmarCancelamento() {
+            // Cria um formulário temporário para enviar a requisição de cancelamento
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('meu_usuario') }}";
+
+            // Adiciona um campo hidden para identificar o cancelamento
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'cancelar';
+            input.value = 'true';
+            form.appendChild(input);
+
+            // Adiciona o formulário à página e envia
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Fechar modais ao clicar fora
+        window.onclick = function (event) {
+            const modalSalvar = document.getElementById('modalSalvar');
+            const modalCancelar = document.getElementById('modalCancelar');
+
+            if (event.target === modalSalvar) {
+                fecharModalSalvar();
+            }
+            if (event.target === modalCancelar) {
+                fecharModalCancelar();
+            }
+        }
+
+        // Script de CEP automático
         document.addEventListener('DOMContentLoaded', function () {
             const cepInput = document.getElementById('cep');
 

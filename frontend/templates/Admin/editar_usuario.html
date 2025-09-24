@@ -38,13 +38,18 @@
 
         .admin-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-bottom: 30px;
             padding: 20px;
             background: var(--white);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+        }
+
+        .admin-header a {
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
 
         .admin-header h1 {
@@ -54,6 +59,12 @@
             -webkit-text-fill-color: transparent;
             font-weight: 700;
             margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        .admin-header a:hover h1 {
+            transform: scale(1.05);
+            text-shadow: 0 2px 10px rgba(255, 107, 139, 0.3);
         }
 
         .form-editar {
@@ -113,6 +124,7 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
+            box-sizing: border-box;
         }
 
         .checkbox-group {
@@ -128,6 +140,7 @@
             gap: 15px;
             margin-top: 25px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -141,36 +154,14 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            font-size: 16px;
-        }
-
-        .btn-primary {
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-        }
-
-        .btn-cancelar {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 12px 24px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-            color: white;
-            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
-        }
-
-        .btn-cancelar:hover {
-            background: linear-gradient(135deg, #ff4d73, #ff3366);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
@@ -205,17 +196,135 @@
                 flex-direction: column;
             }
         }
+
+        /* Ajustes para os campos de endereço */
+        .endereco-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+        }
+
+        /* Estilos para modais de confirmação */
+        .modal-confirmacao {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-confirmacao-conteudo {
+            background: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .modal-confirmacao-cabecalho {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-confirmacao-cabecalho h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .modal-confirmacao-fechar {
+            font-size: 1.8em;
+            cursor: pointer;
+        }
+
+        .modal-confirmacao-corpo {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-confirmacao-rodape {
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-modal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-modal:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        .mensagem-sucesso-temporaria {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="admin-container">
         <div class="admin-header">
-            <a href="{{ url_for('home') }}" style="text-decoration: none;">
+            <a href="{{ url_for('home') }}">
                 <h1>🧁 CupcakeStore</h1>
-            </a>
-            <a href="{{ url_for('admin_usuarios') }}" class="btn btn-primary">
-                <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>
 
@@ -243,7 +352,7 @@
             <div class="user-type-badge badge-user">Usuário</div>
             {% endif %}
 
-            <form action="{{ url_for('admin_editar_usuario', user_id=usuario.id) }}" method="POST">
+            <form action="{{ url_for('admin_editar_usuario', user_id=usuario.id) }}" method="POST" id="formEditarUsuarioAdmin">
                 <div class="form-group">
                     <label for="username">Nome de usuário:</label>
                     <input type="text" id="username" name="username" value="{{ usuario.username }}" required {% if
@@ -258,12 +367,12 @@
 
                 <div class="form-group">
                     <label for="password">Nova senha:</label>
-                    <label for="password">(deixe em branco para não alterar)</label>
+                    <small>(deixe em branco para não alterar)</small>
                     <input type="password" id="password" name="password" placeholder="••••••••">
                 </div>
 
-                <!-- 👇 NOVA SEÇÃO: DADOS DE ENDEREÇO -->
-                <div style="margin: 2rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: var(--radius);">
+                <!-- SEÇÃO DE ENDEREÇO -->
+                <div class="endereco-section">
                     <h3 style="color: var(--primary); margin-bottom: 1rem; text-align: center;">📮 Endereço</h3>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -299,28 +408,149 @@
                             <label for="numero">Número:</label>
                             <input type="text" id="numero" name="numero" value="{{ usuario['numero'] or '' }}">
                         </div>
+                    </div>
+                </div>
 
-                        {% if usuario.email != 'saviosales@cupcakestore.com' %}
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="is_admin" name="is_admin" value="1" {% if usuario.is_admin==1
-                                %}checked{% endif %}>
-                            <label for="is_admin">É administrador</label>
-                        </div>
-                        {% endif %}
+                {% if usuario.email != 'saviosales@cupcakestore.com' %}
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_admin" name="is_admin" value="1" {% if usuario.is_admin==1 %}checked{% endif %}>
+                    <label for="is_admin">É administrador</label>
+                </div>
+                {% endif %}
 
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Salvar Alterações
-                            </button>
-                            <a href="{{ url_for('admin_usuarios') }}" class="btn-cancelar">
-                                <i class="fas fa-times"></i> Cancelar
-                            </a>
-                        </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="abrirModalSalvar()">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                    <button type="button" class="btn" onclick="abrirModalCancelar()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <a href="{{ url_for('admin_usuarios') }}" class="btn">
+                        <i class="fas fa-arrow-left"></i> Voltar aos Usuários
+                    </a>
+                </div>
             </form>
         </div>
     </div>
-    <!-- 👇 SCRIPT DE CEP PARA ADMIN -->
+
+    <!-- Modal de Confirmação para Salvar (Admin) -->
+    <div id="modalSalvar" class="modal-confirmacao">
+        <div class="modal-confirmacao-conteudo">
+            <div class="modal-confirmacao-cabecalho">
+                <h3>💾 Confirmar Alterações</h3>
+                <span class="modal-confirmacao-fechar" onclick="fecharModalSalvar()">&times;</span>
+            </div>
+            <div class="modal-confirmacao-corpo">
+                <p>Tem certeza que deseja salvar as alterações nos dados do usuário?</p>
+                <p><strong>Esta ação atualizará as informações permanentemente.</strong></p>
+            </div>
+            <div class="modal-confirmacao-rodape">
+                <button class="btn-modal" onclick="fecharModalSalvar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-modal" onclick="confirmarSalvar()">
+                    <i class="fas fa-save"></i> Sim, Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação para Cancelar (Admin) -->
+    <div id="modalCancelar" class="modal-confirmacao">
+        <div class="modal-confirmacao-conteudo">
+            <div class="modal-confirmacao-cabecalho">
+                <h3>⚠️ Confirmar Cancelamento</h3>
+                <span class="modal-confirmacao-fechar" onclick="fecharModalCancelar()">&times;</span>
+            </div>
+            <div class="modal-confirmacao-corpo">
+                <p>Tem certeza que deseja cancelar as alterações?</p>
+                <p><strong>Todas as modificações não salvas serão perdidas.</strong></p>
+            </div>
+            <div class="modal-confirmacao-rodape">
+                <button class="btn-modal" onclick="fecharModalCancelar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-modal" onclick="confirmarCancelamento()">
+                    <i class="fas fa-check"></i> Sim, Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Função para mostrar mensagem de sucesso temporária
+        function mostrarMensagemSucesso(mensagem) {
+            const mensagemDiv = document.createElement('div');
+            mensagemDiv.className = 'mensagem-sucesso-temporaria';
+            mensagemDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${mensagem}</span>
+            `;
+            
+            document.body.appendChild(mensagemDiv);
+            
+            // Remove a mensagem após a animação
+            setTimeout(() => {
+                if (mensagemDiv.parentNode) {
+                    mensagemDiv.parentNode.removeChild(mensagemDiv);
+                }
+            }, 3000);
+        }
+
+         // Funções para o Modal de Salvar (Admin)
+        function abrirModalSalvar() {
+            document.getElementById('modalSalvar').style.display = 'block';
+        }
+
+        function fecharModalSalvar() {
+            document.getElementById('modalSalvar').style.display = 'none';
+        }
+
+        function confirmarSalvar() {
+            document.getElementById('formEditarUsuarioAdmin').submit();
+        }
+
+        // Funções para o Modal de Cancelar (Admin)
+        function abrirModalCancelar() {
+            document.getElementById('modalCancelar').style.display = 'block';
+        }
+
+        function fecharModalCancelar() {
+            document.getElementById('modalCancelar').style.display = 'none';
+        }
+
+        function confirmarCancelamento() {
+            // Cria um formulário temporário para enviar a requisição de cancelamento
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('admin_editar_usuario', user_id=usuario.id) }}";
+            
+            // Adiciona um campo hidden para identificar o cancelamento
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'cancelar';
+            input.value = 'true';
+            form.appendChild(input);
+            
+            // Adiciona o formulário à página e envia
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            const modalSalvar = document.getElementById('modalSalvar');
+            const modalCancelar = document.getElementById('modalCancelar');
+            
+            if (event.target === modalSalvar) {
+                fecharModalSalvar();
+            }
+            if (event.target === modalCancelar) {
+                fecharModalCancelar();
+            }
+        }
+
+        // Script de CEP para Admin
         document.addEventListener('DOMContentLoaded', function () {
             const cepInput = document.getElementById('cep');
 

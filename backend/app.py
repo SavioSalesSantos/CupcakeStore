@@ -363,12 +363,17 @@ def meu_usuario():
     if 'user_id' not in session:
         flash('Você precisa fazer login para acessar esta página!', 'error')
         return redirect(url_for('login'))
-    
+
     user_id = session['user_id']
-    
+
     try:
         conn = get_db_connection()
-        
+
+        # 👇 VERIFICA SE É UM CANCELAMENTO
+        if request.method == 'POST' and 'cancelar' in request.form:
+            flash('Alterações canceladas com sucesso!', 'success')
+            return redirect(url_for('meu_usuario'))
+
         if request.method == 'POST':
             username = request.form['username']
             email = request.form['email']
@@ -575,7 +580,12 @@ def admin_editar_usuario(user_id):
             return redirect(url_for('admin_usuarios'))
         
         conn = get_db_connection()
-        
+
+        # 👇 VERIFICA SE É UM CANCELAMENTO
+        if request.method == 'POST' and 'cancelar' in request.form:
+            flash('Alterações canceladas com sucesso!', 'success')
+            return redirect(url_for('admin_editar_usuario', user_id=user_id))
+
         if request.method == 'POST':
             username = request.form['username']
             email = request.form['email']
