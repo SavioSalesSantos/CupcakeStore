@@ -59,14 +59,14 @@
                     <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                         {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
                         <!-- CONTA MASTER - AÇÕES BLOQUEADAS -->
-                        <button class="btn-admin btn-secondary" disabled title="Conta master protegida">
+                        <button class="btn-admin btn-primary" disabled title="Conta master protegida">
                             👑 Protegido
                         </button>
 
                         {% else %}
                         <!-- USUÁRIOS NORMAIS -->
                         {% if usuario['is_admin'] == 1 %}
-                        <button class="btn-admin btn-warning"
+                        <button class="btn-admin btn-danger"
                             onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 1)">
                             Remover Admin
                         </button>
@@ -83,12 +83,12 @@
                         </a>
 
                         {% if usuario['id'] != session['user_id'] %}
-                        <button class="btn-admin btn-danger"
+                        <button class="btn-admin btn-primary"
                             onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
                             🗑️ Excluir
                         </button>
                         {% else %}
-                        <button class="btn-admin btn-secondary" disabled title="Não pode excluir a si mesmo">
+                        <button class="btn-admin btn-primary" disabled title="Não pode excluir a si mesmo">
                             🚫 Excluir
                         </button>
                         {% endif %}
@@ -112,7 +112,7 @@
         <div class="modal-confirmacao-corpo">
             <p>Tem certeza que deseja excluir o usuário <strong id="nome-usuario-excluir">[Username]</strong>?</p>
             <p>⚠️ Todos os pedidos deste usuário também serão removidos!</p>
-            <p>🚫 Esta ação não pode ser desfeita!</p>
+            <p><strong>🚫 Esta ação não pode ser desfeita!<strong></p>
         </div>
         <div class="modal-confirmacao-rodape">
             <button class="btn-modal" onclick="fecharModalUsuario()">
@@ -352,13 +352,37 @@
         border: 2px solid gold;
     }
 
-    .btn-warning {
-        background: linear-gradient(135deg, #f39c12, #e67e22);
-        color: white;
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        color: white !important;
     }
 
-    .btn-warning:hover {
-        background: linear-gradient(135deg, #e67e22, #d35400);
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4) !important;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #27ae60, #219653) !important;
+        color: white !important;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #219653, #1e8449) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4) !important;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73) !important;
+        color: white !important;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #ff4d73, #9b59b6) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4) !important;
     }
 
     /* Estilos para modais */

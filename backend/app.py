@@ -681,30 +681,30 @@ def admin_excluir_todos_pedidos():
         flash('Erro ao excluir todos os pedidos', 'error')
         return jsonify({'success': False, 'message': 'Erro ao excluir pedidos'})
     
-@app.route('/admin/pedidos/resetar-numeracao', methods=['POST'])
+@app.route('/admin/pedidos/reset-numeracao', methods=['POST'])
 @admin_required
-def resetar_numeracao_pedidos():
-    """Reseta a sequência de numeração dos pedidos"""
+def admin_reset_numeracao_pedidos():
+    """Reseta a numeração dos pedidos (sequência de IDs)"""
     try:
         conn = get_db_connection()
         
-        # Busca o maior ID atual
-        result = conn.execute("SELECT MAX(id) as max_id FROM orders").fetchone()
-        max_id = result['max_id'] if result and result['max_id'] is not None else 0
+        # Busca o maior ID atual para mostrar na mensagem
+        max_id = conn.execute("SELECT MAX(id) as max_id FROM orders").fetchone()
+        current_max = max_id['max_id'] if max_id and max_id['max_id'] else 0
         
         # Reseta a sequência SQLite
         conn.execute("DELETE FROM sqlite_sequence WHERE name='orders'")
-        conn.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('orders', ?)", (max_id,))
         conn.commit()
         conn.close()
         
-        flash('Numeração de pedidos resetada com sucesso! Próximo pedido: #{}'.format(max_id + 1), 'success')
-        return jsonify({'success': True, 'proximo_pedido': max_id + 1})
+        flash(f'Numeração de pedidos resetada com sucesso! Próximo pedido começará do ID 1 (anterior: {current_max}).', 'success')
+        return jsonify({'success': True, 'message': 'Numeração resetada com sucesso!'})
         
     except Exception as e:
         print(f"❌ Erro ao resetar numeração: {e}")
-        flash('Erro ao resetar numeração dos pedidos', 'error')
-        return jsonify({'success': False, 'message': str(e)})   
+        flash('Erro ao resetar numeração.', 'error')
+        return jsonify({'success': False, 'message': 'Erro ao resetar numeração'})
+    
 
 # =============================================
 # 👇 ROTAS DO PAINEL ADMIN
@@ -1178,6 +1178,7 @@ def admin_excluir_usuario(user_id):
         print(f"❌ Erro ao excluir usuário: {e}")
         flash('Erro ao excluir usuário.', 'error')
         return redirect(url_for('admin_usuarios'))
+    
 
 # =============================================
 # 👇 EXECUÇÃO DO APP

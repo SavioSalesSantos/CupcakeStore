@@ -128,7 +128,7 @@
                 <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>✅ Entregue</option>
                 <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>❌ Cancelado</option>
             </select>
-            <button class="btn-atualizar" onclick="atualizarStatus({{ pedido['id'] }})">
+            <button class="btn-atualizar" onclick="abrirModalAtualizarStatus({{ pedido['id'] }})">
                 💾 Atualizar
             </button>
             <button class="btn-atualizar" style="background: linear-gradient(135deg, #ff6b8b, #ff4d73);"
@@ -147,6 +147,28 @@
         </button>
     </div>
     {% endif %}
+</div>
+
+<!-- 👇 MODAL DE CONFIRMAÇÃO PARA ATUALIZAR STATUS -->
+<div id="modalAtualizarStatus" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3>🔄 Confirmar Atualização</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalAtualizarStatus()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p>Tem certeza que deseja atualizar o status do pedido <strong id="id-pedido-atualizar">#000</strong>?</p>
+            <p>Novo status: <strong id="novo-status-atualizar">Pendente</strong></p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal btn-modal-confirmar" onclick="fecharModalAtualizarStatus()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button class="btn-modal btn-modal-confirmar" onclick="confirmarAtualizarStatus()">
+                <i class="fas fa-check"></i> Sim, Atualizar
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- 👇 MODAL DE CONFIRMAÇÃO PARA EXCLUSÃO DE PEDIDOS (PADRONIZADO) -->
@@ -181,7 +203,7 @@
         </div>
         <div class="modal-confirmacao-corpo">
             <p>Tem certeza que deseja resetar a numeração dos pedidos?</p>
-            <p>📝 <strong>Próximo pedido começará do número sequencial correto.</strong></p>
+            <p>📝 <strong>Próximo pedido começará do número sequencial correto (ID 1).</strong></p>
             <p>⚠️ Esta ação não afeta os pedidos existentes, apenas a numeração futura.</p>
         </div>
         <div class="modal-confirmacao-rodape">
@@ -223,42 +245,64 @@
     let pedidoIdParaExcluir = null;
     let pedidoValorParaExcluir = null;
 
+    // 👇 VARIÁVEIS GLOBAIS PARA ATUALIZAR STATUS
+    let pedidoIdParaAtualizar = null;
+    let novoStatusParaAtualizar = null;
+
     // 👇 FILTRAR POR STATUS
     function filtrarPorStatus(status) {
         window.location.href = `/admin/pedidos?status=${status}`;
     }
 
-    // 👇 ATUALIZAR STATUS
-    function atualizarStatus(pedidoId) {
+    // 👇 ABRIR MODAL DE ATUALIZAR STATUS
+    function abrirModalAtualizarStatus(pedidoId) {
+        pedidoIdParaAtualizar = pedidoId;
         const select = document.getElementById(`status-${pedidoId}`);
-        const novoStatus = select.value;
+        novoStatusParaAtualizar = select.value;
 
-        fetch(`/admin/pedido/${pedidoId}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: novoStatus })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.redirect) {
-                    // Redireciona para a mesma página para mostrar a flash message
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const statusFilter = urlParams.get('status') || 'todos';
-                    window.location.href = `/admin/pedidos?status=${statusFilter}`;
-                } else if (!data.success && data.redirect) {
-                    // Também redireciona para mostrar mensagem de erro
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const statusFilter = urlParams.get('status') || 'todos';
-                    window.location.href = `/admin/pedidos?status=${statusFilter}`;
-                } else if (!data.success) {
-                    alert('Erro ao atualizar status: ' + (data.message || 'Erro desconhecido'));
-                }
+        document.getElementById('id-pedido-atualizar').textContent = '#' + pedidoId;
+        document.getElementById('novo-status-atualizar').textContent = document.querySelector(`#status-${pedidoId} option[value="${novoStatusParaAtualizar}"]`).textContent;
+        document.getElementById('modalAtualizarStatus').style.display = 'block';
+    }
+
+    // 👇 FECHAR MODAL DE ATUALIZAR STATUS
+    function fecharModalAtualizarStatus() {
+        document.getElementById('modalAtualizarStatus').style.display = 'none';
+        pedidoIdParaAtualizar = null;
+        novoStatusParaAtualizar = null;
+    }
+
+    // 👇 CONFIRMAR ATUALIZAR STATUS
+    function confirmarAtualizarStatus() {
+        if (pedidoIdParaAtualizar && novoStatusParaAtualizar) {
+            fetch(`/admin/pedido/${pedidoIdParaAtualizar}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: novoStatusParaAtualizar })
             })
-            .catch(error => {
-                alert('Erro de conexão ao atualizar status');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.redirect) {
+                        // Redireciona para a mesma página para mostrar a flash message
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const statusFilter = urlParams.get('status') || 'todos';
+                        window.location.href = `/admin/pedidos?status=${statusFilter}`;
+                    } else if (!data.success && data.redirect) {
+                        // Também redireciona para mostrar mensagem de erro
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const statusFilter = urlParams.get('status') || 'todos';
+                        window.location.href = `/admin/pedidos?status=${statusFilter}`;
+                    } else if (!data.success) {
+                        alert('Erro ao atualizar status: ' + (data.message || 'Erro desconhecido'));
+                    }
+                })
+                .catch(error => {
+                    alert('Erro de conexão ao atualizar status');
+                });
+        }
+        fecharModalAtualizarStatus();
     }
 
     // 👇 ABRIR MODAL DE EXCLUSÃO DE PEDIDO
@@ -316,8 +360,26 @@
     }
 
     function confirmarResetNumeracao() {
-        // Implementação simplificada - apenas mostra mensagem
-        alert('Funcionalidade de reset de numeração será implementada em breve!');
+        fetch('/admin/pedidos/reset-numeracao', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recarrega a página para mostrar a mensagem de sucesso
+                    window.location.href = '/admin/pedidos?status=todos';
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao resetar numeração');
+            });
+
         fecharModalResetNumeracao();
     }
 
@@ -356,6 +418,12 @@
     }
 
     // 👇 FECHAR MODAL AO CLICAR FORA
+    document.getElementById('modalAtualizarStatus').addEventListener('click', function (e) {
+        if (e.target === this) {
+            fecharModalAtualizarStatus();
+        }
+    });
+
     document.getElementById('modalExclusaoPedido').addEventListener('click', function (e) {
         if (e.target === this) {
             fecharModalPedido();
