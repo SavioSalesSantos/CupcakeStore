@@ -161,7 +161,7 @@
             <p>Novo status: <strong id="novo-status-atualizar">Pendente</strong></p>
         </div>
         <div class="modal-confirmacao-rodape">
-            <button class="btn-modal btn-modal-confirmar" onclick="fecharModalAtualizarStatus()">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModalAtualizarStatus()">
                 <i class="fas fa-times"></i> Cancelar
             </button>
             <button class="btn-modal btn-modal-confirmar" onclick="confirmarAtualizarStatus()">
@@ -184,7 +184,7 @@
             <p>⚠️ <strong>Esta ação não pode ser desfeita!</strong></p>
         </div>
         <div class="modal-confirmacao-rodape">
-            <button class="btn-modal btn-modal-confirmar" onclick="fecharModalPedido()">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModalPedido()">
                 <i class="fas fa-times"></i> Cancelar
             </button>
             <button class="btn-modal btn-modal-confirmar" onclick="confirmarExclusaoPedido()">
@@ -207,7 +207,7 @@
             <p>⚠️ <strong>Esta ação não afeta os pedidos existentes, apenas a numeração futura.</strong></p>
         </div>
         <div class="modal-confirmacao-rodape">
-            <button class="btn-modal btn-modal-confirmar" onclick="fecharModalResetNumeracao()">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModalResetNumeracao()">
                 <i class="fas fa-times"></i> Cancelar
             </button>
             <button class="btn-modal btn-modal-confirmar" onclick="confirmarResetNumeracao()">
@@ -230,7 +230,7 @@
             <p>📊 Total de pedidos: <strong id="total-pedidos-excluir">0</strong></p>
         </div>
         <div class="modal-confirmacao-rodape">
-            <button class="btn-modal btn-modal-confirmar" onclick="fecharModalExcluirTodos()">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModalExcluirTodos()">
                 <i class="fas fa-times"></i> Cancelar
             </button>
             <button class="btn-modal btn-modal-confirmar" onclick="confirmarExclusaoTodos()">
@@ -682,6 +682,46 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
+    /* 🔽 CORREÇÃO: BOTÕES DOS MODAIS COM ESTILOS CORRETOS */
+    .btn-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 12px 25px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 🔽 AGORA O BOTÃO CANCELAR TAMBÉM TEM O MESMO ESTILO ROSA/ROXO */
+    .btn-modal-cancelar {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+    }
+
+    .btn-modal-confirmar {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+    }
+
+    /* 🔽 HOVER ROXO IGUAL AO PADRÃO DO SITE PARA AMBOS OS BOTÕES */
+    .btn-modal-cancelar:hover {
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
+    }
+
+    .btn-modal-confirmar:hover {
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
+    }
+
     /* Estilos para modais de confirmação - PADRONIZADO */
     .modal-confirmacao {
         display: none;
@@ -738,32 +778,6 @@
         justify-content: center;
     }
 
-    .btn-modal {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 12px 25px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-modal-confirmar {
-        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-        color: white;
-    }
-
-    .btn-modal-confirmar:hover {
-        background: linear-gradient(135deg, #ff4d73, #ff3366);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-    }
-
     @media (max-width: 768px) {
         .pedidos-grid {
             grid-template-columns: 1fr;
@@ -790,6 +804,15 @@
 
         .select-status {
             min-width: 100%;
+        }
+
+        .modal-confirmacao-rodape {
+            flex-direction: column;
+        }
+
+        .btn-modal {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
