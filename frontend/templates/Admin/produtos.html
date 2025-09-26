@@ -14,7 +14,7 @@
 <div id="addProductForm"
     style="display: none; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px;">
     <h3 style="color: #ff6b8b; margin-bottom: 20px; text-align: center;">➕ Adicionar Novo Produto</h3>
-    <form action="{{ url_for('admin_adicionar_produto') }}" method="POST" enctype="multipart/form-data">
+    <form id="formAdicionarProduto" action="{{ url_for('admin_adicionar_produto') }}" method="POST" enctype="multipart/form-data">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div class="form-group">
                 <label for="nome">Nome do Produto:</label>
@@ -42,9 +42,12 @@
         </div>
 
         <div style="display: flex; gap: 15px; margin-top: 20px; justify-content: center;">
-            <button type="submit" class="btn-admin btn-primary">Adicionar Produto</button>
-            <button type="button" class="btn-admin btn-secondary"
-                onclick="document.getElementById('addProductForm').style.display='none'">Cancelar</button>
+            <button type="button" class="btn-admin btn-primary" onclick="abrirModalConfirmacaoAdicionar()">
+                <i class="fas fa-plus"></i> Adicionar Produto
+            </button>
+            <button type="button" class="btn-admin btn-primary" onclick="document.getElementById('addProductForm').style.display='none'">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
         </div>
     </form>
 </div>
@@ -96,7 +99,28 @@
 </div>
 {% endif %}
 
-<!-- Modal de confirmação padronizado -->
+<!-- Modal de confirmação para adicionar produto -->
+<div id="modalConfirmacaoAdicionar" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho">
+            <h3>🧁 Confirmar Adição</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalAdicionar()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p>Tem certeza que deseja adicionar o produto <strong id="nome-produto-adicionar">[Nome do Produto]</strong>?</p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal btn-modal-confirmar" onclick="fecharModalAdicionar()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button class="btn-modal btn-modal-confirmar" onclick="confirmarAdicionarProduto()">
+                <i class="fas fa-check"></i> Sim, Adicionar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação de exclusão -->
 <div id="modalConfirmacao" class="modal-confirmacao">
     <div class="modal-confirmacao-conteudo">
         <div class="modal-confirmacao-cabecalho">
@@ -117,6 +141,24 @@
                     <i class="fas fa-trash"></i> Sim, Excluir
                 </button>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- 🔽 MODAL DE ERRO - MESMO FORMATO DOS OUTROS MODAIS -->
+<div id="modalErro" class="modal-confirmacao">
+    <div class="modal-confirmacao-conteudo">
+        <div class="modal-confirmacao-cabecalho" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+            <h3>❌ Erro de Validação</h3>
+            <span class="modal-confirmacao-fechar" onclick="fecharModalErro()">&times;</span>
+        </div>
+        <div class="modal-confirmacao-corpo">
+            <p id="mensagem-erro-texto">Por favor, preencha o nome do produto.</p>
+        </div>
+        <div class="modal-confirmacao-rodape">
+            <button class="btn-modal btn-modal-confirmar" onclick="fecharModalErro()">
+                <i class="fas fa-times"></i> Fechar
+            </button>
         </div>
     </div>
 </div>
@@ -144,6 +186,32 @@
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
+    }
+
+    .btn-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
     }
 
     /* Estilos para modais de confirmação - PADRONIZADO */
@@ -223,25 +291,24 @@
     }
 
     .btn-modal-confirmar:hover {
-        background: linear-gradient(135deg, #ff4d73, #ff3366);
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
     }
 
-    .btn-cancelar {
-        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 25px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
+    @media (max-width: 768px) {
+        .produtos-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .modal-confirmacao-rodape {
+            flex-direction: column;
+        }
 
-    .btn-cancelar:hover {
-        background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
-        transform: translateY(-2px);
+        .btn-modal {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 
@@ -249,6 +316,52 @@
     let produtoIdParaExcluir = null;
     let produtoNomeParaExcluir = null;
 
+    // 🔽 FUNÇÃO PARA ABRIR MODAL DE ERRO
+    function mostrarErro(mensagem) {
+        document.getElementById('mensagem-erro-texto').textContent = mensagem;
+        document.getElementById('modalErro').style.display = 'block';
+    }
+
+    function fecharModalErro() {
+        document.getElementById('modalErro').style.display = 'none';
+    }
+
+    // 🔽 FUNÇÕES PARA MODAL DE ADIÇÃO
+    function abrirModalConfirmacaoAdicionar() {
+        const nomeProduto = document.getElementById('nome').value.trim();
+        
+        if (!nomeProduto) {
+            mostrarErro('Por favor, preencha o nome do produto.');
+            return;
+        }
+
+        // Validação adicional para outros campos
+        const preco = document.getElementById('preco').value;
+        const descricao = document.getElementById('descricao').value.trim();
+        
+        if (!preco || preco <= 0) {
+            mostrarErro('Por favor, insira um preço válido para o produto.');
+            return;
+        }
+        
+        if (!descricao) {
+            mostrarErro('Por favor, preencha a descrição do produto.');
+            return;
+        }
+        
+        document.getElementById('nome-produto-adicionar').textContent = nomeProduto;
+        document.getElementById('modalConfirmacaoAdicionar').style.display = 'block';
+    }
+
+    function fecharModalAdicionar() {
+        document.getElementById('modalConfirmacaoAdicionar').style.display = 'none';
+    }
+
+    function confirmarAdicionarProduto() {
+        document.getElementById('formAdicionarProduto').submit();
+    }
+
+    // 🔽 FUNÇÕES PARA MODAL DE EXCLUSÃO
     function abrirModalExclusao(id, nome) {
         produtoIdParaExcluir = id;
         produtoNomeParaExcluir = nome;
@@ -266,10 +379,31 @@
         produtoNomeParaExcluir = null;
     }
 
-    // Fechar modal ao clicar fora
+    // Fechar modais ao clicar fora
+    document.getElementById('modalConfirmacaoAdicionar').addEventListener('click', function (e) {
+        if (e.target === this) {
+            fecharModalAdicionar();
+        }
+    });
+
     document.getElementById('modalConfirmacao').addEventListener('click', function (e) {
         if (e.target === this) {
             fecharModal();
+        }
+    });
+
+    document.getElementById('modalErro').addEventListener('click', function (e) {
+        if (e.target === this) {
+            fecharModalErro();
+        }
+    });
+
+    // Fechar modais com ESC
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            fecharModalAdicionar();
+            fecharModal();
+            fecharModalErro();
         }
     });
 </script>
