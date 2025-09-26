@@ -549,8 +549,8 @@ def finalizar_compra():
         session.pop('carrinho', None)
         print("🛒 Carrinho limpo da sessão")
         
-        # Gera ID do pedido para exibição
-        pedido_id_exibicao = f"#{pedido_id:04d}"
+        # 🔽 CORREÇÃO: Formatação simples do ID (apenas # + número)
+        pedido_id_exibicao = f"{pedido_id}"
         
         print(f"🎉 Compra finalizada com sucesso! Redirecionando para página de confirmação")
         
