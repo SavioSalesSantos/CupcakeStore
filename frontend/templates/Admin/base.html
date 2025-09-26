@@ -103,24 +103,30 @@
             box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
         }
 
-        /* User menu dropdown admin */
+        /* 🔽 USER MENU ADMIN CORRIGIDO - MESMO ESTILO DO INDEX */
         .user-menu-admin {
             position: relative;
-            display: inline-block;
         }
 
         .user-trigger-admin {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: bold;
+            font-weight: 600;
+            height: 48px;
+            min-width: 140px;
+            justify-content: center;
             box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+            border: none;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
         }
 
         .user-trigger-admin:hover {
@@ -128,31 +134,39 @@
             box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
-        .dropdown-arrow {
-            transition: transform 0.3s ease;
-        }
-
-        .user-menu-admin:hover .dropdown-arrow {
-            transform: rotate(0deg);
-        }
-
-        .user-menu-admin:not(:hover) .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-
+        /* 🔽 CORREÇÃO: DROPDOWN ADMIN COM MESMO ESTILO DO INDEX */
         .dropdown-content-admin {
-            display: none;
             position: absolute;
+            top: 100%;
             right: 0;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             min-width: 200px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            border-radius: 0 0 12px 12px;
+            border-radius: 12px;
             z-index: 1000;
             overflow: hidden;
+            margin-top: 5px;
+            display: none;
+            padding-top: 10px;
+            margin-top: -5px;
+        }
+
+        /* 🔽 CORREÇÃO: PONTEIRO INVISÍVEL PARA EVITAR LACUNA */
+        .dropdown-content-admin::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: transparent;
         }
 
         .user-menu-admin:hover .dropdown-content-admin {
+            display: block;
+        }
+
+        .dropdown-content-admin:hover {
             display: block;
         }
 
@@ -165,14 +179,43 @@
             color: white;
             transition: all 0.3s ease;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: white !important;
         }
 
+        /* 🔽 CORREÇÃO: HOVER ROXO E TEXTO BRANCO (IGUAL AO INDEX) */
         .dropdown-item-admin:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(155, 89, 182, 0.3);
+            color: white !important;
+            transform: translateX(5px);
         }
 
         .dropdown-item-admin:last-child {
             border-bottom: none;
+        }
+
+        .dropdown-item-admin i {
+            color: white !important;
+            font-size: 14px;
+        }
+
+        /* 🔽 CORREÇÃO DOS ÍCONES DO USER TRIGGER ADMIN */
+        .user-trigger-admin .fa-user {
+            color: white !important;
+            font-size: 16px;
+        }
+
+        .user-trigger-admin .fa-chevron-down {
+            color: white !important;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .user-menu-admin .fa-chevron-down {
+            transform: rotate(0deg);
+        }
+
+        .user-menu-admin:hover .fa-chevron-down {
+            transform: rotate(180deg);
         }
         
         /* Alertas */
@@ -259,6 +302,35 @@
             background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
             transform: translateY(-2px);
         }
+
+        /* 🔽 RESPONSIVIDADE PARA O MENU ADMIN */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .user-menu-admin {
+                width: 100%;
+            }
+
+            .user-trigger-admin {
+                width: 100%;
+                max-width: 250px;
+                margin: 0 auto;
+            }
+
+            .dropdown-content-admin {
+                position: static;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -270,11 +342,11 @@
             </a>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="user-menu-admin">
-                    <div class="user-trigger-admin">
+                    <button class="user-trigger-admin">
                         <i class="fas fa-user"></i>
                         {{ session['username'] }}
-                        <i class="fas fa-chevron-down dropdown-arrow"></i>
-                    </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
                     <div class="dropdown-content-admin">
                         <a href="{{ url_for('home') }}" class="dropdown-item-admin">
                             <i class="fas fa-store"></i>

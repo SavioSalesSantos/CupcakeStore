@@ -31,31 +31,30 @@
             padding: 1rem;
         }
 
+        /* 🔽 HEADER CORRIGIDO - LAYOUT FLEX MELHORADO */
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
             background: var(--white);
             padding: 1rem 2rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             margin-bottom: 1rem;
+            position: relative;
+            min-height: 80px;
         }
 
         .logo-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            /* Centraliza a logo */
-            min-width: 200px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
         }
 
         .logo {
             text-decoration: none;
             display: inline-block;
-            /* Limita a área clicável */
         }
 
         .logo h1 {
@@ -66,79 +65,66 @@
             font-weight: 700;
             margin: 0;
             transition: transform 0.3s ease;
-            display: inline-block;
-            /* Limita o hover apenas ao texto */
         }
 
         .logo:hover h1 {
             transform: scale(1.05);
         }
 
+        /* 🔽 BOTÕES DO LADO DIREITO - ALINHADOS CORRETAMENTE */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: auto;
+        }
+
         .carrinho-info {
             display: flex;
             align-items: center;
-            gap: 10px;
         }
 
         .auth-buttons {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
-        .auth-buttons a {
-            padding: 8px 15px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .auth-buttons a.btn-login {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .auth-buttons a.btn-login:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-        }
-
-        .auth-buttons a.btn-register {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .auth-buttons a.btn-register:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-        }
-
-        .carrinho-info button {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            font-size: 14px;
+        /* 🔽 BOTÕES PADRONIZADOS - MESMO TAMANHO E ESTILO */
+        .btn-header {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+            height: 48px;
+            min-width: 140px;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
         }
 
-        .carrinho-info button:hover {
+        .btn-header:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
-        /* User menu e dropdown */
+        .btn-header i {
+            color: white !important;
+            font-size: 14px;
+        }
+
+        /* 🔽 USER MENU CORRIGIDO - MESMA ALTURA DOS BOTÕES */
         .user-info {
             display: flex;
             align-items: center;
@@ -153,13 +139,21 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: bold;
+            font-weight: 600;
+            height: 48px;
+            min-width: 140px;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+            border: none;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
         }
 
         .user-trigger:hover {
@@ -167,21 +161,40 @@
             box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
 
+        /* 🔽 CORREÇÃO CRÍTICA: ADICIONAR PONTEIRO ENTRE BOTÃO E DROPDOWN */
         .dropdown-content {
             position: absolute;
             top: 100%;
             right: 0;
-            background: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             min-width: 200px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            border-radius: 0 0 12px 12px;
+            border-radius: 12px;
             z-index: 1000;
             overflow: hidden;
-            margin-top: 0;
+            margin-top: 5px;
             display: none;
+            /* 🔽 ADICIONA PADDING TOP PARA CRIAR ÁREA DE TRANSIÇÃO */
+            padding-top: 10px;
+            margin-top: -5px;
         }
 
-        .user-menu:hover .dropdown-content,
+        /* 🔽 CORREÇÃO: PONTEIRO INVISÍVEL PARA EVITAR LACUNA */
+        .dropdown-content::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: transparent;
+        }
+
+        .user-menu:hover .dropdown-content {
+            display: block;
+        }
+
+        /* 🔽 CORREÇÃO: MANTER DROPDOWN ABERTO AO PASSAR SOBRE ELE */
         .dropdown-content:hover {
             display: block;
         }
@@ -192,18 +205,27 @@
             gap: 12px;
             padding: 15px 20px;
             text-decoration: none;
-            color: var(--dark);
+            color: white;
             transition: all 0.3s ease;
-            border-bottom: 1px solid #f1f1f1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            /* 🔽 GARANTIR QUE O TEXTO FIQUE BRANCO SEMPRE */
+            color: white !important;
         }
 
+        /* 🔽 CORREÇÃO: HOVER ROXO E TEXTO BRANCO */
         .dropdown-item:hover {
-            background: #f8f9fa;
-            color: var(--primary);
+            background: rgba(155, 89, 182, 0.3); /* Cor roxa com transparência */
+            color: white !important;
+            transform: translateX(5px);
         }
 
         .dropdown-item:last-child {
             border-bottom: none;
+        }
+
+        .dropdown-item i {
+            color: white !important;
+            font-size: 14px;
         }
 
         /* Barra de pesquisa */
@@ -348,25 +370,6 @@
             box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4) !important;
         }
 
-        /* 🔽 SETAS DE NAVEGAÇÃO (se houver) */
-        .paginacao .seta {
-            padding: 10px 14px;
-        }
-
-        .paginacao .seta i {
-            font-size: 14px;
-        }
-
-        /* 🔽 RESPONSIVIDADE */
-        @media (max-width: 768px) {
-            .paginacao a {
-                padding: 8px 12px;
-                min-width: 35px;
-                font-size: 14px;
-                margin: 0 2px;
-            }
-        }
-
         /* Notificações */
         .notificacao {
             position: fixed;
@@ -445,110 +448,71 @@
             margin-bottom: 15px;
         }
 
+        /* 🔽 CORREÇÃO DOS ÍCONES DO USER TRIGGER */
+        .user-trigger .fa-user {
+            color: white !important;
+            font-size: 16px;
+        }
+
+        .user-trigger .fa-chevron-down {
+            color: white !important;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .user-menu .fa-chevron-down {
+            transform: rotate(0deg);
+        }
+
+        .user-menu:hover .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* 🔽 RESPONSIVIDADE CORRIGIDA */
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
+                gap: 15px;
                 text-align: center;
+                padding: 1rem;
+            }
+
+            .logo-container {
+                position: static;
+                transform: none;
+                order: 1;
+            }
+
+            .header-right {
+                margin-left: 0;
+                order: 2;
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .btn-header,
+            .user-trigger {
+                width: 100%;
+                max-width: 250px;
+                margin: 0 auto;
             }
 
             .auth-buttons {
-                justify-content: center;
+                flex-direction: column;
+                width: 100%;
             }
 
             .grid-produtos {
                 grid-template-columns: 1fr;
             }
-        }
-
-        /* 1. MENU DROPDOWN ROSA COM ÍCONES BRANCOS */
-        .dropdown-content {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
-            border: none;
-            border-radius: 0 0 12px 12px;
-        }
-
-        .dropdown-item {
-            color: white !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-        }
-
-        .dropdown-item:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary)) !important;
-            color: white !important;
-        }
-
-        .dropdown-item i {
-            color: white !important;
-        }
-
-        /* 2. ÍCONES BRANCOS PARA TODOS OS BOTÕES */
-        .auth-buttons a i,
-        .carrinho-info button i,
-        .produto button i,
-        .user-info button i {
-            color: white !important;
-            font-size: 14px;
-        }
-
-        /* 3. GARANTE ÍCONES DURANTE ANIMAÇÕES */
-        .produto button.carregando i,
-        .produto button.adicionado i {
-            color: white !important;
-        }
-
-        /* 4. MELHORIA VISUAL NO DROPDOWN */
-        .user-menu:hover .user-trigger {
-            border-radius: 25px 25px 0 0;
-            margin-bottom: -1px;
-        }
-
-        .dropdown-content {
-            border-radius: 0 0 15px 15px;
-        }
-
-        /* Ícones do user trigger */
-        .user-trigger .fa-user {
-            color: white !important;
-            font-size: 16px;
-            margin-right: 5px;
-        }
-
-        .user-trigger .fa-chevron-down {
-            color: white !important;
-            font-size: 12px;
-            margin-left: 5px;
-            transition: transform 0.3s ease;
-        }
-
-        .user-trigger .fa-chevron-down {
-            color: white !important;
-            font-size: 12px;
-            margin-left: 5px;
-            transition: transform 0.3s ease;
-            transform: rotate(180deg);
-        }
-
-        .user-menu:hover .fa-chevron-down {
-            transform: rotate(0deg);
-        }
-
-        .user-menu .fa-chevron-down {
-            transition: transform 0.3s ease;
-        }
-
-        /* Ícones do carrinho em todas as situações */
-        .carrinho-info button i,
-        .user-info button i,
-        .auth-buttons button i {
-            color: white !important;
-            font-size: 14px;
-            margin-right: 5px;
-        }
-
-        /* Remove qualquer estilo de emoji antigo */
-        .user-avatar,
-        .dropdown-arrow {
-            display: none;
+            
+            /* 🔽 CORREÇÃO RESPONSIVA PARA DROPDOWN */
+            .dropdown-content {
+                position: static;
+                width: 100%;
+                margin-top: 10px;
+            }
         }
 
         .nenhum-resultado .btn-padrao {
@@ -575,27 +539,29 @@
 
 <body>
     <header>
+        <!-- 🔽 HEADER CORRIGIDO - ESTRUTURA SEMÂNTICA MELHORADA -->
         <div class="header-content">
             <div class="logo-container">
                 <a href="{{ url_for('home') }}" class="logo">
                     <h1>🧁 CupcakeStore</h1>
                 </a>
             </div>
-            <div class="carrinho-info">
+
+            <div class="header-right">
                 {% if session.get('user_id') %}
                 <div class="user-info">
                     <div class="user-menu">
-                        <div class="user-trigger">
+                        <button class="user-trigger">
                             <i class="fas fa-user"></i>
                             <span class="user-name">{{ session['username'] }}</span>
                             <i class="fas fa-chevron-down"></i>
-                        </div>
+                        </button>
                         <div class="dropdown-content">
                             <a href="{{ url_for('meus_pedidos') }}" class="dropdown-item">
                                 <i class="fas fa-clipboard-list"></i>
                                 Meus Pedidos
                             </a>
-                            <a href="{{ url_for('meu_usuario') }}" class="dropdown-item"> <!-- LINHA NOVA -->
+                            <a href="{{ url_for('meu_usuario') }}" class="dropdown-item">
                                 <i class="fas fa-user-edit"></i>
                                 Meus Dados
                             </a>
@@ -611,19 +577,19 @@
                             </a>
                         </div>
                     </div>
-                    <button onclick="verCarrinho()">
+                    <button class="btn-header" onclick="verCarrinho()">
                         <i class="fas fa-shopping-cart"></i> Carrinho (<span id="contador-carrinho">0</span>)
                     </button>
                 </div>
                 {% else %}
                 <div class="auth-buttons">
-                    <a href="{{ url_for('login') }}" class="btn-login">
+                    <a href="{{ url_for('login') }}" class="btn-header">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </a>
-                    <a href="{{ url_for('register') }}" class="btn-register">
+                    <a href="{{ url_for('register') }}" class="btn-header">
                         <i class="fas fa-user-plus"></i> Cadastrar
                     </a>
-                    <button onclick="verCarrinho()">
+                    <button class="btn-header" onclick="verCarrinho()">
                         <i class="fas fa-shopping-cart"></i> Carrinho (<span id="contador-carrinho">0</span>)
                     </button>
                 </div>
@@ -763,7 +729,7 @@
                         // Volta ao normal após 2 segundos
                         setTimeout(() => {
                             botao.classList.remove('adicionado');
-                            botao.innerHTML = iconHtml + 'Comprar'; // 
+                            botao.innerHTML = iconHtml + 'Comprar';
                             botao.style.backgroundColor = '';
                         }, 2000);
                     }
