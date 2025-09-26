@@ -452,18 +452,21 @@ def usuario_tem_endereco(user_id):
 
 @app.route('/finalizar-compra')
 def finalizar_compra():
-    """Página de confirmação de compra finalizada"""
+    """Página de confirmação de compra finalizada - VERSÃO CORRIGIDA"""
     metodo_pagamento = request.args.get('metodo', 'cartao')
-    
+    forma_entrega = request.args.get('entrega', 'delivery')
+
+    print(f"🔧 Iniciando finalização de compra - Método: {metodo_pagamento}, Entrega: {forma_entrega}")
+
     if 'user_id' not in session:
         flash('Você precisa fazer login para finalizar a compra!', 'error')
         return redirect(url_for('login'))
     
     user_id = session['user_id']
     
-    # 👇 VERIFICA SE O USUÁRIO TEM ENDEREÇO CADASTRADO
-    if not usuario_tem_endereco(user_id):
-        flash('Para finalizar a compra, cadastre um endereço para entrega!', 'error')
+    # 👇 VERIFICA SE O USUÁRIO TEM ENDEREÇO CADASTRADO (APENAS PARA DELIVERY)
+    if forma_entrega == 'delivery' and not usuario_tem_endereco(user_id):
+        flash('Para entrega delivery, cadastre um endereço para entrega!', 'error')
         return redirect(url_for('meu_usuario'))
     
     carrinho_ids = session.get('carrinho', [])
@@ -473,6 +476,10 @@ def finalizar_compra():
         return redirect(url_for('carrinho'))
     
     try:
+        # 👇 VERIFICAR PRIMEIRO SE A COLUNA EXISTE
+        from database.database import verificar_e_criar_coluna_forma_entrega
+        verificar_e_criar_coluna_forma_entrega()
+        
         conn = get_db_connection()
         placeholders = ','.join('?' * len(carrinho_ids))
         query = f'SELECT * FROM produtos WHERE id IN ({placeholders})'
@@ -497,32 +504,69 @@ def finalizar_compra():
         # Prepara os dados do pedido
         pedido_data = {
             'itens': itens_pedido,
-            'metodo_pagamento': metodo_pagamento
+            'metodo_pagamento': metodo_pagamento,
+            'forma_entrega': forma_entrega
         }
         
-        # Insere no banco de dados
-        conn.execute(
-            'INSERT INTO orders (user_id, order_data, total_amount, metodo_pagamento) VALUES (?, ?, ?, ?)',
-            (user_id, json.dumps(pedido_data), total, metodo_pagamento)
-        )
-        conn.commit()
+        print(f"📦 Inserindo pedido no banco - User: {user_id}, Total: {total}")
+        
+        # 👇 INSERE NO BANCO COM TRATAMENTO DE ERRO MELHORADO
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                'INSERT INTO orders (user_id, order_data, total_amount, metodo_pagamento, forma_entrega) VALUES (?, ?, ?, ?, ?)',
+                (user_id, json.dumps(pedido_data), total, metodo_pagamento, forma_entrega)
+            )
+            conn.commit()
+            
+            # Obtém o ID do pedido recém-inserido
+            pedido_id = cursor.lastrowid
+            print(f"✅ Pedido inserido com sucesso! ID: {pedido_id}")
+            
+        except sqlite3.OperationalError as e:
+            if "no such column: forma_entrega" in str(e):
+                print("🚨 ERRO: Coluna forma_entrega não existe! Criando...")
+                # Tenta criar a coluna e inserir novamente
+                conn.execute("ALTER TABLE orders ADD COLUMN forma_entrega TEXT DEFAULT 'delivery'")
+                conn.commit()
+                print("✅ Coluna forma_entrega criada!")
+                
+                # Tenta inserir novamente
+                cursor = conn.cursor()
+                cursor.execute(
+                    'INSERT INTO orders (user_id, order_data, total_amount, metodo_pagamento, forma_entrega) VALUES (?, ?, ?, ?, ?)',
+                    (user_id, json.dumps(pedido_data), total, metodo_pagamento, forma_entrega)
+                )
+                conn.commit()
+                pedido_id = cursor.lastrowid
+                print(f"✅ Pedido inserido após correção! ID: {pedido_id}")
+            else:
+                raise e
+        
         conn.close()
         
         # Limpa o carrinho
         session.pop('carrinho', None)
+        print("🛒 Carrinho limpo da sessão")
         
         # Gera ID do pedido para exibição
-        pedido_id = f"{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
+        pedido_id_exibicao = f"#{pedido_id:04d}"
+        
+        print(f"🎉 Compra finalizada com sucesso! Redirecionando para página de confirmação")
         
         # Renderiza a página de confirmação
         return render_template('compra_finalizada.html', 
-                             pedido_id=pedido_id,
+                             pedido_id=pedido_id_exibicao,
                              data_pedido=datetime.now().strftime('%d/%m/%Y %H:%M'),
                              total=total,
-                             metodo_pagamento=metodo_pagamento)
+                             metodo_pagamento=metodo_pagamento,
+                             forma_entrega=forma_entrega,
+                             itens_pedido=itens_pedido)
                              
     except Exception as e:
         print(f"❌ Erro ao finalizar compra: {e}")
+        import traceback
+        traceback.print_exc()
         flash('Erro ao processar seu pedido. Tente novamente.', 'error')
         return redirect(url_for('carrinho'))
 

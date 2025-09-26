@@ -34,13 +34,17 @@
             onclick="filtrarPorStatus('processando')">
             🧑‍🍳 Processando
         </button>
+        <button class="btn-status pronto {% if status_filter == 'pronto' %}ativo{% endif %}"
+            onclick="filtrarPorStatus('pronto')">
+            ✅ Prontos
+        </button>
         <button class="btn-status enviado {% if status_filter == 'enviado' %}ativo{% endif %}"
             onclick="filtrarPorStatus('enviado')">
             🚚 Enviados
         </button>
         <button class="btn-status entregue {% if status_filter == 'entregue' %}ativo{% endif %}"
             onclick="filtrarPorStatus('entregue')">
-            ✅ Entregues
+            🏠 Entregues
         </button>
         <button class="btn-status cancelado {% if status_filter == 'cancelado' %}ativo{% endif %}"
             onclick="filtrarPorStatus('cancelado')">
@@ -72,6 +76,11 @@
                     {% if pedido['metodo_pagamento'] == 'cartao' %}💳 Cartão{% endif %}
                     {% if pedido['metodo_pagamento'] == 'pix' %}📱 PIX{% endif %}
                     {% if not pedido['metodo_pagamento'] %}💳 Cartão (padrão){% endif %}
+                </p>
+                <p><strong>Entrega:</strong>
+                    {% if pedido['forma_entrega'] == 'delivery' %}🚚 Delivery{% endif %}
+                    {% if pedido['forma_entrega'] == 'retirada' %}🏪 Retirada{% endif %}
+                    {% if not pedido['forma_entrega'] %}🚚 Delivery (padrão){% endif %}
                 </p>
             </div>
             <span class="pedido-status status-{{ pedido['status'] }}">
@@ -122,10 +131,10 @@
         <div class="pedido-acoes">
             <select class="select-status" id="status-{{ pedido['id'] }}">
                 <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>⏳ Pendente</option>
-                <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>🧑‍🍳
-                    Processando</option>
+                <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>🧑‍🍳 Processando</option>
+                <option value="pronto" {% if pedido['status']=='pronto' %}selected{% endif %}>✅ Pronto</option>
                 <option value="enviado" {% if pedido['status']=='enviado' %}selected{% endif %}>🚚 Enviado</option>
-                <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>✅ Entregue</option>
+                <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>🏠 Entregue</option>
                 <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>❌ Cancelado</option>
             </select>
             <button class="btn-atualizar" onclick="abrirModalAtualizarStatus({{ pedido['id'] }})">
@@ -505,13 +514,18 @@
         color: #2d3436;
     }
 
-    .btn-status.enviado {
+    .btn-status.pronto {
         background: linear-gradient(135deg, #a29bfe, #6c5ce7);
         color: white;
     }
 
-    .btn-status.entregue {
+    .btn-status.enviado {
         background: linear-gradient(135deg, #00b894, #00a085);
+        color: white;
+    }
+
+    .btn-status.entregue {
+        background: linear-gradient(135deg, #55efc4, #00b894);
         color: white;
     }
 
@@ -567,6 +581,10 @@
         border-left-color: #74b9ff;
     }
 
+    .pedido-card.pronto {
+        border-left-color: #a29bfe;
+    }
+
     .pedido-card.enviado {
         border-left-color: #6c5ce7;
     }
@@ -608,14 +626,19 @@
         color: #004085;
     }
 
-    .status-enviado {
+    .status-pronto {
         background: #e0cffc;
         color: #4a3c7d;
     }
 
-    .status-entregue {
+    .status-enviado {
         background: #d4edda;
         color: #155724;
+    }
+
+    .status-entregue {
+        background: #d1ecf1;
+        color: #0c5460;
     }
 
     .status-cancelado {
@@ -698,7 +721,6 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    /* 🔽 AGORA O BOTÃO CANCELAR TAMBÉM TEM O MESMO ESTILO ROSA/ROXO */
     .btn-modal-cancelar {
         background: linear-gradient(135deg, #ff6b8b, #ff4d73);
         color: white;
@@ -709,7 +731,6 @@
         color: white;
     }
 
-    /* 🔽 HOVER ROXO IGUAL AO PADRÃO DO SITE PARA AMBOS OS BOTÕES */
     .btn-modal-cancelar:hover {
         background: linear-gradient(135deg, #ff4d73, #9b59b6);
         transform: translateY(-2px);

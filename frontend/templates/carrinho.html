@@ -231,6 +231,55 @@
             color: var(--primary);
         }
 
+        /* 🔽 NOVOS ESTILOS PARA FORMA DE ENTREGA */
+        .forma-entrega {
+            margin: 1.5rem 0;
+        }
+
+        .forma-entrega h4 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .opcoes-entrega {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .opcao-entrega {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .opcao-entrega:hover {
+            border-color: var(--primary);
+        }
+
+        .opcao-entrega.selecionado {
+            border-color: var(--primary);
+            background: rgba(255, 107, 139, 0.1);
+        }
+
+        .opcao-entrega i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .opcao-entrega span {
+            display: block;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
         .metodo-pagamento {
             margin: 1.5rem 0;
         }
@@ -303,7 +352,7 @@
                 margin-top: 1rem;
             }
 
-            .opcoes-pagamento {
+            .opcoes-pagamento, .opcoes-entrega {
                 flex-direction: column;
             }
 
@@ -396,6 +445,28 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
         }
+
+        /* 🔽 ESTILOS PARA LISTA DE PRODUTOS NO MODAL */
+        .lista-produtos {
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+        }
+
+        .item-lista {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .item-lista:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 
@@ -444,6 +515,23 @@
 
             <div class="resumo-carrinho">
                 <h3>Resumo do Pedido</h3>
+
+                <!-- 🔽 NOVA SEÇÃO: FORMA DE ENTREGA -->
+                <div class="forma-entrega">
+                    <h4>Forma de Entrega</h4>
+                    <div class="opcoes-entrega">
+                        <div class="opcao-entrega" onclick="selecionarEntrega('delivery')" data-entrega="delivery">
+                            <i class="fas fa-truck"></i>
+                            <span>Delivery</span>
+                            <small>Entrega no endereço</small>
+                        </div>
+                        <div class="opcao-entrega" onclick="selecionarEntrega('retirada')" data-entrega="retirada">
+                            <i class="fas fa-store"></i>
+                            <span>Retirada</span>
+                            <small>Buscar na loja</small>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="metodo-pagamento">
                     <h4>Método de Pagamento</h4>
@@ -513,7 +601,7 @@
         </div>
     </div>
 
-    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA FINALIZAR COMPRA -->
+    <!-- 👇 MODAL DE CONFIRMAÇÃO PARA FINALIZAR COMPRA (ATUALIZADO) -->
     <div id="modalFinalizarCompra" class="modal-confirmacao">
         <div class="modal-confirmacao-conteudo">
             <div class="modal-confirmacao-cabecalho">
@@ -521,9 +609,25 @@
                 <span class="modal-confirmacao-fechar" onclick="fecharModalFinalizarCompra()">&times;</span>
             </div>
             <div class="modal-confirmacao-corpo">
-                <p>Tem certeza que deseja finalizar a compra?</p>
-                <p>⚠️<strong>Verifique se todos os itens e o método de pagamento estão corretos!</strong></p>
-                <p>Total: <strong>R$ {{ "%.2f"|format(total) }}</strong></p>
+                <p><strong>Por favor, confirme os detalhes do seu pedido:</strong></p>
+                
+                <div style="text-align: left; margin: 1rem 0;">
+                    <p><strong>Itens do pedido:</strong></p>
+                    <div class="lista-produtos" id="lista-produtos-confirmacao">
+                        {% for produto in produtos %}
+                        <div class="item-lista">
+                            <span>{{ produto['nome'] }} ({{ quantidades[produto['id']] }}x)</span>
+                            <span>R$ {{ "%.2f"|format(produto['preco'] * quantidades[produto['id']]) }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <p><strong>Forma de entrega:</strong> <span id="forma-entrega-confirmacao">-</span></p>
+                    <p><strong>Método de pagamento:</strong> <span id="metodo-pagamento-confirmacao">-</span></p>
+                    <p><strong>Total:</strong> R$ {{ "%.2f"|format(total) }}</p>
+                </div>
+                
+                <p>⚠️<strong>Verifique se todas as informações estão corretas antes de confirmar!</strong></p>
             </div>
             <div class="modal-confirmacao-rodape">
                 <button class="btn-modal" onclick="fecharModalFinalizarCompra()">
@@ -538,6 +642,7 @@
 
     <script>
         let metodoPagamentoSelecionado = null;
+        let formaEntregaSelecionada = null; // 👈 NOVA VARIÁVEL
 
         function selecionarPagamento(metodo) {
             document.querySelectorAll('.opcao-pagamento').forEach(opcao => {
@@ -548,6 +653,19 @@
             if (elemento) {
                 elemento.classList.add('selecionado');
                 metodoPagamentoSelecionado = metodo;
+            }
+        }
+
+        // 👇 NOVA FUNÇÃO PARA SELECIONAR ENTREGA
+        function selecionarEntrega(forma) {
+            document.querySelectorAll('.opcao-entrega').forEach(opcao => {
+                opcao.classList.remove('selecionado');
+            });
+            
+            const elemento = document.querySelector(`.opcao-entrega[data-entrega="${forma}"]`);
+            if (elemento) {
+                elemento.classList.add('selecionado');
+                formaEntregaSelecionada = forma;
             }
         }
 
@@ -564,12 +682,25 @@
             window.location.href = "{{ url_for('limpar_carrinho') }}";
         }
 
-        // 👇 FUNÇÕES PARA FINALIZAR COMPRA
+        // 👇 FUNÇÕES PARA FINALIZAR COMPRA (ATUALIZADAS)
         function abrirModalFinalizarCompra() {
             if (!metodoPagamentoSelecionado) {
                 mostrarNotificacao('Por favor, selecione um método de pagamento!', 'erro', 'Atenção!');
                 return;
             }
+            
+            if (!formaEntregaSelecionada) {
+                mostrarNotificacao('Por favor, selecione a forma de entrega!', 'erro', 'Atenção!');
+                return;
+            }
+            
+            // Atualizar o modal de confirmação com as informações selecionadas
+            document.getElementById('metodo-pagamento-confirmacao').textContent = 
+                metodoPagamentoSelecionado === 'dinheiro' ? '💵 Dinheiro' :
+                metodoPagamentoSelecionado === 'cartao' ? '💳 Cartão' : '📱 PIX';
+            
+            document.getElementById('forma-entrega-confirmacao').textContent = 
+                formaEntregaSelecionada === 'delivery' ? '🚚 Delivery' : '🏪 Retirada';
             
             document.getElementById('modalFinalizarCompra').style.display = 'block';
         }
@@ -579,7 +710,7 @@
         }
 
         function confirmarFinalizarCompra() {
-            window.location.href = "/finalizar-compra?metodo=" + metodoPagamentoSelecionado;
+            window.location.href = "/finalizar-compra?metodo=" + metodoPagamentoSelecionado + "&entrega=" + formaEntregaSelecionada;
         }
 
         // 👇 FUNÇÃO DE NOTIFICAÇÃO

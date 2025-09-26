@@ -112,6 +112,11 @@
             color: #004085;
         }
 
+        .status-pronto {
+            background: #e0cffc;
+            color: #4a3c7d;
+        }
+
         .status-enviado {
             background: #d4edda;
             color: #155724;
@@ -242,6 +247,12 @@
                     {% if pedido['metodo_pagamento'] == 'pix' %}📱 PIX{% endif %}
                 </p>
                 {% endif %}
+                {% if pedido['forma_entrega'] %}
+                <p><strong>Entrega:</strong>
+                    {% if pedido['forma_entrega'] == 'delivery' %}🚚 Delivery{% endif %}
+                    {% if pedido['forma_entrega'] == 'retirada' %}🏪 Retirada{% endif %}
+                </p>
+                {% endif %}
             </div>
 
             <div class="pedido-itens">
@@ -273,7 +284,7 @@
         <div class="sem-pedidos">
             <h2>📦Você ainda não fez nenhum pedido</h2>
             <p>Que tal dar uma olhada em nossos deliciosos cupcakes?</p>
-            <a href="{{ url_for('home') }}" class="btn-comprar">Ir às Compras</a>
+            <a href="{{ url_for('home') }}" class="btn-padrao">Ir às Compras</a>
         </div>
         {% endif %}
     </div>

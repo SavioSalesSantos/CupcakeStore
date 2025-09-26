@@ -89,17 +89,22 @@
             font-weight: 600;
         }
 
-        .detalhes-pedido p {
+        .info-pedido {
+            margin: 1rem 0;
+        }
+
+        .info-pedido p {
             margin: 0.5rem 0;
             display: flex;
             justify-content: space-between;
         }
 
-        .detalhes-pedido strong {
+        .info-pedido strong {
             color: var(--dark);
         }
 
-        .metodo-pagamento {
+        /* 🔽 ESTILOS PARA OS ÍCONES DE STATUS */
+        .status-info {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -110,17 +115,38 @@
             border-radius: var(--radius);
         }
 
-        .metodo-pagamento i {
+        .status-info i {
             font-size: 1.5rem;
             color: var(--primary);
         }
 
-        .metodo-pagamento span {
+        .status-info span {
             font-weight: 600;
             color: var(--dark);
         }
 
-        /* 🔽 BOTÕES PADRONIZADOS IGUAL AO CARRINHO */
+        /* 🔽 LISTA DE PRODUTOS */
+        .lista-produtos-finalizada {
+            margin: 1rem 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+
+        .item-produto-finalizado {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-produto-finalizado:last-child {
+            border-bottom: none;
+        }
+
+        /* 🔽 BOTÕES PADRONIZADOS */
         .btn-padrao {
             display: inline-flex;
             align-items: center;
@@ -179,22 +205,50 @@
         <p>Obrigado pela sua preferência! Seu pedido foi processado e em breve estará a caminho.</p>
 
         <div class="detalhes-pedido">
-            <h3>Resumo do Pedido</h3>
-            <p><strong>Número do Pedido:</strong> #{{ pedido_id }}</p>
-            <p><strong>Data:</strong> {{ data_pedido }}</p>
-            <p><strong>Total:</strong> R$ {{ "%.2f"|format(total) }}</p>
+            <h3>📋 Resumo do Pedido</h3>
             
-            <div class="metodo-pagamento">
+            <div class="info-pedido">
+                <p><strong>Número do Pedido:</strong> #{{ pedido_id }}</p>
+                <p><strong>Data:</strong> {{ data_pedido }}</p>
+                <p><strong>Total:</strong> R$ {{ "%.2f"|format(total) }}</p>
+            </div>
+            
+            <!-- 🔽 FORMA DE ENTREGA -->
+            <div class="status-info">
+                {% if forma_entrega == 'delivery' %}
+                <i class="fas fa-truck"></i>
+                <span>Entrega: Delivery (Endereço cadastrado)</span>
+                {% else %}
+                <i class="fas fa-store"></i>
+                <span>Entrega: Retirada na Loja</span>
+                {% endif %}
+            </div>
+            
+            <!-- 🔽 MÉTODO DE PAGAMENTO -->
+            <div class="status-info">
                 {% if metodo_pagamento == 'dinheiro' %}
                 <i class="fas fa-money-bill-wave"></i>
-                <span>Pagamento em Dinheiro</span>
+                <span>Pagamento: Dinheiro</span>
                 {% elif metodo_pagamento == 'cartao' %}
                 <i class="fas fa-credit-card"></i>
-                <span>Pagamento com Cartão</span>
+                <span>Pagamento: Cartão</span>
                 {% elif metodo_pagamento == 'pix' %}
                 <i class="fas fa-qrcode"></i>
-                <span>Pagamento via PIX</span>
+                <span>Pagamento: PIX</span>
                 {% endif %}
+            </div>
+
+            <!-- 🔽 LISTA DE PRODUTOS -->
+            <div style="margin-top: 1.5rem;">
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">🧁 Itens do Pedido:</h4>
+                <div class="lista-produtos-finalizada">
+                    {% for item in itens_pedido %}
+                    <div class="item-produto-finalizado">
+                        <span>{{ item.nome }} ({{ item.quantidade }}x)</span>
+                        <span>R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
 
