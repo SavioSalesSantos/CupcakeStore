@@ -1,134 +1,166 @@
-# **🧁 Cupcake Store**
+# Cupcake Store 🧁
 
+Projeto Integrador Transdisciplinar em Engenharia de Software - UNICID - Cruzeiro Sul Virtual
 
+_Este é um projeto completo de e-commerce para uma loja de cupcakes, desenvolvido como parte do trabalho acadêmico. O sistema inclui loja virtual, carrinho de compras, painel administrativo e gestão completa de pedidos. Tenha em mente que este é um projeto acadêmico e não atende aos requisitos para ser utilizado em produção._
 
-**Um protótipo de e-commerce para uma loja de cupcakes, desenvolvido como trabalho acadêmico para a disciplina de Projeto Integrador Transdisciplinar II do curso de Engenharia de Software da UNICID - Cruzeiro Sul Virtual**
+#### 🔧 Sinta-se à vontade para contribuir com o código 🔧
 
+## Como rodar o projeto *local*?
 
-**⚠️ Esse é um projeto que funcionará como uma loja online de cupcakes para uma pequena empresa. Ele faz parte de um trabalho acadêmico e utiliza conceitos aprendidos durante o curso. Tenha em mente que este é um projeto acadêmico e não atende aos requisitos para ser utilizado em produção** 
+### Pré-requisitos
+- Python 3.8 ou superior
+- Git
 
-Funcionalidades Principais
-Catálogo de Produtos: Visualização de cupcakes com imagens, descrições e preços
+### Passos para execução
 
-Sistema de Carrinho: Adição, remoção e gestão de itens no carrinho de compras
+1. **Clone o repositório:**
+~~~sh
+git clone https://github.com/seu-usuario/cupcake-store.git
+~~~
 
-Autenticação de Usuários: Registro, login e gestão de perfis
+2. **Navegue até a pasta do projeto:**
+~~~sh
+cd cupcake-store
+~~~
 
-Painel Administrativo: CRUD completo de produtos, usuários e pedidos
+3. **Crie e ative um ambiente virtual (recomendado):**
+~~~sh
+# Windows
+python -m venv venv
+venv\Scripts\activate
 
-Sistema de Pedidos: Histórico de compras e status de pedidos
+# Linux/Mac
+python3 -m venv venv
+source venv/bin/activate
+~~~
 
-Design Responsivo: Interface adaptada para mobile, tablet e desktop
+4. **Instale as dependências:**
+~~~sh
+pip install -r requirements.txt
+~~~
 
-Tecnologias Utilizadas
-Back-end
-Python 3.8+: Linguagem de programação principal
-
-Flask: Framework web lightweight
-
-SQLite: Banco de dados relacional
-
-SQLAlchemy: ORM para gestão do banco de dados
-
-Werkzeug: Utilidades para segurança (hash de senhas)
-
-Front-end
-HTML5: Estrutura das páginas
-
-CSS3: Estilização com design responsivo
-
-JavaScript: Interatividade e funcionalidades dinâmicas
-
-Font Awesome: Ícones
-
-Google Fonts (Poppins): Tipografia
-
-
-Estrutura do Projeto
-cupcakestore/
-backend/
-app.py                 # Aplicação principal Flask
-controller.py          # Controladores adicionais  
-database
-database.py            # Configuração e modelos do banco
-cupcakes.db            # Banco de dados SQLite (gerado)
-frontend/
-static/
-css/
-style.css      # Estilos principais
-js/
-script.js      # JavaScript geral
-carrinho.js    # Funcionalidades do carrinho
-sounds/            # Efeitos sonoros
-uploads/           # Imagens enviadas
-templates/
-admin/             # Painel administrativo
-dashboard.html # Visão geral  
-produtos.html # Gerenciamento de produtos 
-pedidos.html # Gerenciamento de pedidos
-usuarios.html # Gerenciamento de usuários
-editar_produto.html # Edição de produtos 
-editar_usuario.html # Edição de usuários
-index.html         # Página inicial
-login.html         # Autenticação
-register.html      # Registro
-carrinho.html      # Carrinho de compras
-compra_finalizada.html # Confirmação de compras
-meu_usuario.html   # Perfil do usuário
-meus_pedidos.html  # Histórico de pedidos
-docs/                      # Documentação
-README.md                  # Este arquivo
-
-
-Capturas de Tela
-Página Principal
-
-![alt text](image.png)
-
-Painel Administrativo
-
-![alt text](image-2.png)
-
-Carrinho de Compras
-
-![alt text](image-1.png)
-
-Como Executar o Projeto Localmente
-Pré-requisitos
-Python 3.8+
-
-pip (gerenciador de pacotes do Python)
-
-SQLite (já incluído no Python)
-
-Passo a Passo
-Clone o repositório:
-
-bash
-git clone https://github.com/seu-usuario/cupcakestore.git
-cd cupcakestore
-
-Execute a aplicação:
-bash
+5. **Execute a aplicação:**
+~~~sh
 python backend/app.py
-Acesse a aplicação:
-Abra seu navegador e visite: http://localhost:5000
+~~~
 
- Credenciais de Demonstração
-Conta Administrativa
-Email: admin@cupcakestore.com
+6. **Acesse a aplicação no navegador:**
+~~~
+http://localhost:5000
+~~~
 
-Senha: admin123
+### Dados de Acesso para Teste
 
-Conta de Usuário Comum
-Email: teste@email.com
+**Conta Administrativa:**
+- Email: `admin@cupcakestore.com`
+- Senha: `admin123`
 
-Senha: teste123
+**Conta de Cliente:**
+- Email: `teste@email.com`
+- Senha: `teste123`
 
+### Informações Adicionais
 
-Autoria
-Este projeto foi desenvolvido como parte do Projeto Integrador Transdisciplinar em Engenharia de Software II da UNICID - Cruzeiro Sul Virtual.
+- **Linguagem Back-end**: Python (Flask)
+- **Front-end**: HTML5, CSS3, JavaScript (Vanilla)
+- **Banco de Dados**: SQLite3
+- **Framework Web**: Flask
+- **Autenticação**: Sessions com Flask
+- **Upload de Imagens**: Suporte a PNG, JPG, JPEG, GIF, WEBP
+- **Plataforma**: Web (totalmente responsivo para mobile, tablet e desktop)
 
-Desenvolvedor: [Savio Sales Santos]
-Email: [savio.s11@gmail.com]
-GitHub: [https://github.com/SavioSalesSantos]
+### Estrutura do Projeto
+
+A estrutura do projeto é organizada da seguinte forma:
+
+- `backend/`: 
+  - `app.py` - *Aplicação principal Flask com todas as rotas*
+  - `controller.py` - *Controladores e lógica de negócio*
+- `database/`: 
+  - `database.py` - *Configuração e inicialização do banco de dados*
+  - `cupcakes.db` - *Banco de dados SQLite (gerado automaticamente)*
+- `frontend/`: 
+  - `templates/` - *Templates HTML (Jinja2)*
+    - `Admin/` - *Painel administrativo*
+    - `*.html` - *Páginas da loja*
+  - `static/` - *Arquivos estáticos*
+    - `css/` - *Estilos CSS*
+    - `js/` - *JavaScript client-side*
+    - `uploads/` - *Imagens dos produtos*
+    - `sounds/` - *Efeitos sonoros*
+- `docs/`: *Documentação do projeto*
+- `venv/`: *Ambiente virtual Python*
+
+### Funcionalidades Principais
+
+#### 🛍️ Loja Virtual
+- Catálogo de produtos com paginação
+- Busca em tempo real
+- Carrinho de compras interativo
+- Múltiplas formas de pagamento (Cartão, Dinheiro, PIX)
+- Opções de entrega (Delivery e Retirada)
+- Histórico de pedidos
+
+#### 👤 Área do Cliente
+- Cadastro e login de usuários
+- Gestão de dados pessoais
+- Endereço de entrega com busca por CEP
+- Histórico de pedidos
+- Acompanhamento de status
+
+#### ⚙️ Painel Administrativo
+- Dashboard com métricas e gráficos
+- Gestão completa de produtos (CRUD)
+- Gerenciamento de pedidos e status
+- Controle de usuários
+- Estatísticas de vendas
+- Upload de imagens para produtos
+
+### Tecnologias Utilizadas
+
+- **Back-end**: Python, Flask, SQLite3, Werkzeug
+- **Front-end**: HTML5, CSS3, JavaScript (ES6+)
+- **Banco de Dados**: SQLite3 com ORM nativo
+- **Segurança**: Hash de senhas com Werkzeug
+- **Uploads**: Processamento de imagens com Pillow
+- **UI/UX**: Font Awesome, Google Fonts (Poppins)
+- **Responsividade**: CSS Grid e Flexbox
+
+### Autoria
+
+Este projeto foi desenvolvido por Savio Sales Santos (<saviosales.s11@gmail.com>) como parte do Projeto Integrador Transdisciplinar em Engenharia de Software - UNICID - Cruzeiro Sul Virtual.
+
+Para mais informações, consulte a [documentação](https://github.com/seu-usuario/cupcake-store/tree/main/docs).
+
+## Capturas de Tela
+
+- **Loja Principal:**
+  ![Loja](https://github.com/seu-usuario/cupcake-store/blob/main/docs/loja.png)
+
+- **Carrinho de Compras:**
+  ![Carrinho](https://github.com/seu-usuario/cupcake-store/blob/main/docs/carrinho.png)
+
+- **Painel Administrativo:**
+  ![Painel Admin](https://github.com/seu-usuario/cupcake-store/blob/main/docs/admin-dashboard.png)
+
+- **Gestão de Produtos:**
+  ![Produtos](https://github.com/seu-usuario/cupcake-store/blob/main/docs/admin-produtos.png)
+
+### Desenvolvimento
+
+Para contribuir com o projeto:
+
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+### Licença
+
+Este projeto é destinado exclusivamente para fins acadêmicos.
+
+---
+
+**Nota**: Este projeto está em constante desenvolvimento e melhorias. Sugestões são sempre bem-vindas! 🚀
