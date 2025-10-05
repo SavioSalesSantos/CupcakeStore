@@ -16,7 +16,7 @@ _Este é um projeto completo de e-commerce para uma loja de cupcakes, desenvolvi
 
 1. **Clone o repositório:**
 ~~~sh
-git clone https://github.com/seu-usuario/cupcake-store.git
+git clone https://github.com/SavioSalesSantos/CupcakeStore.git
 ~~~
 
 2. **Navegue até a pasta do projeto:**
@@ -136,16 +136,16 @@ Para mais informações, consulte a [documentação](https://github.com/seu-usua
 ## Capturas de Tela
 
 - **Loja Principal:**
-  ![Loja](https://github.com/seu-usuario/cupcake-store/blob/main/docs/loja.png)
+  ![Loja](docs/loja.png)
 
 - **Carrinho de Compras:**
-  ![Carrinho](https://github.com/seu-usuario/cupcake-store/blob/main/docs/carrinho.png)
+  ![Carrinho](docs/carrinho.png)
 
 - **Painel Administrativo:**
-  ![Painel Admin](https://github.com/seu-usuario/cupcake-store/blob/main/docs/admin-dashboard.png)
+  ![Painel Admin](docs/admin-dashboard.png)
 
 - **Gestão de Produtos:**
-  ![Produtos](https://github.com/seu-usuario/cupcake-store/blob/main/docs/admin-produtos.png)
+  ![Produtos](docs/admin-produtos.png)
 
 ### Desenvolvimento
 
