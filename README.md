@@ -129,7 +129,7 @@ A estrutura do projeto é organizada da seguinte forma:
 
 ### Autoria
 
-Este projeto foi desenvolvido por Savio Sales Santos (<saviosales.s11@gmail.com>) como parte do Projeto Integrador Transdisciplinar em Engenharia de Software - UNICID - Cruzeiro Sul Virtual.
+Este projeto foi desenvolvido por [Savio](https://github.com/SavioSalesSantos) como parte do Projeto Integrador Transdisciplinar em Engenharia de Software - UNICID - Cruzeiro Sul Virtual.
 
 Para mais informações, consulte a [documentação](docs).
 
