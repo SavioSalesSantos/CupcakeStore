@@ -131,7 +131,7 @@ A estrutura do projeto é organizada da seguinte forma:
 
 Este projeto foi desenvolvido por Savio Sales Santos (<saviosales.s11@gmail.com>) como parte do Projeto Integrador Transdisciplinar em Engenharia de Software - UNICID - Cruzeiro Sul Virtual.
 
-Para mais informações, consulte a [documentação](https://github.com/seu-usuario/cupcake-store/tree/main/docs).
+Para mais informações, consulte a [documentação](docs).
 
 ## Capturas de Tela
 
