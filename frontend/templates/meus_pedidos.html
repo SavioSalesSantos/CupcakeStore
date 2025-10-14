@@ -81,6 +81,31 @@
             border-left: 4px solid var(--primary);
         }
 
+        /* 👇 CORES DAS BORDAS LATERAIS (IGUAL AO ADMIN/PEDIDOS) */
+        .pedido-card.pendente {
+            border-left-color: #f39c12;
+        }
+
+        .pedido-card.processando {
+            border-left-color: #3498db;
+        }
+
+        .pedido-card.pronto {
+            border-left-color: #9b59b6;
+        }
+
+        .pedido-card.enviado {
+            border-left-color: #1abc9c;
+        }
+
+        .pedido-card.entregue {
+            border-left-color: #27ae60;
+        }
+
+        .pedido-card.cancelado {
+            border-left-color: #2c3e50;
+        }
+
         .pedido-header {
             display: flex;
             justify-content: space-between;
@@ -96,35 +121,43 @@
         }
 
         .pedido-status {
-            padding: 0.5rem 1rem;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .status-pendente {
-            background: #fff3cd;
-            color: #856404;
+            background: #fef5e7;
+            color: #b06c0f;
         }
 
         .status-processando {
-            background: #cce7ff;
-            color: #004085;
+            background: #e8f4fd;
+            color: #1a5d8a;
         }
 
         .status-pronto {
-            background: #e0cffc;
-            color: #4a3c7d;
+            background: #f4ecf7;
+            color: #6c3483;
         }
 
         .status-enviado {
-            background: #d4edda;
-            color: #155724;
+            background: #e8f6f3;
+            color: #117864;
         }
 
         .status-entregue {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: #eafaf1;
+            color: #196f3d;
+        }
+
+        .status-cancelado {
+            background: #ecf0f1;
+            color: #2c3e50;
         }
 
         .pedido-info {
@@ -229,10 +262,19 @@
 
         {% if pedidos %}
         {% for pedido in pedidos %}
-        <div class="pedido-card">
+        <div class="pedido-card {{ pedido['status'] }}">
             <div class="pedido-header">
                 <h3>Pedido #{{ pedido['id'] }}</h3>
                 <span class="pedido-status status-{{ pedido['status'] }}">
+                    <i class="fas 
+                        {% if pedido['status'] == 'pendente' %}fa-clock
+                        {% elif pedido['status'] == 'processando' %}fa-cogs
+                        {% elif pedido['status'] == 'pronto' %}fa-check-circle
+                        {% elif pedido['status'] == 'enviado' %}fa-shipping-fast
+                        {% elif pedido['status'] == 'entregue' %}fa-home
+                        {% elif pedido['status'] == 'cancelado' %}fa-times-circle
+                        {% endif %}">
+                    </i>
                     {{ pedido['status']|title }}
                 </span>
             </div>

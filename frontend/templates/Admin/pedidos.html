@@ -3,58 +3,36 @@
 {% block title %}Pedidos - CupcakeStore{% endblock %}
 
 {% block content %}
-<!-- 👇 ESTATÍSTICAS -->
-<div class="estatisticas">
-    {% for stat in contagem_status %}
-    <div class="estatistica-card">
-        <h3>{{ stat['status']|title }}</h3>
-        <div class="estatistica-numero">{{ stat['count'] }}</div>
-        <small>Pedidos</small>
+<!-- 👇 ESTATÍSTICAS COMPACTAS -->
+<div class="estatisticas-compactas">
+    <div class="filtro-status-compacto">
+        <button class="btn-status-compacto todos {% if status_filter == 'todos' %}ativo{% endif %}" onclick="filtrarPorStatus('todos')">
+            <i class="fas fa-boxes"></i> Todos ({{ pedidos|length }})
+        </button>
+        <button class="btn-status-compacto pendente {% if status_filter == 'pendente' %}ativo{% endif %}" onclick="filtrarPorStatus('pendente')">
+            <i class="fas fa-clock"></i> Pendentes ({{ contagem_status | selectattr('status', 'equalto', 'pendente') | map(attribute='count') | first | default(0) }})
+        </button>
+        <button class="btn-status-compacto processando {% if status_filter == 'processando' %}ativo{% endif %}" onclick="filtrarPorStatus('processando')">
+            <i class="fas fa-cogs"></i> Processando ({{ contagem_status | selectattr('status', 'equalto', 'processando') | map(attribute='count') | first | default(0) }})
+        </button>
+        <button class="btn-status-compacto pronto {% if status_filter == 'pronto' %}ativo{% endif %}" onclick="filtrarPorStatus('pronto')">
+            <i class="fas fa-check-circle"></i> Prontos ({{ contagem_status | selectattr('status', 'equalto', 'pronto') | map(attribute='count') | first | default(0) }})
+        </button>
+        <button class="btn-status-compacto enviado {% if status_filter == 'enviado' %}ativo{% endif %}" onclick="filtrarPorStatus('enviado')">
+            <i class="fas fa-shipping-fast"></i> Enviados ({{ contagem_status | selectattr('status', 'equalto', 'enviado') | map(attribute='count') | first | default(0) }})
+        </button>
+        <button class="btn-status-compacto entregue {% if status_filter == 'entregue' %}ativo{% endif %}" onclick="filtrarPorStatus('entregue')">
+            <i class="fas fa-home"></i> Entregues ({{ contagem_status | selectattr('status', 'equalto', 'entregue') | map(attribute='count') | first | default(0) }})
+        </button>
+        <button class="btn-status-compacto cancelado {% if status_filter == 'cancelado' %}ativo{% endif %}" onclick="filtrarPorStatus('cancelado')">
+            <i class="fas fa-times-circle"></i> Cancelados ({{ contagem_status | selectattr('status', 'equalto', 'cancelado') | map(attribute='count') | first | default(0) }})
+        </button>
     </div>
-    {% endfor %}
-    <div class="estatistica-card">
-        <h3>Total</h3>
-        <div class="estatistica-numero">{{ pedidos|length }}</div>
-        <small>Pedidos</small>
-    </div>
-</div>
-
-<!-- 👇 FILTROS -->
-<div class="filtros-pedidos">
-    <div class="filtro-status">
-        <button class="btn-status todos {% if status_filter == 'todos' %}ativo{% endif %}"
-            onclick="filtrarPorStatus('todos')">
-            <i class="fas fa-boxes"></i> Todos
-        </button>
-        <button class="btn-status pendente {% if status_filter == 'pendente' %}ativo{% endif %}"
-            onclick="filtrarPorStatus('pendente')">
-            <i class="fas fa-clock"></i> Pendentes
-        </button>
-        <button class="btn-status processando {% if status_filter == 'processando' %}ativo{% endif %}"
-            onclick="filtrarPorStatus('processando')">
-            <i class="fas fa-cogs"></i> Processando
-        </button>
-        <button class="btn-status pronto {% if status_filter == 'pronto' %}ativo{% endif %}"
-            onclick="filtrarPorStatus('pronto')">
-            <i class="fas fa-check-circle"></i> Prontos
-        </button>
-        <button class="btn-status enviado {% if status_filter == 'enviado' %}ativo{% endif %}"
-            onclick="filtrarPorStatus('enviado')">
-            <i class="fas fa-shipping-fast"></i> Enviados
-        </button>
-        <button class="btn-status entregue {% if status_filter == 'entregue' %}ativo{% endif %}"
-            onclick="filtrarPorStatus('entregue')">
-            <i class="fas fa-home"></i> Entregues
-        </button>
-        <button class="btn-status cancelado {% if status_filter == 'cancelado' %}ativo{% endif %}"
-            onclick="filtrarPorStatus('cancelado')">
-            <i class="fas fa-times-circle"></i> Cancelados
-        </button>
-        <button class="btn-status reset-numeracao" onclick="abrirModalResetNumeracao()">
+    <div class="acoes-avancadas">
+        <button class="btn-status-avancado reset-numeracao" onclick="abrirModalResetNumeracao()">
             <i class="fas fa-sync-alt"></i> Resetar Numeração
         </button>
-        <button class="btn-status excluir-todos" onclick="abrirModalExcluirTodos()"
-            style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+        <button class="btn-status-avancado excluir-todos" onclick="abrirModalExcluirTodos()">
             <i class="fas fa-trash-alt"></i> Excluir Todos
         </button>
     </div>
@@ -144,7 +122,7 @@
             <div class="dropdown-content-pedido">
                 <div class="status-section">
                     <label for="status-{{ pedido['id'] }}"><i class="fas fa-exchange-alt"></i> Alterar Status:</label>
-                    <select class="select-status" id="status-{{ pedido['id'] }}">
+                    <select class="select-status" id="status-{{ pedido['id'] }}" onchange="atualizarIconeStatus({{ pedido['id'] }})">
                         <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>
                             <i class="fas fa-clock"></i> Pendente
                         </option>
@@ -168,8 +146,7 @@
                 <button class="dropdown-item-pedido" onclick="abrirModalAtualizarStatus({{ pedido['id'] }})">
                     <i class="fas fa-save"></i> Atualizar Status
                 </button>
-                <button class="dropdown-item-pedido btn-excluir"
-                    onclick="abrirModalExclusaoPedido({{ pedido['id'] }}, {{ pedido['total_amount'] }})">
+                <button class="dropdown-item-pedido" onclick="abrirModalExclusaoPedido({{ pedido['id'] }}, {{ pedido['total_amount'] }})">
                     <i class="fas fa-trash-alt"></i> Excluir Pedido
                 </button>
             </div>
@@ -181,7 +158,7 @@
         <h2><i class="fas fa-box-open"></i> Nenhum pedido encontrado</h2>
         <p>Não há pedidos com o status selecionado.</p>
         <div class="btn-container">
-            <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
+            <button class="btn-status-compacto todos" onclick="filtrarPorStatus('todos')">
                 <i class="fas fa-boxes"></i> Ver Todos os Pedidos
             </button>
         </div>
@@ -290,28 +267,29 @@
     let pedidoIdParaAtualizar = null;
     let novoStatusParaAtualizar = null;
 
-    // 👇 FUNÇÃO PARA TOGGLE DO DROPDOWN
+    // 👇 FUNÇÃO PARA ATUALIZAR ÍCONE DO STATUS NO DROPDOWN
+    function atualizarIconeStatus(pedidoId) {
+        const select = document.getElementById(`status-${pedidoId}`);
+        const selectedOption = select.options[select.selectedIndex];
+        console.log(`Status atualizado para: ${selectedOption.text}`);
+    }
+
+    // 👇 FUNÇÃO PARA TOGGLE DO DROPDOWN COM ANIMAÇÃO DA SETA (CORRIGIDA)
     function toggleDropdown(button) {
         const dropdownContent = button.nextElementSibling;
         const dropdownArrow = button.querySelector('.dropdown-arrow');
-        const allDropdowns = document.querySelectorAll('.dropdown-content-pedido');
-        const allArrows = document.querySelectorAll('.dropdown-arrow');
         
-        // Fecha todos os outros dropdowns e reseta setas
-        allDropdowns.forEach(dropdown => {
-            if (dropdown !== dropdownContent) {
-                dropdown.classList.remove('active');
-            }
-        });
-        allArrows.forEach(arrow => {
-            if (arrow !== dropdownArrow) {
-                arrow.classList.remove('active');
-            }
-        });
-        
-        // Alterna o dropdown atual e a seta
+        // Alterna o dropdown
         dropdownContent.classList.toggle('active');
-        dropdownArrow.classList.toggle('active');
+        
+        // Animação da seta - CORREÇÃO: padrão para baixo, ativo para cima
+        if (dropdownContent.classList.contains('active')) {
+            dropdownArrow.classList.remove('fa-chevron-down');
+            dropdownArrow.classList.add('fa-chevron-up');
+        } else {
+            dropdownArrow.classList.remove('fa-chevron-up');
+            dropdownArrow.classList.add('fa-chevron-down');
+        }
     }
 
     // Fecha dropdowns ao clicar fora
@@ -321,7 +299,8 @@
                 dropdown.classList.remove('active');
             });
             document.querySelectorAll('.dropdown-arrow').forEach(arrow => {
-                arrow.classList.remove('active');
+                arrow.classList.remove('fa-chevron-up');
+                arrow.classList.add('fa-chevron-down');
             });
         }
     });
@@ -520,148 +499,113 @@
     });
 </script>
 <style>
-    .estatisticas {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    .estatisticas-compactas {
+        display: flex;
+        flex-direction: column;
         gap: 15px;
-        margin-bottom: 30px;
-    }
-
-    .estatistica-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        text-align: center;
-    }
-
-    .estatistica-numero {
-        font-size: 2em;
-        font-weight: bold;
-        margin: 10px 0;
-    }
-
-    .filtros-pedidos {
         margin-bottom: 25px;
     }
 
-    .filtro-status {
+    .filtro-status-compacto {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-status-compacto {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: white;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .btn-status-compacto.todos {
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+    }
+
+    .btn-status-compacto.pendente {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+    }
+
+    .btn-status-compacto.processando {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+
+    .btn-status-compacto.pronto {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    }
+
+    .btn-status-compacto.enviado {
+        background: linear-gradient(135deg, #1abc9c, #16a085);
+    }
+
+    .btn-status-compacto.entregue {
+        background: linear-gradient(135deg, #27ae60, #219653);
+    }
+
+    .btn-status-compacto.cancelado {
+        background: linear-gradient(135deg, #242525, #34495e);
+    }
+
+    .btn-status-compacto:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-status-compacto.ativo {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .acoes-avancadas {
         display: flex;
         gap: 10px;
+        justify-content: center;
         flex-wrap: wrap;
     }
 
-    .btn-status {
+    .btn-status-avancado {
         padding: 10px 20px;
         border: none;
         border-radius: 25px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 600;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
         gap: 8px;
         color: white;
+        font-size: 14px;
     }
 
-    .btn-status.todos {
-        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+    .btn-status-avancado.reset-numeracao {
+        background: linear-gradient(135deg, #867d7b, #2b2e2d);
     }
 
-    .btn-status.todos:hover {
-        background: linear-gradient(135deg, #ff4d73, #ff3366);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
-    }
-
-    .btn-status.pendente {
-        background: linear-gradient(135deg, #f39c12, #e67e22);
-    }
-
-    .btn-status.pendente:hover {
-        background: linear-gradient(135deg, #e67e22, #d35400);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
-    }
-
-    .btn-status.processando {
-        background: linear-gradient(135deg, #3498db, #2980b9);
-    }
-
-    .btn-status.processando:hover {
-        background: linear-gradient(135deg, #2980b9, #1f618d);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-    }
-
-    .btn-status.pronto {
-        background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    }
-
-    .btn-status.pronto:hover {
-        background: linear-gradient(135deg, #8e44ad, #7d3c98);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
-    }
-
-    .btn-status.enviado {
-        background: linear-gradient(135deg, #1abc9c, #16a085);
-    }
-
-    .btn-status.enviado:hover {
-        background: linear-gradient(135deg, #16a085, #138d75);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4);
-    }
-
-    .btn-status.entregue {
-        background: linear-gradient(135deg, #27ae60, #219652);
-    }
-
-    .btn-status.entregue:hover {
-        background: linear-gradient(135deg, #219652, #1e8449);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-    }
-
-    .btn-status.cancelado {
-        background: linear-gradient(135deg, #2c3e50, #34495e);
-    }
-
-    .btn-status.cancelado:hover {
-        background: linear-gradient(135deg, #34495e, #2c3e50);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
-    }
-
-    .btn-status.reset-numeracao {
-        background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    }
-
-    .btn-status.reset-numeracao:hover {
-        background: linear-gradient(135deg, #8e44ad, #7d3c98);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
-    }
-
-    .btn-status.excluir-todos {
+    .btn-status-avancado.excluir-todos {
         background: linear-gradient(135deg, #e74c3c, #c0392b);
     }
 
-    .btn-status.excluir-todos:hover {
-        background: linear-gradient(135deg, #c0392b, #a93226);
+    .btn-status-avancado:hover {
         transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-status-avancado.reset-numeracao:hover {
+        box-shadow: 0 6px 20px rgba(0, 206, 201, 0.4);
+    }
+
+    .btn-status-avancado.excluir-todos:hover {
         box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
-    }
-
-    .btn-status:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-status.ativo {
-        transform: scale(1.05);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .pedidos-grid {
@@ -819,10 +763,7 @@
 
     .dropdown-arrow {
         transition: transform 0.3s ease;
-    }
-
-    .dropdown-arrow.active {
-        transform: rotate(180deg);
+        font-size: 12px;
     }
 
     .dropdown-content-pedido {
@@ -877,6 +818,13 @@
         background-size: 16px;
     }
 
+    /* CORREÇÃO: Remove o destaque azul do select quando em foco */
+    .dropdown-content-pedido .select-status:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    }
+
     .dropdown-content-pedido .select-status option {
         background: #ff6b8b;
         color: white;
@@ -908,10 +856,6 @@
 
     .dropdown-item-pedido:last-child {
         border-bottom: none;
-    }
-
-    .btn-excluir:hover {
-        background: rgba(231, 76, 60, 0.3) !important;
     }
 
     /* 🔽 ESTILO PARA NENHUM PEDIDO - BOTÃO CENTRALIZADO */
@@ -961,13 +905,13 @@
     }
 
     .btn-modal-cancelar:hover {
-        background: linear-gradient(135deg, #ff4d73, #ff3366);
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
     }
 
     .btn-modal-confirmar:hover {
-        background: linear-gradient(135deg, #ff4d73, #ff3366);
+        background: linear-gradient(135deg, #ff4d73, #9b59b6);
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
     }
@@ -1033,13 +977,13 @@
             grid-template-columns: 1fr;
         }
 
-        .filtro-status {
+        .filtro-status-compacto {
             justify-content: center;
         }
 
-        .btn-status {
+        .btn-status-compacto {
             padding: 8px 15px;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .pedido-header {

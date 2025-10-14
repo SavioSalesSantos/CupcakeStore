@@ -1,4 +1,4 @@
-<!-- templates/register.html -->
+<!-- frontend/templates/register.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -38,7 +38,7 @@
 
         .auth-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
         }
 
         .auth-header {
@@ -116,9 +116,10 @@
             outline: none;
         }
 
-        .btn-auth {
-            width: 100%;
-            padding: 0.8rem;
+        /* 👇 BOTÕES PADRONIZADOS - MESMO TAMANHO */
+        .btn-form {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
@@ -127,11 +128,18 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 140px;
+            text-decoration: none;
         }
 
-        .btn-auth:hover {
+        .btn-form:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 139, 0.3);
         }
 
         .auth-link {
@@ -196,6 +204,120 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
+        /* 👇 INDICADOR DE PROGRESSO */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            gap: 2rem;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 15%;
+            right: 15%;
+            height: 3px;
+            background: #e9ecef;
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(135deg, #ff4d73, #ff3366) !important;
+            color: white;
+            border-color: #ff3366;
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 107, 139, 0.4);
+        }
+
+        .step.completed .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: var(--dark);
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* 👇 CONTAINER DE BOTÕES CORRIGIDO - MESMO TAMANHO */
+        .botoes-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .botoes-container .btn-form {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        @media (max-width: 480px) {
+            .progress-steps {
+                max-width: 350px;
+                gap: 1rem;
+            }
+            
+            .step-label {
+                font-size: 0.8rem;
+            }
+            
+            .botoes-container {
+                flex-direction: column;
+            }
+            
+            .botoes-container .btn-form {
+                flex: none;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -216,65 +338,105 @@
         {% endif %}
         {% endwith %}
 
+        <!-- 👇 INDICADOR DE PROGRESSO -->
+        <div class="progress-steps">
+            <div class="progress-line">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">Dados Básicos</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">Endereço</div>
+            </div>
+        </div>
+
         <div class="auth-card">
-            <h2>Cadastrar</h2>
-            <form action="{{ url_for('register') }}" method="POST">
-                <div class="form-group">
-                    <label for="username">Nome de usuário:</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Senha:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-
-                <!-- 👇 NOVA SEÇÃO: DADOS DE ENDEREÇO -->
-                <div style="margin: 2rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: var(--radius);">
-                    <h3 style="color: var(--primary); margin-bottom: 1rem; text-align: center;">📮 Dados de Endereço
-                    </h3>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label for="cep">CEP:</label>
-                            <input type="text" id="cep" name="cep" placeholder="00000-000" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="estado">Estado:</label>
-                            <input type="text" id="estado" name="estado" placeholder="SP" required>
-                        </div>
+            <h2 id="formTitle">Cadastrar - Dados Básicos</h2>
+            <form action="{{ url_for('register') }}" method="POST" id="registerForm">
+                
+                <!-- 👇 ETAPA 1: DADOS BÁSICOS -->
+                <div id="etapaDadosBasicos">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i> Nome de usuário:
+                        </label>
+                        <input type="text" id="username" name="username" required placeholder="Digite seu nome de usuário">
                     </div>
 
                     <div class="form-group">
-                        <label for="cidade">Cidade:</label>
-                        <input type="text" id="cidade" name="cidade" required>
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email:
+                        </label>
+                        <input type="email" id="email" name="email" required placeholder="seu@email.com">
                     </div>
 
                     <div class="form-group">
-                        <label for="bairro">Bairro:</label>
-                        <input type="text" id="bairro" name="bairro" required>
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Senha:
+                        </label>
+                        <input type="password" id="password" name="password" required placeholder="Crie uma senha segura">
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label for="rua">Rua:</label>
-                            <input type="text" id="rua" name="rua" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="numero">Número:</label>
-                            <input type="text" id="numero" name="numero" required>
-                        </div>
-                    </div>
+                    <button type="button" class="btn-form" onclick="avancarParaEndereco()">
+                        <i class="fas fa-arrow-right"></i> Continuar para Endereço
+                    </button>
                 </div>
 
-                <button type="submit" class="btn-auth">Criar Conta</button>
+                <!-- 👇 ETAPA 2: DADOS DE ENDEREÇO (OCULTO INICIALMENTE) -->
+                <div id="etapaEndereco" style="display: none;">
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: var(--radius);">
+                        <h3 style="color: var(--primary); margin-bottom: 1rem; text-align: center;">
+                            <i class="fas fa-map-marker-alt"></i> Dados de Endereço
+                        </h3>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="cep">CEP:</label>
+                                <input type="text" id="cep" name="cep" placeholder="00000-000" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="estado">Estado:</label>
+                                <input type="text" id="estado" name="estado" placeholder="SP" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" name="cidade" required placeholder="Sua cidade">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bairro">Bairro:</label>
+                            <input type="text" id="bairro" name="bairro" required placeholder="Seu bairro">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="rua">Rua:</label>
+                                <input type="text" id="rua" name="rua" required placeholder="Nome da rua">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="numero">Número:</label>
+                                <input type="text" id="numero" name="numero" required placeholder="Nº">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 👇 BOTÕES COM MESMO TAMANHO -->
+                    <div class="botoes-container">
+                        <button type="button" class="btn-form" onclick="voltarParaDadosBasicos()">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                        <button type="submit" class="btn-form">
+                            <i class="fas fa-user-plus"></i> Criar Conta
+                        </button>
+                    </div>
+                </div>
             </form>
 
             <p class="auth-link">
@@ -283,13 +445,75 @@
         </div>
 
         <div style="text-align: center;">
-            <a href="{{ url_for('home') }}" class="btn-padrao"> <!-- 👈 BOTÃO PADRONIZADO -->
+            <a href="{{ url_for('home') }}" class="btn-padrao">
                 <i class="fas fa-store"></i> Voltar à Loja
             </a>
         </div>
     </div>
-    <!-- 👇 SCRIPT DE CEP AUTOMÁTICO PARA USUÁRIO -->
+
     <script>
+        // 👇 FUNÇÃO PARA AVANÇAR PARA A ETAPA DE ENDEREÇO
+        function avancarParaEndereco() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Validação básica
+            if (!username || !email || !password) {
+                alert('Por favor, preencha todos os campos básicos antes de continuar.');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('A senha deve ter pelo menos 6 caracteres.');
+                return;
+            }
+
+            // Esconde etapa 1 e mostra etapa 2
+            document.getElementById('etapaDadosBasicos').style.display = 'none';
+            document.getElementById('etapaEndereco').style.display = 'block';
+            
+            // Atualiza o título
+            document.getElementById('formTitle').textContent = 'Cadastrar - Endereço';
+            
+            // Atualiza o indicador de progresso
+            atualizarProgresso(2);
+        }
+
+        // 👇 FUNÇÃO PARA VOLTAR PARA DADOS BÁSICOS
+        function voltarParaDadosBasicos() {
+            document.getElementById('etapaEndereco').style.display = 'none';
+            document.getElementById('etapaDadosBasicos').style.display = 'block';
+            
+            // Atualiza o título
+            document.getElementById('formTitle').textContent = 'Cadastrar - Dados Básicos';
+            
+            // Atualiza o indicador de progresso
+            atualizarProgresso(1);
+        }
+
+        // 👇 FUNÇÃO PARA ATUALIZAR O INDICADOR DE PROGRESSO
+        function atualizarProgresso(etapa) {
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const progressFill = document.getElementById('progressFill');
+
+            // Reseta todas as etapas
+            step1.classList.remove('completed', 'active');
+            step2.classList.remove('completed', 'active');
+
+            if (etapa === 1) {
+                step1.classList.add('active');
+                step2.classList.remove('active');
+                progressFill.style.width = '0%';
+            } else if (etapa === 2) {
+                step1.classList.add('completed');
+                step2.classList.add('active');
+                progressFill.style.width = '100%';
+            }
+        }
+
+        // 👇 SCRIPT DE CEP AUTOMÁTICO
         document.addEventListener('DOMContentLoaded', function () {
             const cepInput = document.getElementById('cep');
 
@@ -309,24 +533,37 @@
                     if (cep.length === 8) {
                         console.log('Buscando CEP:', cep);
 
+                        // Mostra loading
+                        this.style.background = "url('data:image/svg+xml;charset=UTF-8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"%23ff6b8b\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"currentColor\" stroke-width=\"8\" fill=\"none\" stroke-dasharray=\"200\" stroke-dashoffset=\"-200\"><animate attributeName=\"stroke-dashoffset\" values=\"-200;0\" dur=\"2s\" repeatCount=\"indefinite\"/></circle></svg>') no-repeat right 10px center";
+                        this.style.backgroundSize = "20px";
+
                         fetch(`https://viacep.com.br/ws/${cep}/json/`)
                             .then(response => response.json())
                             .then(data => {
+                                // Remove loading
+                                this.style.background = "";
+
                                 if (!data.erro) {
-                                    // Preenche os campos
+                                    // Preenche os campos automaticamente
                                     setValue('estado', data.uf);
                                     setValue('cidade', data.localidade);
                                     setValue('bairro', data.bairro);
                                     setValue('rua', data.logradouro);
 
+                                    // Foca no campo número
                                     if (document.getElementById('numero')) {
                                         document.getElementById('numero').focus();
                                     }
                                 } else {
                                     console.log('CEP não encontrado');
+                                    alert('CEP não encontrado. Por favor, verifique o número digitado.');
                                 }
                             })
-                            .catch(error => console.error('Erro ao buscar CEP:', error));
+                            .catch(error => {
+                                console.error('Erro ao buscar CEP:', error);
+                                this.style.background = "";
+                                alert('Erro ao buscar CEP. Tente novamente.');
+                            });
                     }
                 });
             }
@@ -337,6 +574,32 @@
                     element.value = value;
                 }
             }
+
+            // Inicializa o progresso
+            atualizarProgresso(1);
+        });
+
+        // 👇 VALIDAÇÃO DO FORMULÁRIO ANTES DO ENVIO
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const cep = document.getElementById('cep').value.trim();
+
+            if (!username || !email || !password || !cep) {
+                e.preventDefault();
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('A senha deve ter pelo menos 6 caracteres.');
+                return;
+            }
+
+            // Se chegou até aqui, o formulário pode ser enviado
+            console.log('Formulário validado com sucesso!');
         });
     </script>
 </body>

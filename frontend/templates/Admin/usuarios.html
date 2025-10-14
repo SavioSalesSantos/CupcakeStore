@@ -38,20 +38,28 @@
                 <td>{{ usuario['email'] }}</td>
                 <td>
                     {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
-                    <span class="admin-badge badge-master">👑 Master</span>
+                    <span class="admin-badge badge-master">
+                        <i class="fas fa-crown"></i> Master
+                    </span>
                     {% elif usuario['is_admin'] == 1 %}
-                    <span class="admin-badge badge-admin">Administrador</span>
+                    <span class="admin-badge badge-admin">
+                        <i class="fas fa-user-shield"></i> Administrador
+                    </span>
                     {% else %}
-                    <span class="admin-badge badge-user">Usuário</span>
+                    <span class="admin-badge badge-user">
+                        <i class="fas fa-user"></i> Usuário
+                    </span>
                     {% endif %}
                 </td>
                 <td>
                     {% if usuario['cep'] and usuario['rua'] and usuario['numero'] %}
                     <span class="badge-completo" title="Endereço completo">
-                        ✅ Completo
+                        <i class="fas fa-check-circle"></i> Completo
                     </span>
                     {% else %}
-                    <span class="badge-incompleto">❌ Incompleto</span>
+                    <span class="badge-incompleto">
+                        <i class="fas fa-times-circle"></i> Incompleto
+                    </span>
                     {% endif %}
                 </td>
                 <td>{{ usuario['created_at'] }}</td>
@@ -60,7 +68,7 @@
                         {% if usuario['email'] == 'saviosales@cupcakestore.com' %}
                         <!-- CONTA MASTER - AÇÕES BLOQUEADAS -->
                         <button class="btn-admin btn-primary" disabled title="Conta master protegida">
-                            👑 Protegido
+                            <i class="fas fa-shield-alt"></i> Protegido
                         </button>
 
                         {% else %}
@@ -68,28 +76,28 @@
                         {% if usuario['is_admin'] == 1 %}
                         <button class="btn-admin btn-danger"
                             onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 1)">
-                            Remover Admin
+                            <i class="fas fa-user-times"></i> Remover Admin
                         </button>
                         {% else %}
                         <button class="btn-admin btn-success"
                             onclick="abrirModalToggleAdmin({{ usuario['id'] }}, '{{ usuario['username'] }}', 0)">
-                            Tornar Admin
+                            <i class="fas fa-user-shield"></i> Tornar Admin
                         </button>
                         {% endif %}
 
                         <a href="{{ url_for('admin_editar_usuario', user_id=usuario['id']) }}"
                             class="btn-admin btn-primary">
-                            ✏️ Editar
+                            <i class="fas fa-edit"></i> Editar
                         </a>
 
                         {% if usuario['id'] != session['user_id'] %}
                         <button class="btn-admin btn-primary"
                             onclick="abrirModalExclusaoUsuario({{ usuario['id'] }}, '{{ usuario['username'] }}')">
-                            🗑️ Excluir
+                            <i class="fas fa-trash-alt"></i> Excluir
                         </button>
                         {% else %}
                         <button class="btn-admin btn-primary" disabled title="Não pode excluir a si mesmo">
-                            🚫 Excluir
+                            <i class="fas fa-ban"></i> Excluir
                         </button>
                         {% endif %}
                         {% endif %}
@@ -334,6 +342,9 @@
         border-radius: 20px;
         font-size: 0.9em;
         font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
 
     .badge-admin {
@@ -350,6 +361,31 @@
         background: linear-gradient(135deg, #ff6b8b, #ff4d73);
         color: white;
         border: 2px solid gold;
+    }
+
+    .btn-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 12px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-admin:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-admin:disabled:hover {
+        transform: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .btn-danger {
@@ -458,6 +494,9 @@
         padding: 4px 8px;
         border-radius: 12px;
         font-size: 0.8em;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
 
     .badge-incompleto {
@@ -466,6 +505,9 @@
         padding: 4px 8px;
         border-radius: 12px;
         font-size: 0.8em;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
 
     /* Estilos para modais de confirmação - PADRONIZADO */

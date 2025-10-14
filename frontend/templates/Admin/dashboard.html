@@ -3,337 +3,507 @@
 {% block title %}Dashboard - CupcakeStore{% endblock %}
 
 {% block content %}
-    <!-- 🔽 NOVO GRID DE ESTATÍSTICAS -->
-    <div class="dashboard-grid">
-        <div class="stat-card">
-            <div class="stat-icon">👥</div>
-            <div class="stat-number" data-stat="usuarios">{{ total_usuarios }}</div>
-            <div class="stat-label">Total de Usuários</div>
-            <small>Clientes cadastrados</small>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">📦</div>
-            <div class="stat-number" data-stat="pedidos">{{ total_pedidos }}</div>
-            <div class="stat-label">Pedidos Realizados</div>
-            <small>Vendas totais</small>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-number" data-stat="vendas">R$ {{ "%.2f"|format(total_vendas) }}</div>
-            <div class="stat-label">Faturamento Total</div>
-            <small>Receita acumulada</small>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">🧁</div>
-            <div class="stat-number" data-stat="produtos">{{ total_produtos }}</div>
-            <div class="stat-label">Produtos Ativos</div>
-            <small>Cupcakes cadastrados</small>
-        </div>
+<!-- 🔽 NOVO GRID DE ESTATÍSTICAS -->
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-number" data-stat="usuarios">{{ total_usuarios }}</div>
+        <div class="stat-label">Total de Usuários</div>
+        <small>Clientes cadastrados</small>
     </div>
 
-    <!-- 🔽 SEÇÃO DE GRÁFICOS -->
-    <div class="charts-grid">
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">📈 Vendas por Mês</h3>
-            </div>
-            <canvas id="vendasChart" height="250"></canvas>
-        </div>
-
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">🎂 Produtos Mais Vendidos</h3>
-            </div>
-            <canvas id="produtosChart" height="250"></canvas>
-        </div>
-
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">📊 Status dos Pedidos</h3>
-            </div>
-            <canvas id="statusChart" height="250"></canvas>
-        </div>
-
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">👥 Novos Usuários</h3>
-            </div>
-            <canvas id="usuariosChart" height="250"></canvas>
-        </div>
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-number" data-stat="pedidos">{{ total_pedidos }}</div>
+        <div class="stat-label">Pedidos Realizados</div>
+        <small>Vendas totais</small>
     </div>
 
-    <!-- 🔽 PEDIDOS RECENTES -->
-    <div class="recent-orders">
-        <h2>📦 Pedidos Recentes</h2>
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-number" data-stat="vendas">R$ {{ "%.2f"|format(total_vendas) }}</div>
+        <div class="stat-label">Faturamento Total</div>
+        <small>Receita acumulada</small>
+    </div>
 
-        {% if pedidos_recentes %}
-        {% for pedido in pedidos_recentes %}
-        <div class="order-item">
-            <div class="order-info">
-                <strong>Pedido #{{ pedido['id'] }}</strong>
-                <br>
-                <small>Cliente: {{ pedido['username'] }}</small>
-                <br>
-                <small>Total: R$ {{ "%.2f"|format(pedido['total_amount']) }}</small>
-                <br>
-                <small>Data: {{ pedido['created_at'] }}</small>
-            </div>
-            <div class="order-actions">
-                <span class="status-badge status-{{ pedido['status'] }}">
+    <div class="stat-card">
+        <div class="stat-icon">🧁</div>
+        <div class="stat-number" data-stat="produtos">{{ total_produtos }}</div>
+        <div class="stat-label">Produtos Ativos</div>
+        <small>Cupcakes cadastrados</small>
+    </div>
+</div>
+
+<!-- 🔽 SEÇÃO DE GRÁFICOS -->
+<div class="charts-grid">
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">📈 Vendas por Mês</h3>
+        </div>
+        <canvas id="vendasChart" height="250"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">🎂 Produtos Mais Vendidos</h3>
+        </div>
+        <canvas id="produtosChart" height="250"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">📊 Status dos Pedidos</h3>
+        </div>
+        <canvas id="statusChart" height="250"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">👥 Novos Usuários</h3>
+        </div>
+        <canvas id="usuariosChart" height="250"></canvas>
+    </div>
+</div>
+
+<!-- 🔽 PEDIDOS RECENTES CORRIGIDOS -->
+<div class="recent-orders">
+    <h2>📦 Pedidos Recentes</h2>
+
+    {% if pedidos_recentes %}
+    {% for pedido in pedidos_recentes %}
+    <div class="order-item {{ pedido['status'] }}">
+        <div class="order-header">
+            <div class="order-main-info">
+                <h4>Pedido #{{ pedido['id'] }}</h4>
+                <span class="order-status status-{{ pedido['status'] }}">
+                    <i class="fas 
+                        {% if pedido['status'] == 'pendente' %}fa-clock
+                        {% elif pedido['status'] == 'processando' %}fa-cogs
+                        {% elif pedido['status'] == 'pronto' %}fa-check-circle
+                        {% elif pedido['status'] == 'enviado' %}fa-shipping-fast
+                        {% elif pedido['status'] == 'entregue' %}fa-home
+                        {% elif pedido['status'] == 'cancelado' %}fa-times-circle
+                        {% endif %}">
+                    </i>
                     {{ pedido['status']|title }}
                 </span>
             </div>
         </div>
-        {% endfor %}
-        {% else %}
-        <p>Nenhum pedido recente.</p>
-        {% endif %}
+        
+        <div class="order-details">
+            <div class="order-info-grid">
+                <div class="info-item">
+                    <strong>Cliente:</strong> {{ pedido['username'] }}
+                </div>
+                <div class="info-item">
+                    <strong>Data:</strong> {{ pedido['created_at'] }}
+                </div>
+                <div class="info-item">
+                    <strong>Total:</strong> R$ {{ "%.2f"|format(pedido['total_amount']) }}
+                </div>
+                <div class="info-item">
+                    <strong>Pagamento:</strong>
+                    {% if pedido['metodo_pagamento'] == 'dinheiro' %}💵 Dinheiro{% endif %}
+                    {% if pedido['metodo_pagamento'] == 'cartao' %}💳 Cartão{% endif %}
+                    {% if pedido['metodo_pagamento'] == 'pix' %}📱 PIX{% endif %}
+                    {% if not pedido['metodo_pagamento'] %}💳 Cartão (padrão){% endif %}
+                </div>
+                <div class="info-item">
+                    <strong>Entrega:</strong>
+                    {% if pedido['forma_entrega'] == 'delivery' %}🚚 Delivery{% endif %}
+                    {% if pedido['forma_entrega'] == 'retirada' %}🏪 Retirada{% endif %}
+                    {% if not pedido['forma_entrega'] %}🚚 Delivery (padrão){% endif %}
+                </div>
+            </div>
+            
+            <div class="order-items">
+                <strong>Itens do Pedido:</strong>
+                {% if pedido.order_data %}
+                    {% set order_data = pedido.order_data %}
+                    {% if order_data is string %}
+                        {% set order_data = order_data|parse_json %}
+                    {% endif %}
+                    
+                    <div class="items-list">
+                        {% if order_data.itens is defined %}
+                            {% for item in order_data.itens %}
+                            <div class="item">
+                                {{ item.quantidade }}x {{ item.nome }} - R$ {{ "%.2f"|format(item.preco * item.quantidade) }}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            {% for item in order_data %}
+                            <div class="item">
+                                {% if item.quantidade %}{{ item.quantidade }}x {% endif %}
+                                {{ item.nome if item.nome else 'Item' }} - R$ 
+                                {% if item.preco and item.quantidade %}
+                                {{ "%.2f"|format(item.preco * item.quantidade) }}
+                                {% elif item.preco %}
+                                {{ "%.2f"|format(item.preco) }}
+                                {% else %}
+                                0.00
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p>Nenhum item disponível</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
+    {% endfor %}
+    {% else %}
+    <p>Nenhum pedido recente.</p>
+    {% endif %}
+</div>
 
-    <style>
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
 
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
 
-        .stat-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
+    .stat-icon {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+    }
+
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #ff6b8b;
+        margin: 10px 0;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 1.1em;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .chart-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .chart-title {
+        color: #ff6b8b;
+        margin: 0;
+    }
+
+    /* 👇 ESTILOS PARA PEDIDOS RECENTES NO DASHBOARD */
+    .recent-orders {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+    }
+
+    .order-item {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid;
+        transition: transform 0.3s ease;
+    }
+
+    .order-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 👇 CORES DAS BORDAS LATERAIS (IGUAL AO ADMIN/PEDIDOS) */
+    .order-item.pendente {
+        border-left-color: #f39c12;
+    }
+
+    .order-item.processando {
+        border-left-color: #3498db;
+    }
+
+    .order-item.pronto {
+        border-left-color: #9b59b6;
+    }
+
+    .order-item.enviado {
+        border-left-color: #1abc9c;
+    }
+
+    .order-item.entregue {
+        border-left-color: #27ae60;
+    }
+
+    .order-item.cancelado {
+        border-left-color: #2c3e50;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .order-main-info h4 {
+        color: #ff6b8b;
+        margin: 0;
+    }
+
+    .order-status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-pendente {
+        background: #fef5e7;
+        color: #b06c0f;
+    }
+
+    .status-processando {
+        background: #e8f4fd;
+        color: #1a5d8a;
+    }
+
+    .status-pronto {
+        background: #f4ecf7;
+        color: #6c3483;
+    }
+
+    .status-enviado {
+        background: #e8f6f3;
+        color: #117864;
+    }
+
+    .status-entregue {
+        background: #eafaf1;
+        color: #196f3d;
+    }
+
+    .status-cancelado {
+        background: #ecf0f1;
+        color: #2c3e50;
+    }
+
+    .order-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .info-item {
+        padding: 8px;
+        background: white;
+        border-radius: 8px;
+        font-size: 0.9em;
+    }
+
+    .order-items {
+        margin-top: 15px;
+    }
+
+    .items-list {
+        max-height: 150px;
+        overflow-y: auto;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 8px;
+    }
+
+    .item {
+        padding: 5px 0;
+        border-bottom: 1px solid #f1f1f1;
+        font-size: 0.9em;
+    }
+
+    .item:last-child {
+        border-bottom: none;
+    }
+
+    @media (max-width: 768px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
         }
 
         .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #ff6b8b;
-            margin: 10px 0;
+            font-size: 2em;
         }
 
-        .stat-label {
-            color: #666;
-            font-size: 1.1em;
+        .order-info-grid {
+            grid-template-columns: 1fr;
         }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+        
+        .order-header {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
         }
+    }
+</style>
 
-        .chart-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .chart-title {
-            color: #ff6b8b;
-            margin: 0;
-        }
-
-        .recent-orders {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            margin: 10px 0;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #ff6b8b;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-
-        .status-pendente {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-processando {
-            background: #cce7ff;
-            color: #004085;
-        }
-
-        .status-enviado {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-entregue {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        @media (max-width: 768px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-number {
-                font-size: 2em;
-            }
-        }
-    </style>
-
-    <script>
-        // 🔽 DADOS FIXOS PARA TESTE - AGORA COM DADOS REAIS
-        document.addEventListener('DOMContentLoaded', function () {
-            try {
-                // 1. Gráfico de Vendas (usando dados reais se disponíveis)
-                const vendasCtx = document.getElementById('vendasChart');
-                if (vendasCtx) {
-                    new Chart(vendasCtx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                            datasets: [{
-                                label: 'Vendas Mensais (R$)',
-                                data: [1500, 2300, 1800, 2100, 1900, 2500, 2200, 2400, 2600, 2800, 3000, 3200],
-                                borderColor: '#ff6b8b',
-                                backgroundColor: 'rgba(255, 107, 139, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                borderWidth: 3
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: { 
-                                legend: { 
-                                    position: 'top',
-                                    labels: {
-                                        font: {
-                                            family: 'Poppins'
-                                        }
+<script>
+    // 🔽 DADOS FIXOS PARA TESTE - AGORA COM DADOS REAIS
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            // 1. Gráfico de Vendas (usando dados reais se disponíveis)
+            const vendasCtx = document.getElementById('vendasChart');
+            if (vendasCtx) {
+                new Chart(vendasCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                        datasets: [{
+                            label: 'Vendas Mensais (R$)',
+                            data: [1500, 2300, 1800, 2100, 1900, 2500, 2200, 2400, 2600, 2800, 3000, 3200],
+                            borderColor: '#ff6b8b',
+                            backgroundColor: 'rgba(255, 107, 139, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { 
+                            legend: { 
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        family: 'Poppins'
                                     }
-                                } 
-                            }
+                                }
+                            } 
                         }
-                    });
-                }
+                    }
+                });
+            }
 
-                // 2. Gráfico de Produtos
-                const produtosCtx = document.getElementById('produtosChart');
-                if (produtosCtx) {
-                    new Chart(produtosCtx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Chocolate', 'Baunilha', 'Morango', 'Red Velvet', 'Limão'],
-                            datasets: [{
-                                data: [45, 30, 25, 20, 15],
-                                backgroundColor: [
-                                    '#ff6b8b', '#3498db', '#27ae60', '#f39c12', '#9b59b6'
-                                ]
-                            }]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        font: {
-                                            family: 'Poppins'
-                                        }
+            // 2. Gráfico de Produtos
+            const produtosCtx = document.getElementById('produtosChart');
+            if (produtosCtx) {
+                new Chart(produtosCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Chocolate', 'Baunilha', 'Morango', 'Red Velvet', 'Limão'],
+                        datasets: [{
+                            data: [45, 30, 25, 20, 15],
+                            backgroundColor: [
+                                '#ff6b8b', '#3498db', '#27ae60', '#f39c12', '#9b59b6'
+                            ]
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        family: 'Poppins'
                                     }
                                 }
                             }
                         }
-                    });
-                }
-
-                // 3. Gráfico de Status
-                const statusCtx = document.getElementById('statusChart');
-                if (statusCtx) {
-                    new Chart(statusCtx, {
-                        type: 'pie',
-                        data: {
-                            labels: ['Pendente', 'Processando', 'Enviado', 'Entregue'],
-                            datasets: [{
-                                data: [5, 3, 8, 15],
-                                backgroundColor: ['#fff3cd', '#cce7ff', '#d4edda', '#d1ecf1']
-                            }]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        font: {
-                                            family: 'Poppins'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                // 4. Gráfico de Usuários
-                const usuariosCtx = document.getElementById('usuariosChart');
-                if (usuariosCtx) {
-                    new Chart(usuariosCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                            datasets: [{
-                                label: 'Novos Usuários',
-                                data: [3, 5, 2, 4, 6, 3],
-                                backgroundColor: '#3498db'
-                            }]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        font: {
-                                            family: 'Poppins'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-
-            } catch (error) {
-                console.error('❌ Erro ao carregar gráficos:', error);
+                    }
+                });
             }
-        });
-    </script>
+
+            // 3. Gráfico de Status
+            const statusCtx = document.getElementById('statusChart');
+            if (statusCtx) {
+                new Chart(statusCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Pendente', 'Processando', 'Enviado', 'Entregue'],
+                        datasets: [{
+                            data: [5, 3, 8, 15],
+                            backgroundColor: ['#fff3cd', '#cce7ff', '#d4edda', '#d1ecf1']
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        family: 'Poppins'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 4. Gráfico de Usuários
+            const usuariosCtx = document.getElementById('usuariosChart');
+            if (usuariosCtx) {
+                new Chart(usuariosCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        datasets: [{
+                            label: 'Novos Usuários',
+                            data: [3, 5, 2, 4, 6, 3],
+                            backgroundColor: '#3498db'
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        family: 'Poppins'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao carregar gráficos:', error);
+        }
+    });
+</script>
 {% endblock %}

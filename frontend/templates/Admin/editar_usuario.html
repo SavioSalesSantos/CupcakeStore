@@ -81,7 +81,9 @@
         }
 
         .user-type-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 8px 16px;
             border-radius: 25px;
             font-weight: bold;
@@ -343,13 +345,19 @@
         <div class="form-editar">
             <h2>Editar Usuário</h2>
 
-            <!-- Badge de tipo de usuário -->
+            <!-- Badge de tipo de usuário COM ÍCONES -->
             {% if usuario.email == 'saviosales@cupcakestore.com' %}
-            <div class="user-type-badge badge-master">👑 Conta Master</div>
+            <div class="user-type-badge badge-master">
+                <i class="fas fa-crown"></i> Conta Master
+            </div>
             {% elif usuario.is_admin == 1 %}
-            <div class="user-type-badge badge-admin">Administrador</div>
+            <div class="user-type-badge badge-admin">
+                <i class="fas fa-user-shield"></i> Administrador
+            </div>
             {% else %}
-            <div class="user-type-badge badge-user">Usuário</div>
+            <div class="user-type-badge badge-user">
+                <i class="fas fa-user"></i> Usuário
+            </div>
             {% endif %}
 
             <form action="{{ url_for('admin_editar_usuario', user_id=usuario.id) }}" method="POST" id="formEditarUsuarioAdmin">
