@@ -84,6 +84,15 @@
                 </p>
             </div>
             <span class="pedido-status status-{{ pedido['status'] }}">
+                <i class="fas 
+                    {% if pedido['status'] == 'pendente' %}fa-clock
+                    {% elif pedido['status'] == 'processando' %}fa-cogs
+                    {% elif pedido['status'] == 'pronto' %}fa-check-circle
+                    {% elif pedido['status'] == 'enviado' %}fa-shipping-fast
+                    {% elif pedido['status'] == 'entregue' %}fa-home
+                    {% elif pedido['status'] == 'cancelado' %}fa-times-circle
+                    {% endif %}">
+                </i>
                 {{ pedido['status']|title }}
             </span>
         </div>
@@ -127,24 +136,43 @@
             <p>Nenhum item disponível</p>
             {% endif %}
         </div>
-
-        <div class="pedido-acoes">
-            <select class="select-status" id="status-{{ pedido['id'] }}">
-                <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>Pendente</option>
-                <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>Processando
-                </option>
-                <option value="pronto" {% if pedido['status']=='pronto' %}selected{% endif %}>Pronto</option>
-                <option value="enviado" {% if pedido['status']=='enviado' %}selected{% endif %}>Enviado</option>
-                <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>Entregue</option>
-                <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>Cancelado</option>
-            </select>
-            <button class="btn-atualizar" onclick="abrirModalAtualizarStatus({{ pedido['id'] }})">
-                <i class="fas fa-save"></i> Atualizar
+        <div class="pedido-acoes-dropdown">
+            <button class="dropdown-trigger-pedido" onclick="toggleDropdown(this)">
+                <i class="fas fa-cog"></i> Ações
+                <i class="fas fa-chevron-down dropdown-arrow"></i>
             </button>
-            <button class="btn-atualizar" style="background: linear-gradient(135deg, #ff6b8b, #ff4d73);"
-                onclick="abrirModalExclusaoPedido({{ pedido['id'] }}, {{ pedido['total_amount'] }})">
-                <i class="fas fa-trash-alt"></i> Excluir
-            </button>
+            <div class="dropdown-content-pedido">
+                <div class="status-section">
+                    <label for="status-{{ pedido['id'] }}"><i class="fas fa-exchange-alt"></i> Alterar Status:</label>
+                    <select class="select-status" id="status-{{ pedido['id'] }}">
+                        <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>
+                            <i class="fas fa-clock"></i> Pendente
+                        </option>
+                        <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>
+                            <i class="fas fa-cogs"></i> Processando
+                        </option>
+                        <option value="pronto" {% if pedido['status']=='pronto' %}selected{% endif %}>
+                            <i class="fas fa-check-circle"></i> Pronto
+                        </option>
+                        <option value="enviado" {% if pedido['status']=='enviado' %}selected{% endif %}>
+                            <i class="fas fa-shipping-fast"></i> Enviado
+                        </option>
+                        <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>
+                            <i class="fas fa-home"></i> Entregue
+                        </option>
+                        <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>
+                            <i class="fas fa-times-circle"></i> Cancelado
+                        </option>
+                    </select>
+                </div>
+                <button class="dropdown-item-pedido" onclick="abrirModalAtualizarStatus({{ pedido['id'] }})">
+                    <i class="fas fa-save"></i> Atualizar Status
+                </button>
+                <button class="dropdown-item-pedido btn-excluir"
+                    onclick="abrirModalExclusaoPedido({{ pedido['id'] }}, {{ pedido['total_amount'] }})">
+                    <i class="fas fa-trash-alt"></i> Excluir Pedido
+                </button>
+            </div>
         </div>
     </div>
     {% endfor %}
@@ -152,9 +180,11 @@
     <div class="nenhum-pedido">
         <h2><i class="fas fa-box-open"></i> Nenhum pedido encontrado</h2>
         <p>Não há pedidos com o status selecionado.</p>
-        <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
-            <i class="fas fa-boxes"></i> Ver Todos os Pedidos
-        </button>
+        <div class="btn-container">
+            <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
+                <i class="fas fa-boxes"></i> Ver Todos os Pedidos
+            </button>
+        </div>
     </div>
     {% endif %}
 </div>
@@ -167,7 +197,8 @@
             <span class="modal-confirmacao-fechar" onclick="fecharModalAtualizarStatus()">&times;</span>
         </div>
         <div class="modal-confirmacao-corpo">
-            <p>Tem certeza que deseja atualizar o status do pedido <strong id="id-pedido-atualizar">#000</strong>?</p>
+            <p>Tem certeza que deseja atualizar o status do pedido <strong id="id-pedido-atualizar">#000</strong>?
+            </p>
             <p>Novo status: <strong id="novo-status-atualizar">Pendente</strong></p>
         </div>
         <div class="modal-confirmacao-rodape">
@@ -258,6 +289,42 @@
     // 👇 VARIÁVEIS GLOBAIS PARA ATUALIZAR STATUS
     let pedidoIdParaAtualizar = null;
     let novoStatusParaAtualizar = null;
+
+    // 👇 FUNÇÃO PARA TOGGLE DO DROPDOWN
+    function toggleDropdown(button) {
+        const dropdownContent = button.nextElementSibling;
+        const dropdownArrow = button.querySelector('.dropdown-arrow');
+        const allDropdowns = document.querySelectorAll('.dropdown-content-pedido');
+        const allArrows = document.querySelectorAll('.dropdown-arrow');
+        
+        // Fecha todos os outros dropdowns e reseta setas
+        allDropdowns.forEach(dropdown => {
+            if (dropdown !== dropdownContent) {
+                dropdown.classList.remove('active');
+            }
+        });
+        allArrows.forEach(arrow => {
+            if (arrow !== dropdownArrow) {
+                arrow.classList.remove('active');
+            }
+        });
+        
+        // Alterna o dropdown atual e a seta
+        dropdownContent.classList.toggle('active');
+        dropdownArrow.classList.toggle('active');
+    }
+
+    // Fecha dropdowns ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.pedido-acoes-dropdown')) {
+            document.querySelectorAll('.dropdown-content-pedido').forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+            document.querySelectorAll('.dropdown-arrow').forEach(arrow => {
+                arrow.classList.remove('active');
+            });
+        }
+    });
 
     // 👇 FILTRAR POR STATUS
     function filtrarPorStatus(status) {
@@ -395,8 +462,8 @@
 
     // 👇 FUNÇÕES PARA EXCLUSÃO DE TODOS OS PEDIDOS
     function abrirModalExcluirTodos() {
-    document.getElementById('total-pedidos-excluir').textContent = {{ pedidos | length }};
-    document.getElementById('modalExcluirTodos').style.display = 'block';
+        document.getElementById('total-pedidos-excluir').textContent = {{ pedidos | length }};
+        document.getElementById('modalExcluirTodos').style.display = 'block';
     }
 
     function fecharModalExcluirTodos() {
@@ -452,7 +519,6 @@
         }
     });
 </script>
-
 <style>
     .estatisticas {
         display: grid;
@@ -492,11 +558,14 @@
         cursor: pointer;
         font-weight: bold;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
     }
 
     .btn-status.todos {
         background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-        color: white;
     }
 
     .btn-status.todos:hover {
@@ -506,43 +575,83 @@
     }
 
     .btn-status.pendente {
-        background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-        color:  white;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+    }
+
+    .btn-status.pendente:hover {
+        background: linear-gradient(135deg, #e67e22, #d35400);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
     }
 
     .btn-status.processando {
-        background: linear-gradient(135deg, #81ecec, #74b9ff);
-        color: white;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+
+    .btn-status.processando:hover {
+        background: linear-gradient(135deg, #2980b9, #1f618d);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
     }
 
     .btn-status.pronto {
-        background: linear-gradient(135deg, #a29bfe, #6c5ce7);
-        color: white;
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    }
+
+    .btn-status.pronto:hover {
+        background: linear-gradient(135deg, #8e44ad, #7d3c98);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
     }
 
     .btn-status.enviado {
-        background: linear-gradient(135deg, #00b894, #00a085);
-        color: white;
+        background: linear-gradient(135deg, #1abc9c, #16a085);
+    }
+
+    .btn-status.enviado:hover {
+        background: linear-gradient(135deg, #16a085, #138d75);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4);
     }
 
     .btn-status.entregue {
-        background: linear-gradient(135deg, #55efc4, #00b894);
-        color: white;
+        background: linear-gradient(135deg, #27ae60, #219652);
+    }
+
+    .btn-status.entregue:hover {
+        background: linear-gradient(135deg, #219652, #1e8449);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
     }
 
     .btn-status.cancelado {
-        background: linear-gradient(135deg, #636e72, #2d3436);
-        color: white;
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+    }
+
+    .btn-status.cancelado:hover {
+        background: linear-gradient(135deg, #34495e, #2c3e50);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
     }
 
     .btn-status.reset-numeracao {
         background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        color: white;
+    }
+
+    .btn-status.reset-numeracao:hover {
+        background: linear-gradient(135deg, #8e44ad, #7d3c98);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
     }
 
     .btn-status.excluir-todos {
         background: linear-gradient(135deg, #e74c3c, #c0392b);
-        color: white;
+    }
+
+    .btn-status.excluir-todos:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
     }
 
     .btn-status:hover {
@@ -557,8 +666,9 @@
 
     .pedidos-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
     }
 
     .pedido-card {
@@ -567,6 +677,13 @@
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         border-left: 5px solid;
+        transition: transform 0.3s ease;
+        min-height: 380px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
     }
 
     .pedido-card:hover {
@@ -575,27 +692,27 @@
     }
 
     .pedido-card.pendente {
-        border-left-color: #fdcb6e;
+        border-left-color: #f39c12;
     }
 
     .pedido-card.processando {
-        border-left-color: #74b9ff;
+        border-left-color: #3498db;
     }
 
     .pedido-card.pronto {
-        border-left-color: #a29bfe;
+        border-left-color: #9b59b6;
     }
 
     .pedido-card.enviado {
-        border-left-color: #6c5ce7;
+        border-left-color: #1abc9c;
     }
 
     .pedido-card.entregue {
-        border-left-color: #00b894;
+        border-left-color: #27ae60;
     }
 
     .pedido-card.cancelado {
-        border-left-color: #636e72;
+        border-left-color: #2c3e50;
     }
 
     .pedido-header {
@@ -615,36 +732,39 @@
         border-radius: 20px;
         font-weight: bold;
         font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .status-pendente {
-        background: #fff3cd;
-        color: #856404;
+        background: #fef5e7;
+        color: #b06c0f;
     }
 
     .status-processando {
-        background: #cce7ff;
-        color: #004085;
+        background: #e8f4fd;
+        color: #1a5d8a;
     }
 
     .status-pronto {
-        background: #e0cffc;
-        color: #4a3c7d;
+        background: #f4ecf7;
+        color: #6c3483;
     }
 
     .status-enviado {
-        background: #d4edda;
-        color: #155724;
+        background: #e8f6f3;
+        color: #117864;
     }
 
     .status-entregue {
-        background: #d1ecf1;
-        color: #0c5460;
+        background: #eafaf1;
+        color: #196f3d;
     }
 
     .status-cancelado {
-        background: #f8d7da;
-        color: #721c24;
+        background: #ecf0f1;
+        color: #2c3e50;
     }
 
     .pedido-detalhes {
@@ -655,6 +775,7 @@
         margin-top: 15px;
         padding-top: 15px;
         border-top: 1px dashed #ddd;
+        flex-grow: 1;
     }
 
     .item-pedido {
@@ -664,49 +785,156 @@
         font-size: 0.9em;
     }
 
-    .pedido-acoes {
-        display: flex;
-        gap: 10px;
+    /* 🔽 DROPDOWN CORRIGIDO - COM FUNDO ROSA */
+    .pedido-acoes-dropdown {
+        position: relative;
+        display: block;
         margin-top: 20px;
+        z-index: 10;
+    }
+
+    .dropdown-trigger-pedido {
+        display: flex;
         align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .select-status {
-        flex: 1;
-        min-width: 150px;
-        padding: 8px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-    }
-
-    .btn-atualizar {
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
         background: linear-gradient(135deg, #ff6b8b, #ff4d73);
         color: white;
-        padding: 8px 16px;
         border: none;
-        border-radius: 8px;
+        border-radius: 25px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 600;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+        font-size: 14px;
+        width: 100%;
     }
 
-    .btn-atualizar:hover {
+    .dropdown-trigger-pedido:hover {
         background: linear-gradient(135deg, #ff4d73, #ff3366);
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
     }
 
+    .dropdown-arrow {
+        transition: transform 0.3s ease;
+    }
+
+    .dropdown-arrow.active {
+        transform: rotate(180deg);
+    }
+
+    .dropdown-content-pedido {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        min-width: 280px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        z-index: 1000;
+        overflow: hidden;
+        margin-bottom: 10px;
+        border: none;
+    }
+
+    .dropdown-content-pedido.active {
+        display: block;
+    }
+
+    .status-section {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .status-section label {
+        display: block;
+        color: white;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .dropdown-content-pedido .select-status {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        font-size: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+    }
+
+    .dropdown-content-pedido .select-status option {
+        background: #ff6b8b;
+        color: white;
+        padding: 8px;
+    }
+
+    .dropdown-item-pedido {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 20px;
+        text-decoration: none;
+        color: white;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .dropdown-item-pedido:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .dropdown-item-pedido:last-child {
+        border-bottom: none;
+    }
+
+    .btn-excluir:hover {
+        background: rgba(231, 76, 60, 0.3) !important;
+    }
+
+    /* 🔽 ESTILO PARA NENHUM PEDIDO - BOTÃO CENTRALIZADO */
     .nenhum-pedido {
         text-align: center;
         padding: 50px;
         background: white;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
     }
 
-    /* 🔽 CORREÇÃO: BOTÕES DOS MODAIS COM ESTILOS CORRETOS */
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* 🔽 CORREÇÃO: BOTÕES CANCELAR PADRONIZADOS EM ROSA */
     .btn-modal {
         display: inline-flex;
         align-items: center;
@@ -733,15 +961,15 @@
     }
 
     .btn-modal-cancelar:hover {
-        background: linear-gradient(135deg, #ff4d73, #9b59b6);
+        background: linear-gradient(135deg, #ff4d73, #ff3366);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
     }
 
     .btn-modal-confirmar:hover {
-        background: linear-gradient(135deg, #ff4d73, #9b59b6);
+        background: linear-gradient(135deg, #ff4d73, #ff3366);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
+        box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
     }
 
     /* Estilos para modais de confirmação - PADRONIZADO */
@@ -819,15 +1047,6 @@
             gap: 10px;
         }
 
-        .pedido-acoes {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .select-status {
-            min-width: 100%;
-        }
-
         .modal-confirmacao-rodape {
             flex-direction: column;
         }
@@ -836,61 +1055,19 @@
             width: 100%;
             justify-content: center;
         }
-    }
 
-    /* Estilo para ícones nos botões de status */
-    .btn-status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 25px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
+        .dropdown-content-pedido {
+            position: fixed;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            width: 90%;
+            max-width: 300px;
+        }
 
-    .btn-status i {
-        color: white;
-        font-size: 14px;
-        width: 16px;
-        text-align: center;
-    }
-
-    /* Estilo para ícones nos botões de ação */
-    .btn-atualizar {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        font-size: 14px;
-    }
-
-    .btn-atualizar i {
-        color: white;
-        font-size: 12px;
-    }
-
-    /* Garantir que os ícones fiquem brancos em todos os estados */
-    .btn-status i,
-    .btn-atualizar i {
-        color: white !important;
-    }
-
-    /* Ajuste para os selects ficarem alinhados */
-    .select-status {
-        padding: 8px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
+        .nenhum-pedido {
+            padding: 30px 20px;
+        }
     }
 </style>
 {% endblock %}
