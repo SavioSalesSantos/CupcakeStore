@@ -214,7 +214,8 @@
 
         /* 🔽 CORREÇÃO: HOVER ROXO E TEXTO BRANCO */
         .dropdown-item:hover {
-            background: rgba(155, 89, 182, 0.3); /* Cor roxa com transparência */
+            background: rgba(155, 89, 182, 0.3);
+            /* Cor roxa com transparência */
             color: white !important;
             transform: translateX(5px);
         }
@@ -461,11 +462,11 @@
         }
 
         .user-menu .fa-chevron-down {
-            transform: rotate(0deg);
+            transform: rotate(180deg);
         }
 
         .user-menu:hover .fa-chevron-down {
-            transform: rotate(180deg);
+            transform: rotate(0deg);
         }
 
         /* 🔽 RESPONSIVIDADE CORRIGIDA */
@@ -506,7 +507,7 @@
             .grid-produtos {
                 grid-template-columns: 1fr;
             }
-            
+
             /* 🔽 CORREÇÃO RESPONSIVA PARA DROPDOWN */
             .dropdown-content {
                 position: static;

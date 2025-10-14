@@ -24,38 +24,38 @@
     <div class="filtro-status">
         <button class="btn-status todos {% if status_filter == 'todos' %}ativo{% endif %}"
             onclick="filtrarPorStatus('todos')">
-            📦 Todos
+            <i class="fas fa-boxes"></i> Todos
         </button>
         <button class="btn-status pendente {% if status_filter == 'pendente' %}ativo{% endif %}"
             onclick="filtrarPorStatus('pendente')">
-            ⏳ Pendentes
+            <i class="fas fa-clock"></i> Pendentes
         </button>
         <button class="btn-status processando {% if status_filter == 'processando' %}ativo{% endif %}"
             onclick="filtrarPorStatus('processando')">
-            🧑‍🍳 Processando
+            <i class="fas fa-cogs"></i> Processando
         </button>
         <button class="btn-status pronto {% if status_filter == 'pronto' %}ativo{% endif %}"
             onclick="filtrarPorStatus('pronto')">
-            ✅ Prontos
+            <i class="fas fa-check-circle"></i> Prontos
         </button>
         <button class="btn-status enviado {% if status_filter == 'enviado' %}ativo{% endif %}"
             onclick="filtrarPorStatus('enviado')">
-            🚚 Enviados
+            <i class="fas fa-shipping-fast"></i> Enviados
         </button>
         <button class="btn-status entregue {% if status_filter == 'entregue' %}ativo{% endif %}"
             onclick="filtrarPorStatus('entregue')">
-            🏠 Entregues
+            <i class="fas fa-home"></i> Entregues
         </button>
         <button class="btn-status cancelado {% if status_filter == 'cancelado' %}ativo{% endif %}"
             onclick="filtrarPorStatus('cancelado')">
-            ❌ Cancelados
+            <i class="fas fa-times-circle"></i> Cancelados
         </button>
         <button class="btn-status reset-numeracao" onclick="abrirModalResetNumeracao()">
-            🔄 Resetar Numeração
+            <i class="fas fa-sync-alt"></i> Resetar Numeração
         </button>
         <button class="btn-status excluir-todos" onclick="abrirModalExcluirTodos()"
             style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-            🗑️ Excluir Todos
+            <i class="fas fa-trash-alt"></i> Excluir Todos
         </button>
     </div>
 </div>
@@ -130,29 +130,30 @@
 
         <div class="pedido-acoes">
             <select class="select-status" id="status-{{ pedido['id'] }}">
-                <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>⏳ Pendente</option>
-                <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>🧑‍🍳 Processando</option>
-                <option value="pronto" {% if pedido['status']=='pronto' %}selected{% endif %}>✅ Pronto</option>
-                <option value="enviado" {% if pedido['status']=='enviado' %}selected{% endif %}>🚚 Enviado</option>
-                <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>🏠 Entregue</option>
-                <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>❌ Cancelado</option>
+                <option value="pendente" {% if pedido['status']=='pendente' %}selected{% endif %}>Pendente</option>
+                <option value="processando" {% if pedido['status']=='processando' %}selected{% endif %}>Processando
+                </option>
+                <option value="pronto" {% if pedido['status']=='pronto' %}selected{% endif %}>Pronto</option>
+                <option value="enviado" {% if pedido['status']=='enviado' %}selected{% endif %}>Enviado</option>
+                <option value="entregue" {% if pedido['status']=='entregue' %}selected{% endif %}>Entregue</option>
+                <option value="cancelado" {% if pedido['status']=='cancelado' %}selected{% endif %}>Cancelado</option>
             </select>
             <button class="btn-atualizar" onclick="abrirModalAtualizarStatus({{ pedido['id'] }})">
-                💾 Atualizar
+                <i class="fas fa-save"></i> Atualizar
             </button>
             <button class="btn-atualizar" style="background: linear-gradient(135deg, #ff6b8b, #ff4d73);"
                 onclick="abrirModalExclusaoPedido({{ pedido['id'] }}, {{ pedido['total_amount'] }})">
-                🗑️ Excluir
+                <i class="fas fa-trash-alt"></i> Excluir
             </button>
         </div>
     </div>
     {% endfor %}
     {% else %}
     <div class="nenhum-pedido">
-        <h2>📦 Nenhum pedido encontrado</h2>
-        <p>Não há pedidos con o status selecionado.</p>
+        <h2><i class="fas fa-box-open"></i> Nenhum pedido encontrado</h2>
+        <p>Não há pedidos com o status selecionado.</p>
         <button class="btn-status todos" onclick="filtrarPorStatus('todos')">
-            Ver Todos os Pedidos
+            <i class="fas fa-boxes"></i> Ver Todos os Pedidos
         </button>
     </div>
     {% endif %}
@@ -394,8 +395,8 @@
 
     // 👇 FUNÇÕES PARA EXCLUSÃO DE TODOS OS PEDIDOS
     function abrirModalExcluirTodos() {
-        document.getElementById('total-pedidos-excluir').textContent = {{ pedidos|length }};
-        document.getElementById('modalExcluirTodos').style.display = 'block';
+    document.getElementById('total-pedidos-excluir').textContent = {{ pedidos | length }};
+    document.getElementById('modalExcluirTodos').style.display = 'block';
     }
 
     function fecharModalExcluirTodos() {
@@ -506,12 +507,12 @@
 
     .btn-status.pendente {
         background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-        color: #d63031;
+        color:  white;
     }
 
     .btn-status.processando {
         background: linear-gradient(135deg, #81ecec, #74b9ff);
-        color: #2d3436;
+        color: white;
     }
 
     .btn-status.pronto {
@@ -835,6 +836,61 @@
             width: 100%;
             justify-content: center;
         }
+    }
+
+    /* Estilo para ícones nos botões de status */
+    .btn-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .btn-status i {
+        color: white;
+        font-size: 14px;
+        width: 16px;
+        text-align: center;
+    }
+
+    /* Estilo para ícones nos botões de ação */
+    .btn-atualizar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #ff6b8b, #ff4d73);
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-atualizar i {
+        color: white;
+        font-size: 12px;
+    }
+
+    /* Garantir que os ícones fiquem brancos em todos os estados */
+    .btn-status i,
+    .btn-atualizar i {
+        color: white !important;
+    }
+
+    /* Ajuste para os selects ficarem alinhados */
+    .select-status {
+        padding: 8px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
     }
 </style>
 {% endblock %}
